@@ -17,14 +17,54 @@
  */
 package org.azkwf.munchkin;
 
+import org.azkwf.munchkin.component.MunchkinFrame;
+
+import com.zaxxer.hikari.HikariDataSource;
+
 /**
- * 
+ *
  * @author Kawakicchi
  */
 public class Munchkin {
 
 	public static void main(final String[] args) {
+
+		Munchkin.getInstance().initialize();
+
 		MunchkinFrame frm = new MunchkinFrame();
 		frm.setVisible(true);
+
+		Munchkin.getInstance().destroy();
 	}
+
+	private static final Munchkin INSTANCE = new Munchkin();
+
+	private HikariDataSource ds;
+
+	private Munchkin() {
+
+	}
+
+	public static Munchkin getInstance() {
+		return INSTANCE;
+	}
+
+	public void initialize() {
+		ds = new HikariDataSource();
+		ds.setDriverClassName("oracle.jdbc.OracleDriver");
+
+		ds.setJdbcUrl("jdbc:oracle:thin:@(DESCRIPTION =(SOURCE_ROUTE=yes)(ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))(CONNECT_DATA =(SERVICE_NAME = XE)))");
+		ds.setUsername("XXX");
+		ds.setPassword("XXX");
+
+	}
+
+	public void destroy() {
+
+	}
+
+	public HikariDataSource getDatasource() {
+		return ds;
+	}
+
 }
