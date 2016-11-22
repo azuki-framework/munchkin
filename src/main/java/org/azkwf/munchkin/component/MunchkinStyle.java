@@ -13,7 +13,7 @@ public class MunchkinStyle {
 	private Font font;
 
 	private MunchkinStyle() {
-		font = new Font("MS ゴシック", Font.PLAIN, 12);
+		font = new Font("Monospaced", Font.PLAIN, 12);
 	}
 
 	public static Font getDefaultFont() {

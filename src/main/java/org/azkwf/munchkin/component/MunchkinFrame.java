@@ -1,6 +1,10 @@
 package org.azkwf.munchkin.component;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -37,12 +41,19 @@ public class MunchkinFrame extends JFrame {
 
 	private JMenu menuTool;
 
+	private JMenu menuToolSql;
+
+	private JMenuItem menuToolSqlSessionList;
+	private JMenuItem menuToolSqlSessionKill;
+
 	private JMenu menuHelp;
+
+	private JMenuItem menuFileConnection;
 
 	private JMenuItem menuFileExit;
 
 	public MunchkinFrame() {
-		setTitle("DBツール");
+		setTitle("Munchkin");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLayout(new BorderLayout());
 
@@ -60,6 +71,27 @@ public class MunchkinFrame extends JFrame {
 		split.setDividerLocation(360);
 		add(split, BorderLayout.CENTER);
 
+		initMenubar();
+
+		pnlObject.addObjectPanelListener(new ObjectPanelListener() {
+			@Override
+			public void objectPanelOnDoubleClick(ObjectEntity object) {
+				pnlQuery.insertText(object.getName());
+			}
+		});
+
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				String msg = String.format("%s : %s", Munchkin.getInstance().getDatasource().getUsername(), Munchkin.getInstance().getDatasource().getJdbcUrl());
+				statusbar.setMessage(msg);
+			}
+		});
+
+		setBounds(0, 0, 1000, 600);
+	}
+
+	private void initMenubar() {
 		menubar = new JMenuBar();
 		setJMenuBar(menubar);
 
@@ -72,16 +104,44 @@ public class MunchkinFrame extends JFrame {
 		menuHelp = new JMenu("ヘルプ");
 		menubar.add(menuHelp);
 
+		menuToolSql = new JMenu("SQL");
+		menuTool.add(menuToolSql);
+
+		menuToolSqlSessionList = new JMenuItem("セッション一覧");
+		menuToolSql.add(menuToolSqlSessionList);
+		menuToolSqlSessionKill = new JMenuItem("セッション切断");
+		menuToolSql.add(menuToolSqlSessionKill);
+
+		menuFileConnection = new JMenuItem("接続");
+		menuFile.add(menuFileConnection);
+
+		menuFile.addSeparator();
+
 		menuFileExit = new JMenuItem("終了");
 		menuFile.add(menuFileExit);
 
-		pnlObject.addObjectPanelListener(new ObjectPanelListener() {
+		menuFileConnection.addActionListener(new ActionListener() {
 			@Override
-			public void objectPanelOnDoubleClick(ObjectEntity object) {
-				pnlQuery.insertText(object.getName());
+			public void actionPerformed(ActionEvent e) {
+				openConnection();
 			}
 		});
 
-		setBounds(0, 0, 1000, 600);
+		menuToolSqlSessionList.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pnlQuery.insertText("select * from v$session\n");
+			}
+		});
+		menuToolSqlSessionKill.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pnlQuery.insertText("alter system kill session 'nnn,nnn' immediate\n");
+			}
+		});
+	}
+
+	private void openConnection() {
+
 	}
 }

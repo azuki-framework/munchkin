@@ -21,7 +21,11 @@
 	<url>https://github.com/azuki-framework/munchkin</url>
 
 	<properties>
+		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyyMMdd_HHmm</maven.build.timestamp.format>
 	</properties>
 
 	<distributionManagement>
@@ -41,12 +45,12 @@
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
-
 		<repository>
 			<id>myteam-nexus</id>
 			<name>public</name>
 			<url>http://10.160.3.25:8081/nexus/content/groups/public</url>
 		</repository>
+
 	</repositories>
 
 	<dependencies>
@@ -97,14 +101,16 @@
 	</dependencies>
 
 	<build>
+		<finalName>${product.name}</finalName>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 
@@ -125,7 +131,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<author>true</author>
-					<source>1.7</source>
+					<source>${java.version}</source>
 					<showPackage>false</showPackage>
 					<showPrivate>true</showPrivate>
 					<encoding>UTF-8</encoding>
@@ -144,7 +150,20 @@
 				</configuration>
 			</plugin>
 		</plugins>
+
 	</build>
 
+	<profiles>
+		<profile>
+			<id>production</id>
+			<properties>
+				<product.name>Munchkin</product.name>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+
+		</profile>
+	</profiles>
 
 </project>

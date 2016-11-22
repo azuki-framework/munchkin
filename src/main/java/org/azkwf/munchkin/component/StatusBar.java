@@ -47,7 +47,7 @@ public class StatusBar extends JComponent {
 				int width = getWidth() - (insets.left + insets.right);
 				int height = getHeight() - (insets.top + insets.bottom);
 
-				label.setSize(width - 8, height - 4);
+				label.setSize(width - (160 + 8), height - 4);
 				progressBar.setBounds(width - (160), insets.top + 2, 160, height - 2);
 			}
 		});

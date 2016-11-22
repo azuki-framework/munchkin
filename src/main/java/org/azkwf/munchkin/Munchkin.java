@@ -17,6 +17,13 @@
  */
 package org.azkwf.munchkin;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.azkwf.munchkin.component.MunchkinFrame;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -34,7 +41,12 @@ public class Munchkin {
 		MunchkinFrame frm = new MunchkinFrame();
 		frm.setVisible(true);
 
-		Munchkin.getInstance().destroy();
+		frm.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				Munchkin.getInstance().destroy();
+			}
+		});
 	}
 
 	private static final Munchkin INSTANCE = new Munchkin();
@@ -51,16 +63,42 @@ public class Munchkin {
 
 	public void initialize() {
 		ds = new HikariDataSource();
-		ds.setDriverClassName("oracle.jdbc.OracleDriver");
+		ds.setConnectionTimeout(60 * 1000);
+		ds.setMaximumPoolSize(1);
 
-		ds.setJdbcUrl("jdbc:oracle:thin:@(DESCRIPTION =(SOURCE_ROUTE=yes)(ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))(CONNECT_DATA =(SERVICE_NAME = XE)))");
-		ds.setUsername("XXX");
-		ds.setPassword("XXX");
+		File file = new File("datasource.properties");
+		if (file.isFile()) {
+
+			Properties p = new Properties();
+
+			FileInputStream stream = null;
+			try {
+				stream = new FileInputStream(file);
+				p.load(stream);
+
+				ds.setDriverClassName(p.getProperty("datasource.driver"));
+				ds.setJdbcUrl(p.getProperty("datasource.url"));
+				ds.setUsername(p.getProperty("datasource.user"));
+				ds.setPassword(p.getProperty("datasource.password"));
+
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			} finally {
+				if (null != stream) {
+					try {
+						stream.close();
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		}
 
 	}
 
 	public void destroy() {
-
+		System.out.println("destory");
+		ds.close();
 	}
 
 	public HikariDataSource getDatasource() {
