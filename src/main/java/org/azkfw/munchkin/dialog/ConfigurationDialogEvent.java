@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -15,16 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkwf.munchkin;
+package org.azkfw.munchkin.dialog;
 
 /**
- * 
+ *
  * @author Kawakicchi
+ * @param <ENTITY> 設定情報
  */
-public class Munchkin {
+public interface ConfigurationDialogEvent<ENTITY> {
 
-	public static void main(final String[] args) {
-		MunchkinFrame frm = new MunchkinFrame();
-		frm.setVisible(true);
-	}
+	public ConfigurationDialog<ENTITY> getSource();
+
+	public void cancel();
+
+	public boolean isCancel();
 }

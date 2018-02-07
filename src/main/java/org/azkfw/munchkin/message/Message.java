@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -15,22 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkwf.munchkin;
+package org.azkfw.munchkin.message;
 
-import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-/**
- * @author Kawakicchi
- *
- */
-public interface DBObjectModel {
+public enum Message {
+	NONE;
 
-	public List<String> getUserList();
-	
-	public List<String> getTypeList();
-	
-	public List<String> getTypeList(final String user);
-	
-	public List<String> getObjectList(final String user, final String type);
-	
+	@Override
+	public String toString() {
+		try {
+			String name = name().toLowerCase().replaceAll("_", ".");
+			return ResourceBundle.getBundle(this.getClass().getName(), Locale.getDefault()).getString(name);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
 }

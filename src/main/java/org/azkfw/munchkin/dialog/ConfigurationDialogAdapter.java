@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -15,45 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkwf.munchkin;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.azkfw.munchkin.dialog;
 
 /**
+ * このインターフェースは、設定ダイアログリスナー機能を定義するインターフェースです。
+ * 
  * @author Kawakicchi
- *
+ * @param <ENTITY> 設定情報
  */
-public class TestDBObjectModel implements DBObjectModel{
+public class ConfigurationDialogAdapter<ENTITY> implements ConfigurationDialogListener<ENTITY> {
 
 	@Override
-	public List<String> getUserList() {
-		List<String> users = new ArrayList<String>();
-		users.add("TESTER");
-		users.add("DEVELOPER");
-		return users;
+	public void configurationDialogCheck(final ConfigurationDialogEvent<ENTITY> event, final ENTITY entity) {
+
 	}
 
 	@Override
-	public List<String> getTypeList(final String user) {
-		return getTypeList();
-	}
-	public List<String> getTypeList() {
-		List<String> types = new ArrayList<String>();
-		types.add("TABLE");
-		types.add("VIEW");
-		types.add("FUNCTION");
-		types.add("DATABASE LINK");
-		return types;
+	public void configurationDialogOk(final ConfigurationDialogEvent<ENTITY> event, final ENTITY entity) {
+
 	}
 
-	/* (non-Javadoc)
-	 * @see org.azkwf.munchkin.DBObjectModel#getObjectList(java.lang.String, java.lang.String)
-	 */
 	@Override
-	public List<String> getObjectList(String user, String type) {
-		// TODO Auto-generated method stub
-		return null;
+	public void configurationDialogCancel(final ConfigurationDialogEvent<ENTITY> event) {
+
 	}
 
 }
