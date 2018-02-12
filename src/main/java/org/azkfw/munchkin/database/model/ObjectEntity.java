@@ -15,35 +15,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.component;
+package org.azkfw.munchkin.database.model;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+/**
+ *
+ * @author Kawakicchi
+ *
+ */
+public class ObjectEntity {
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.EmptyBorder;
+	private final String schema;
+	private final String name;
+	private final String label;
+	private final String type;
 
-public class StatusBar extends JPanel {
+	public ObjectEntity(final String schema, final String name, final String label, final String type) {
+		super();
+		this.schema = schema;
+		this.name = name;
+		this.label = label;
+		this.type = type;
+	}
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = -5638113732514695773L;
+	public String getSchema() {
+		return schema;
+	}
 
-	private final JLabel lblMessage;
+	public String getName() {
+		return name;
+	}
 
-	private final JProgressBar progressBar;
+	public String getLabel() {
+		return label;
+	}
 
-	public StatusBar() {
-		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(0, 30));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
-
-		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
-		progressBar.setPreferredSize(new Dimension(200, 0));
-
-		add(BorderLayout.CENTER, lblMessage);
-		add(BorderLayout.EAST, progressBar);
+	public String getType() {
+		return type;
 	}
 }

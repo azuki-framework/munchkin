@@ -17,16 +17,86 @@
  */
 package org.azkfw.munchkin;
 
-import org.azkfw.munchkin.frame.MunchkinFrame;
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Comparator;
+
+import javax.xml.bind.JAXB;
+
+import org.azkfw.munchkin.entity.MunchkinEntity;
+import org.azkfw.munchkin.entity.SQLHistoryEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * このクラスは、Munchkinクラスです。
  * 
  * @author Kawakicchi
  */
 public class Munchkin {
 
-	public static void main(final String[] args) {
-		final MunchkinFrame frm = new MunchkinFrame();
-		frm.setVisible(true);
+	/** Instance */
+	private static final Munchkin INSTANCE = new Munchkin();
+	/** logger */
+	private static final Logger LOGGER = LoggerFactory.getLogger(Munchkin.class);
+
+	private MunchkinEntity config;
+
+	private final File munchkinDir;
+
+	/**
+	 * コンストラクタ
+	 */
+	private Munchkin() {
+		final File userDir = new File(System.getProperty("user.home"));
+		munchkinDir = Paths.get(userDir.getAbsolutePath(), "Munchkin").toFile();
+		munchkinDir.mkdirs();
+	}
+
+	/**
+	 * インスタンスを取得する。
+	 *
+	 * @return インスタンス
+	 */
+	public static Munchkin getInstance() {
+		return INSTANCE;
+	}
+
+	private File getConfigFile() {
+		return Paths.get(munchkinDir.getAbsolutePath(), "config.xml").toFile();
+	}
+
+	public boolean load() {
+		final File file = getConfigFile();
+
+		if (file.isFile()) {
+			LOGGER.debug("Load config file.");
+			config = JAXB.unmarshal(file, MunchkinEntity.class);
+		} else {
+			config = new MunchkinEntity();
+		}
+
+		Collections.sort(config.getHistorySqls(), new Comparator<SQLHistoryEntity>() {
+			@Override
+			public int compare(final SQLHistoryEntity o1, final SQLHistoryEntity o2) {
+				return o1.getOrder() - o2.getOrder();
+			}
+		});
+
+		return true;
+	}
+
+	public boolean store() {
+		final File file = getConfigFile();
+
+		LOGGER.debug("Store config file.");
+		JAXB.marshal(config, file);
+
+		return true;
+	}
+
+	public MunchkinEntity getConfig() {
+		return config;
 	}
 }

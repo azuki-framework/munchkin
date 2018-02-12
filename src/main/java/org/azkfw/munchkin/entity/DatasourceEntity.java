@@ -17,71 +17,80 @@
  */
 package org.azkfw.munchkin.entity;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * このクラスは、データソース設定を保持するクラスです。
  *
  * @author Kawakicchi
  */
+@XmlType(propOrder = { "name", "user", "password", "driver", "url" })
 public class DatasourceEntity {
 
-	/** 名前 */
+	/** データソース名 */
 	private String name;
+
 	/** ユーザ名 */
 	private String user;
 	/** パスワード */
 	private String password;
 	/** ドライバ */
 	private String driver;
-	/** URL */
+	/** 接続文字列 */
 	private String url;
 
 	/**
-	 * nameを取得する。
+	 * データソース名 を取得する。
 	 *
-	 * @return name
+	 * @return データソース名
 	 */
+	@XmlAttribute
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * nameを設定する。
+	 * データソース名 を設定する。
 	 *
-	 * @param name name
+	 * @param name データソース名
 	 */
 	public void setName(final String name) {
 		this.name = name;
 	}
 
 	/**
-	 * userを取得する。
+	 * ユーザ名 を取得する。
 	 *
-	 * @return user
+	 * @return ユーザ名
 	 */
+	@XmlElement
 	public String getUser() {
 		return user;
 	}
 
 	/**
-	 * userを設定する。
+	 * ユーザ名 を設定する。
 	 *
-	 * @param user ss
+	 * @param user ユーザ名
 	 */
 	public void setUser(final String user) {
 		this.user = user;
 	}
 
 	/**
-	 * passwordを取得する。
+	 * パスワード を取得する。
 	 *
-	 * @return password
+	 * @return パスワード
 	 */
+	@XmlElement
 	public String getPassword() {
 		return password;
 	}
 
 	/**
-	 * passwordを設定する。
+	 * パスワード を設定する。
 	 *
 	 * @param password パスワード
 	 */
@@ -90,36 +99,38 @@ public class DatasourceEntity {
 	}
 
 	/**
-	 * driverを取得する。
+	 * ドライバ を取得する。
 	 *
-	 * @return driver
+	 * @return ドライバ
 	 */
+	@XmlElement
 	public String getDriver() {
 		return driver;
 	}
 
 	/**
-	 * driverを設定する。
+	 * ドライバ を設定する。
 	 *
-	 * @param driver driver
+	 * @param driver ドライバ
 	 */
 	public void setDriver(final String driver) {
 		this.driver = driver;
 	}
 
 	/**
-	 * urlを取得する。
+	 * 接続文字列 を取得する。
 	 *
-	 * @return url
+	 * @return 接続文字列
 	 */
+	@XmlElement
 	public String getUrl() {
 		return url;
 	}
 
 	/**
-	 * urlを設定する。
+	 * 接続文字列 を設定する。
 	 *
-	 * @param url url
+	 * @param url 接続文字列
 	 */
 	public void setUrl(final String url) {
 		this.url = url;

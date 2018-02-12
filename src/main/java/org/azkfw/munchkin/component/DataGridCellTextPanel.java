@@ -17,33 +17,23 @@
  */
 package org.azkfw.munchkin.component;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.Insets;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JTextPane;
 
-public class StatusBar extends JPanel {
+/**
+ *
+ * @author Kawakicchi
+ *
+ */
+public class DataGridCellTextPanel extends JTextPane {
 
 	/** serialVersionUID */
-	private static final long serialVersionUID = -5638113732514695773L;
+	private static final long serialVersionUID = -3719195992712551281L;
 
-	private final JLabel lblMessage;
-
-	private final JProgressBar progressBar;
-
-	public StatusBar() {
-		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(0, 30));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
-
-		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
-		progressBar.setPreferredSize(new Dimension(200, 0));
-
-		add(BorderLayout.CENTER, lblMessage);
-		add(BorderLayout.EAST, progressBar);
+	public DataGridCellTextPanel() {
+		setEditable(false);
+		setEditorKit(new TableDataCellEditorKit());
+		setMargin(new Insets(2, 2, 2, 2));
 	}
 }

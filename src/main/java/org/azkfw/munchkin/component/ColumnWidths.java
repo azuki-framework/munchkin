@@ -17,33 +17,30 @@
  */
 package org.azkfw.munchkin.component;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.EmptyBorder;
+/**
+ *
+ * @author Kawakicchi
+ *
+ */
+public class ColumnWidths {
 
-public class StatusBar extends JPanel {
+	private final List<Integer> widths;
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = -5638113732514695773L;
+	public ColumnWidths(final int size, final int minimum) {
+		widths = new ArrayList<Integer>();
+		for (int i = 0; i < size; i++) {
+			widths.add(minimum);
+		}
+	}
 
-	private final JLabel lblMessage;
+	public void setWidth(final int index, final int width) {
+		widths.set(index, Math.max(widths.get(index), width));
+	}
 
-	private final JProgressBar progressBar;
-
-	public StatusBar() {
-		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(0, 30));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
-
-		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
-		progressBar.setPreferredSize(new Dimension(200, 0));
-
-		add(BorderLayout.CENTER, lblMessage);
-		add(BorderLayout.EAST, progressBar);
+	public int getWidth(final int index) {
+		return widths.get(index);
 	}
 }

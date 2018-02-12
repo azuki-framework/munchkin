@@ -15,35 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.component;
+package org.azkfw.munchkin.database.model;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.util.List;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.EmptyBorder;
+/**
+ *
+ * @author Kawakicchi
+ *
+ */
+public class ObjectDetailEntity {
 
-public class StatusBar extends JPanel {
+	private final List<String> columnNames;
+	private final List<List<Object>> records;
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = -5638113732514695773L;
+	public ObjectDetailEntity(final List<String> columnNames, final List<List<Object>> records) {
+		this.columnNames = columnNames;
+		this.records = records;
+	}
 
-	private final JLabel lblMessage;
+	public List<String> getColumnNames() {
+		return columnNames;
+	}
 
-	private final JProgressBar progressBar;
-
-	public StatusBar() {
-		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(0, 30));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
-
-		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
-		progressBar.setPreferredSize(new Dimension(200, 0));
-
-		add(BorderLayout.CENTER, lblMessage);
-		add(BorderLayout.EAST, progressBar);
+	public List<List<Object>> getRecords() {
+		return records;
 	}
 }

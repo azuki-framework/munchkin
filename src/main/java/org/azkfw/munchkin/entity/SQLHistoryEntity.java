@@ -15,35 +15,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.component;
+package org.azkfw.munchkin.entity;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlValue;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.EmptyBorder;
+/**
+ *
+ * @author Kawakicchi
+ *
+ */
+public class SQLHistoryEntity {
 
-public class StatusBar extends JPanel {
+	private int order;
+	private String sql;
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = -5638113732514695773L;
+	public SQLHistoryEntity() {
+		this.order = -1;
+		this.sql = null;
+	}
 
-	private final JLabel lblMessage;
+	public SQLHistoryEntity(final String sql) {
+		this.order = -1;
+		this.sql = sql;
+	}
 
-	private final JProgressBar progressBar;
+	@XmlAttribute
+	public int getOrder() {
+		return order;
+	}
 
-	public StatusBar() {
-		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(0, 30));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
+	public void setOrder(final int order) {
+		this.order = order;
+	}
 
-		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
-		progressBar.setPreferredSize(new Dimension(200, 0));
+	@XmlValue
+	public String getSql() {
+		return sql;
+	}
 
-		add(BorderLayout.CENTER, lblMessage);
-		add(BorderLayout.EAST, progressBar);
+	public void setSql(final String sql) {
+		this.sql = sql;
 	}
 }

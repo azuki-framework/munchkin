@@ -15,35 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.component;
+package org.azkfw.munchkin.database.model;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+/**
+ *
+ * @author Kawakicchi
+ *
+ */
+public interface SQLBuilder {
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.EmptyBorder;
+	void append(String line);
 
-public class StatusBar extends JPanel {
-
-	/** serialVersionUID */
-	private static final long serialVersionUID = -5638113732514695773L;
-
-	private final JLabel lblMessage;
-
-	private final JProgressBar progressBar;
-
-	public StatusBar() {
-		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(0, 30));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
-
-		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
-		progressBar.setPreferredSize(new Dimension(200, 0));
-
-		add(BorderLayout.CENTER, lblMessage);
-		add(BorderLayout.EAST, progressBar);
-	}
+	void append(String line, Object... params);
 }

@@ -17,6 +17,8 @@
  */
 package org.azkfw.munchkin.util;
 
+import java.util.List;
+
 /**
  *
  * @author Kawakicchi
@@ -24,11 +26,58 @@ package org.azkfw.munchkin.util;
  */
 public class MunchkinUtil {
 
+	public static boolean isNull(final Object object) {
+		return (null == object);
+	}
+
+	public static boolean isNotNull(final Object object) {
+		return (!isNull(object));
+	}
+
+	public static boolean isNullAll(final Object... objects) {
+		for (Object object : objects) {
+			if (isNotNull(object)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean isNotNullAll(final Object... objects) {
+		return (!isNullAll(objects));
+	}
+
+	public static boolean isNotNullAny(final Object... objects) {
+		for (Object object : objects) {
+			if (isNotNull(object)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean isEmpty(final String string) {
-		return !isNotEmpty(string);
+		return (null == string || 0 == string.length());
 	}
 
 	public static boolean isNotEmpty(final String string) {
-		return (null != string && 0 < string.length());
+		return (!isEmpty(string));
+	}
+
+	public static boolean isEmpty(final List<?> list) {
+		return (null == list || 0 == list.size());
+	}
+
+	public static boolean isNotEmpty(final List<?> list) {
+		return (!isEmpty(list));
+	}
+
+	public static boolean isEquals(final String str1, final String str2) {
+		if (null == str1 && null == str2) {
+			return true;
+		} else if (null != str1 && null != str2) {
+			return str1.equals(str2);
+		}
+		return false;
 	}
 }

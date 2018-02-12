@@ -15,35 +15,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.component;
+package org.azkfw.munchkin;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.EmptyBorder;
+import org.azkfw.munchkin.frame.MunchkinFrame;
 
-public class StatusBar extends JPanel {
+/**
+ * このクラスは、Munchkinのアプリケーションクラスです。
+ * 
+ * @author Kawakicchi
+ */
+public class Application {
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = -5638113732514695773L;
+	/**
+	 * メイン関数
+	 *
+	 * @param args 引数
+	 */
+	public static void main(final String[] args) {
 
-	private final JLabel lblMessage;
+		final Munchkin munchkin = Munchkin.getInstance();
+		munchkin.load();
 
-	private final JProgressBar progressBar;
+		final MunchkinFrame frm = new MunchkinFrame();
 
-	public StatusBar() {
-		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(0, 30));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
+		frm.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(final WindowEvent e) {
+			}
 
-		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
-		progressBar.setPreferredSize(new Dimension(200, 0));
+			@Override
+			public void windowClosed(final WindowEvent e) {
+				munchkin.store();
+			}
+		});
 
-		add(BorderLayout.CENTER, lblMessage);
-		add(BorderLayout.EAST, progressBar);
+		frm.setVisible(true);
 	}
 }

@@ -15,35 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.component;
+package org.azkfw.munchkin.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import org.azkfw.munchkin.entity.DatasourceEntity;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.border.EmptyBorder;
+/**
+ * このインターフェースは、データソースダイアログのイベントを定義したインターフェースです。
+ * 
+ * @author Kawakicchi
+ */
+public interface DatasourceDialogListener {
 
-public class StatusBar extends JPanel {
+	/**
+	 * OKボタン押下後に呼び出されるイベントです。
+	 * 
+	 * @param dialog ダイアログ
+	 * @param datasource データーソース
+	 */
+	void datasourceDialogOK(DatasourceDialog dialog, DatasourceEntity datasource);
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = -5638113732514695773L;
-
-	private final JLabel lblMessage;
-
-	private final JProgressBar progressBar;
-
-	public StatusBar() {
-		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(0, 30));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
-
-		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
-		progressBar.setPreferredSize(new Dimension(200, 0));
-
-		add(BorderLayout.CENTER, lblMessage);
-		add(BorderLayout.EAST, progressBar);
-	}
+	/**
+	 * キャンセルボタン押下後に呼び出されるイベントです。
+	 *
+	 * @param dialog ダイアログ
+	 */
+	void datasourceDialogCancel(DatasourceDialog dialog);
 }
