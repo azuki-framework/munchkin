@@ -50,6 +50,11 @@ public class MunchkinEntity {
 		this.datasources.add(datasource);
 	}
 
+	public void setDatasources(final List<DatasourceEntity> datasources) {
+		this.datasources.clear();
+		this.datasources.addAll(datasources);
+	}
+
 	@XmlElementWrapper(name = "datasources")
 	@XmlElement(name = "datasource")
 	public List<DatasourceEntity> getDatasources() {

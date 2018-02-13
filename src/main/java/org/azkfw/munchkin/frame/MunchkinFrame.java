@@ -21,8 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
@@ -30,12 +28,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -60,10 +55,11 @@ import org.azkfw.munchkin.database.model.SchemaEntity;
 import org.azkfw.munchkin.database.model.TypeEntity;
 import org.azkfw.munchkin.dialog.DatasourceDialog;
 import org.azkfw.munchkin.dialog.DatasourceDialogListener;
+import org.azkfw.munchkin.dialog.DatasourceListDialog;
+import org.azkfw.munchkin.dialog.VersionDialog;
 import org.azkfw.munchkin.entity.DatasourceEntity;
 import org.azkfw.munchkin.entity.MunchkinEntity;
 import org.azkfw.munchkin.entity.SQLHistoryEntity;
-import org.azkfw.munchkin.message.Label;
 import org.azkfw.munchkin.util.MunchkinUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Kawakicchi
  */
-public class MunchkinFrame extends JFrame {
+public class MunchkinFrame extends AbstractMunchkinFrame {
 
 	/** serialVersionUID */
 	private static final long serialVersionUID = 4632993014738209545L;
@@ -91,12 +87,6 @@ public class MunchkinFrame extends JFrame {
 
 	private final JPanel toolBar;
 	private final StatusBar statusBar;
-
-	private final JMenuBar menuBar;
-	private final JMenu menuFile;
-	private final JMenuItem menuFileConnection;
-	private final JMenuItem menuFileExit;
-	private final JMenu menuHelp;
 
 	private final JSplitPane spltMain;
 	private final JSplitPane spltLeft;
@@ -118,18 +108,6 @@ public class MunchkinFrame extends JFrame {
 		config = Munchkin.getInstance().getConfig();
 
 		model = new MockDatabaseModel();
-
-		menuBar = new JMenuBar();
-		menuFile = new JMenu(Label.MENU_FILE.toString());
-		menuBar.add(menuFile);
-		menuFileConnection = new JMenuItem(Label.MENU_FILE_CONNECTION.toString());
-		menuFile.add(menuFileConnection);
-		menuFile.addSeparator();
-		menuFileExit = new JMenuItem(Label.MENU_FILE_EXIT.toString());
-		menuFile.add(menuFileExit);
-		menuHelp = new JMenu(Label.MENU_HELP.toString());
-		menuBar.add(menuHelp);
-		setJMenuBar(menuBar);
 
 		pnlCondition = new DBConditionPanel();
 		pnlObjectList = new DBObjectListPanel();
@@ -256,19 +234,6 @@ public class MunchkinFrame extends JFrame {
 			}
 		});
 
-		menuFileConnection.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				doMenuFileConnection();
-			}
-		});
-		menuFileExit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				doMenuFileExit();
-			}
-		});
-
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(final WindowEvent e) {
@@ -389,14 +354,6 @@ public class MunchkinFrame extends JFrame {
 		config.setSqlTextEditorText(pnlSqlEditor.getText());
 	}
 
-	private void doMenuFileConnection() {
-
-	}
-
-	private void doMenuFileExit() {
-		exit();
-	}
-
 	public void info(final String message) {
 		pnlConsole.info(message);
 		tabBottom.setSelectedIndex(TAB_CONSOLE);
@@ -415,5 +372,25 @@ public class MunchkinFrame extends JFrame {
 	public void fatal(final String message, final Object... objs) {
 		pnlConsole.fatal(message, objs);
 		tabBottom.setSelectedIndex(TAB_CONSOLE);
+	}
+
+	@Override
+	protected void doMenuFileConnection() {
+		final List<DatasourceEntity> datasources = new ArrayList<DatasourceEntity>();
+		config.getDatasources().forEach(d -> datasources.add(new DatasourceEntity(d)));
+
+		final DatasourceListDialog dlg = new DatasourceListDialog(this, datasources);
+		dlg.setVisible(true);
+	}
+
+	@Override
+	protected void doMenuFileExit() {
+		exit();
+	}
+
+	@Override
+	protected void doMenuHelpVersion() {
+		final VersionDialog dlg = new VersionDialog(this);
+		dlg.setVisible(true);
 	}
 }

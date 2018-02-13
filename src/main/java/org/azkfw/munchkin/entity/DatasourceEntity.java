@@ -31,6 +31,8 @@ public class DatasourceEntity {
 
 	/** データソース名 */
 	private String name;
+	/** メモ */
+	private String memo;
 
 	/** ユーザ名 */
 	private String user;
@@ -40,6 +42,19 @@ public class DatasourceEntity {
 	private String driver;
 	/** 接続文字列 */
 	private String url;
+
+	public DatasourceEntity() {
+
+	}
+
+	public DatasourceEntity(final DatasourceEntity datasource) {
+		name = datasource.name;
+		memo = datasource.memo;
+		user = datasource.user;
+		password = datasource.password;
+		driver = datasource.driver;
+		url = datasource.url;
+	}
 
 	/**
 	 * データソース名 を取得する。
@@ -58,6 +73,25 @@ public class DatasourceEntity {
 	 */
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	/**
+	 * メモ を取得する。
+	 *
+	 * @return メモ
+	 */
+	@XmlAttribute
+	public String getMemo() {
+		return memo;
+	}
+
+	/**
+	 * メモ を設定する。
+	 *
+	 * @param memo メモ
+	 */
+	public void setMemo(final String memo) {
+		this.memo = memo;
 	}
 
 	/**

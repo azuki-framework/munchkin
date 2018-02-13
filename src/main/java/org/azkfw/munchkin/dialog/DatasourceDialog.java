@@ -41,7 +41,6 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -52,13 +51,14 @@ import javax.swing.JTextPane;
 
 import org.azkfw.munchkin.entity.DatabaseDriver;
 import org.azkfw.munchkin.entity.DatasourceEntity;
+import org.azkfw.munchkin.message.Label;
 import org.azkfw.munchkin.util.MunchkinUtil;
 
 /**
  *
  * @author Kawakicchi
  */
-public class DatasourceDialog extends JDialog {
+public class DatasourceDialog extends AbstractDialog {
 
 	/** serialVersionUID */
 	private static final long serialVersionUID = 6049445841465203910L;
@@ -67,6 +67,8 @@ public class DatasourceDialog extends JDialog {
 
 	private final JLabel lblName;
 	private final JTextField txtNmae;
+	private final JLabel lblMemo;
+	private final JTextPane txtMemo;
 	private final JLabel lblUser;
 	private final JTextField txtUser;
 	private final JLabel lblPass;
@@ -97,7 +99,7 @@ public class DatasourceDialog extends JDialog {
 	 * @param datasource データソース
 	 */
 	public DatasourceDialog(final Frame owner, final DatasourceEntity datasource) {
-		super(owner, true);
+		super(owner);
 
 		setTitle("新しいデータベース接続");
 		setLayout(new BorderLayout());
@@ -106,37 +108,45 @@ public class DatasourceDialog extends JDialog {
 		listeners = new ArrayList<DatasourceDialogListener>();
 
 		final JPanel pnlMain = new JPanel();
+
 		final GroupLayout layout = new GroupLayout(pnlMain);
 		pnlMain.setLayout(layout);
 
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
 
-		lblName = new JLabel("名前");
+		JPanel pnlSpace = new JPanel();
+		pnlSpace.setPreferredSize(new Dimension(12, 12));
+		pnlSpace.setMaximumSize(new Dimension(12, 12));
+
+		lblName = new JLabel(Label.DATASOURCE_NAME.toString());
 		txtNmae = new JTextField();
-		lblUser = new JLabel("ユーザID");
+		lblMemo = new JLabel(Label.DATASOURCE_MEMO.toString());
+		txtMemo = new JTextPane();
+		lblUser = new JLabel(Label.DATASOURCE_USER.toString());
 		txtUser = new JTextField();
-		lblPass = new JLabel("パスワード");
+		lblPass = new JLabel(Label.DATASOURCE_PASSWORD.toString());
 		txtPass = new JPasswordField();
-		lblDriver = new JLabel("ドライバ");
+		lblDriver = new JLabel(Label.DATASOURCE_DRIVER.toString());
 		cmbDriver = new JComboBox<DatabaseDriver>();
-		lblURL = new JLabel("接続文字列");
+		lblURL = new JLabel(Label.DATASOURCE_URL.toString());
 		txtURLSample = new JTextField();
 		txtURL = new JTextPane();
 
 		txtURLSample.setEditable(false);
 
-		final JComponent[][] compos = { { lblName, txtNmae }, { lblUser, txtUser }, { lblPass, txtPass },
-				{ lblDriver, cmbDriver }, { null, txtURLSample }, { lblURL, new JScrollPane(txtURL) } };
-		set(layout, compos);
+		final JComponent[][] compos = { { lblName, txtNmae }, { pnlSpace, null }, { lblUser, txtUser },
+				{ lblPass, txtPass }, { lblDriver, cmbDriver }, { lblURL, new JScrollPane(txtURL) },
+				{ null, txtURLSample }, { pnlSpace, null }, { lblMemo, new JScrollPane(txtMemo) } };
+		add(layout, compos);
 
 		final JPanel pnlControl = new JPanel();
 		pnlControl.setLayout(null);
 		pnlControl.setPreferredSize(new Dimension(0, 40));
 
-		btnOK = new JButton("OK");
+		btnOK = new JButton(Label.BUTTON_OK.toString());
 		btnOK.setSize(120, 30);
-		btnCancel = new JButton("キャンセル");
+		btnCancel = new JButton(Label.BUTTON_CANCEL.toString());
 		btnCancel.setSize(120, 30);
 		btnTest = new JButton("接続テスト");
 		btnTest.setSize(120, 30);
@@ -186,8 +196,8 @@ public class DatasourceDialog extends JDialog {
 				final int width = pnlControl.getWidth() - (insets.left + insets.right);
 				btnCancel.setLocation(width - (btnCancel.getWidth() + 6), 4);
 				btnOK.setLocation(width - (btnOK.getWidth() + 6 + btnCancel.getWidth() + 6), 4);
-				btnTest.setLocation(width
-						- (btnTest.getWidth() + 100 + btnOK.getWidth() + 6 + btnCancel.getWidth() + 6), 4);
+				btnTest.setLocation(
+						width - (btnTest.getWidth() + 18 + btnOK.getWidth() + 6 + btnCancel.getWidth() + 6), 4);
 			}
 		});
 
@@ -203,7 +213,9 @@ public class DatasourceDialog extends JDialog {
 		});
 
 		setDatasource(datasource);
-		setSize(600, 320);
+
+		setSize(500, 500);
+		moveParentCenter();
 	}
 
 	/**
@@ -317,7 +329,7 @@ public class DatasourceDialog extends JDialog {
 		}
 	}
 
-	private void set(final GroupLayout layout, final JComponent[][] compos) {
+	private void add(final GroupLayout layout, final JComponent[][] compos) {
 		int ny = compos.length;
 		int nx = compos[0].length;
 		{// 水平方向のグループ

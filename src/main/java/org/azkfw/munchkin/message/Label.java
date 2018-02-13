@@ -23,6 +23,8 @@ import java.util.ResourceBundle;
 public enum Label {
 	/** */
 	DATASOURCE_NAME,
+	/** */
+	DATASOURCE_MEMO,
 	/** s */
 	DATASOURCE_USER,
 	/** */
@@ -50,7 +52,11 @@ public enum Label {
 	/** */
 	MENU_HELP,
 	/** */
-	TITLE_DATASOURCE_CONFIG,
+	MENU_HELP_VERSION,
+	/** */
+	TITLE_DATASOURCE_LIST,
+	/** */
+	TITLE_VERSION,
 	/** */
 	NONE;
 
