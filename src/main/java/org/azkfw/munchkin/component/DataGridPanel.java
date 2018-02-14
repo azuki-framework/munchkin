@@ -72,7 +72,10 @@ public class DataGridPanel extends JPanel {
 		table = new JTable(model);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
-		table.setRowHeight(14 + 4 + 2);
+
+		final FontMetrics fm = table.getFontMetrics(table.getFont());
+		
+		table.setRowHeight(fm.getHeight() + 4 + 2);
 		table.setSelectionBackground(new Color(255, 204, 153));
 
 		final JPanel pnlControl = new JPanel();
