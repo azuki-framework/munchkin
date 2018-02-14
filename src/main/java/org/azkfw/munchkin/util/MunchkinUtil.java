@@ -80,4 +80,13 @@ public class MunchkinUtil {
 		}
 		return false;
 	}
+
+	public static boolean isEqualsAny(final String str1, final String... strs) {
+		for (String str : strs) {
+			if (isEquals(str1, str)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
