@@ -86,6 +86,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 					schema = new SchemaEntity(name, label);
 				}
 
+			} catch (SQLException ex) {
+				LOGGER.error("SQL : {}" , builder.getSQL());
+				throw ex;
 			} finally {
 				release(rs);
 				release(ps);
@@ -134,6 +137,10 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 					schemas.add(schema);
 				}
 
+				
+			} catch (SQLException ex) {
+				LOGGER.error("SQL : {}" , builder.getSQL());
+				throw ex;
 			} finally {
 				release(rs);
 				release(ps);
@@ -182,6 +189,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 					types.add(type);
 				}
 
+			} catch (SQLException ex) {
+				LOGGER.error("SQL : {}" , builder.getSQL());
+				throw ex;
 			} finally {
 				release(rs);
 				release(ps);
@@ -237,6 +247,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 					objects.add(object);
 				}
 
+			} catch (SQLException ex) {
+				LOGGER.error("SQL : {}" , builder.getSQL());
+				throw ex;
 			} finally {
 				release(rs);
 				release(ps);
@@ -291,7 +304,7 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				detail = new ObjectDetailEntity(columnNames, records);
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : " + builder.getSQL());
+				LOGGER.error("SQL : {}" , builder.getSQL());
 				throw ex;
 			} finally {
 				release(rs);
