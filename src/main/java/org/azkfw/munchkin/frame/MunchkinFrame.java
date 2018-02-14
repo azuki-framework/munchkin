@@ -128,7 +128,6 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		spltLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		spltLeft.setTopComponent(pnlOb);
 		spltLeft.setBottomComponent(pnlObjectDetail);
-		spltLeft.setDividerLocation(240);
 
 		spltRight = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		spltRight.setTopComponent(pnlSqlEditor);
@@ -324,6 +323,8 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	}
 
 	private void doOpened() {
+		spltMain.setDividerLocation(spltMain.getWidth() / 4);
+		spltLeft.setDividerLocation(spltLeft.getHeight() / 2);
 		spltRight.setDividerLocation(spltRight.getHeight() / 2);
 
 		pnlSqlEditor.setText(config.getSqlTextEditorText());

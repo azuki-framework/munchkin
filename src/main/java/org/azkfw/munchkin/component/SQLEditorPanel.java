@@ -67,8 +67,14 @@ public class SQLEditorPanel extends JPanel {
 
 		setLayout(new BorderLayout());
 
-		final Font font = new Font(Font.MONOSPACED, Font.PLAIN, 16);
-
+		Font font = null;
+		if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+			font = new Font("ＭＳ ゴシック", Font.PLAIN, 14);
+		} else if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
+			font = new Font("Osaka-Mono", Font.PLAIN, 16);
+		} else {
+			font = new Font(Font.MONOSPACED, Font.PLAIN, 14);
+		}
 		txtEditor = new SQLTextEditor(font);
 
 		TextLineNumberView numberView = new TextLineNumberView(txtEditor, font);

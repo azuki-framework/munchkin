@@ -60,6 +60,15 @@ public class DataGridPanel extends JPanel {
 
 		setLayout(new BorderLayout());
 
+		Font font = null;
+		if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+			font = new Font("ＭＳ ゴシック", Font.PLAIN, 14);
+		} else if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
+			font = new Font("Osaka-Mono", Font.PLAIN, 14);
+		} else {
+			font = new Font(Font.MONOSPACED, Font.PLAIN, 14);
+		}
+
 		model = new DefaultTableModel() {
 			/** serialVersionUID */
 			private static final long serialVersionUID = 1L;
@@ -71,10 +80,10 @@ public class DataGridPanel extends JPanel {
 		};
 		table = new JTable(model);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		table.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+		table.setFont(font);
 
-		final FontMetrics fm = table.getFontMetrics(table.getFont());
-		
+		final FontMetrics fm = table.getFontMetrics(font);
+
 		table.setRowHeight(fm.getHeight() + 4 + 2);
 		table.setSelectionBackground(new Color(255, 204, 153));
 
