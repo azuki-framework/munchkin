@@ -43,9 +43,12 @@ public class Sample {
 		try {
 			DataFlavor[] dfs = clip.getAvailableDataFlavors();
 			for (DataFlavor df : dfs) {
-				//System.out.println(df.getMimeType());
-				//System.out.println("  " + df.getHumanPresentableName());
+				System.out.println(df.getMimeType());
+				System.out.println("  " + df.getHumanPresentableName());
 
+				// all
+				// fragment
+				// selection
 				if ("text/html; document=all; class=java.lang.String; charset=Unicode".equals(df.getMimeType())) {
 					if ("text/html".equals(df.getHumanPresentableName())) {
 						String html = (String) clip.getData(df);
@@ -143,157 +146,188 @@ public class Sample {
 	}
 
 	public static String getHtml() {
-		StringBuilder s = new StringBuilder();
-		s.append("<html xmlns:v=\"urn:schemas-microsoft-com:vml\"");
-		s.append(" xmlns:o=\"urn:schemas-microsoft-com:office:office\"");
-		s.append(" xmlns:x=\"urn:schemas-microsoft-com:office:excel\"");
-		s.append(" xmlns=\"http://www.w3.org/TR/REC-html40\">");
-		s.append("<head>");
-		s.append("<meta http-equiv=Content-Type content=\"text/html; charset=utf-8\">");
-		s.append("<meta name=ProgId content=Excel.Sheet>");
-		s.append("<meta name=Generator content=\"Microsoft Excel 14\">");
-		s.append("<style>");
-		s.append("<!--");
-		s.append("@page");
-		s.append("{");
-		s.append("	margin:.75in .7in .75in .7in;");
-		s.append("	mso-header-margin:.3in;");
-		s.append("	mso-footer-margin:.3in;");
-		s.append("}");
-		s.append("ruby");
-		s.append("{");
-		s.append("	ruby-align:left;");
-		s.append("}");
-		s.append("table");
-		s.append("{");
-		s.append("	mso-displayed-decimal-separator:\"\\.\";");
-		s.append("	mso-displayed-thousand-separator:\"\\,\";");
-		s.append("}");
-		s.append("rt");
-		s.append("{");
-		s.append("	color:windowtext;");
-		s.append("	font-size:6.0pt;");
-		s.append("	font-weight:400;");
-		s.append("	font-style:normal;");
-		s.append("	text-decoration:none;");
-		s.append("	font-family:\"ＭＳ ゴシック\";");
-		s.append("	mso-font-charset:128;");
-		s.append("	mso-char-type:katakana;");
-		s.append("	display:none;");
-		s.append("}");
-		s.append("td");
-		s.append("{");
-		s.append("	padding-top:1px;");
-		s.append("	padding-right:1px;");
-		s.append("	padding-left:1px;");
-		s.append("	mso-ignore:padding;");
-		s.append("	color:black;");
-		s.append("	font-size:12.0pt;");
-		s.append("	font-weight:400;");
-		s.append("	font-style:normal;");
-		s.append("	text-decoration:none;");
-		s.append("	font-family:\"ＭＳ ゴシック\";");
-		s.append("	mso-font-charset:128;");
-		s.append("	mso-number-format:General;");
-		s.append("	text-align:general;");
-		s.append("	vertical-align:bottom;");
-		s.append("	border:none;");
-		s.append("	mso-background-source:auto;");
-		s.append("	mso-pattern:auto;");
-		s.append("	mso-protection:locked visible;");
-		s.append("	white-space:nowrap;");
-		s.append("	mso-rotate:0;");
-		s.append("}");
-		s.append(".xl63");
-		s.append("{");
-		s.append("	font-weight:700;");
-		s.append("	font-family:\"ＭＳ ゴシック\";");
-		s.append("	mso-generic-font-family:auto;");
-		s.append("	mso-font-charset:128;");
-		s.append("	mso-number-format:\"\\@\";");
-		s.append("	border:.5pt solid windowtext;");
-		s.append("	background:#D8E4BC;");
-		s.append("	mso-pattern:black none;");
-		s.append("}");
-		s.append(".xl64");
-		s.append("{");
-		s.append("	font-family:\"ＭＳ ゴシック\";");
-		s.append("	mso-generic-font-family:auto;");
-		s.append("	mso-font-charset:128;");
-		s.append("	mso-number-format:\"\\@\";");
-		s.append("	border:.5pt solid windowtext;");
-		s.append("}");
-		s.append(".font6");
-		s.append("{");
-		s.append("	color:black;");
-		s.append("	font-size:12.0pt;");
-		s.append("	font-weight:400;");
-		s.append("	font-style:normal;");
-		s.append("	text-decoration:none;");
-		s.append("	font-family:\"ＭＳ ゴシック\";");
-		s.append("	mso-generic-font-family:auto;");
-		s.append("	mso-font-charset:128;");
-		s.append("}");
-		s.append(".font7");
-		s.append("{");
-		s.append("	color:red;");
-		s.append("	font-size:12.0pt;");
-		s.append("	font-weight:400;");
-		s.append("	font-style:normal;");
-		s.append("	text-decoration:none;");
-		s.append("	font-family:\"ＭＳ ゴシック\";");
-		s.append("	mso-generic-font-family:auto;");
-		s.append("	mso-font-charset:128;");
-		s.append("}");
-		s.append(".font8");
-		s.append("{");
-		s.append("	color:blue;");
-		s.append("	font-size:12.0pt;");
-		s.append("	font-weight:700;");
-		s.append("	font-style:normal;");
-		s.append("	text-decoration:none;");
-		s.append("	font-family:\"ＭＳ ゴシック\";");
-		s.append("	mso-generic-font-family:auto;");
-		s.append("	mso-font-charset:128;");
-		s.append("}");
-		s.append("-->");
-		s.append("</style>");
-		s.append("</head>");
-		s.append("<body link=blue vlink=purple>");
-		s.append("<table border=0 cellpadding=0 cellspacing=0 width=345 style='border-collapse: collapse;width:345pt'>");
-		s.append("<!--StartFragment-->");
-		s.append(" <col width=77 span=3 style='width:77pt'>");
-		s.append(" <col width=114 style='mso-width-source:userset;mso-width-alt:4864;width:114pt'>");
-		s.append(" <tr height=18 style='height:18.0pt'>");
-		s.append("  <td class=xl63 width=77 style='height:18.0pt;width:77pt'>ID</td>");
-		s.append("  <td class=xl63 width=77 style='border-left:none;width:77pt'>NAME</td>");
-		s.append("  <td class=xl63 width=77 style='border-left:none;width:77pt'>AGE</td>");
-		s.append("  <td class=xl63 width=114 style='border-left:none;width:114pt'>DATE</td>");
-		s.append(" </tr>");
-		s.append(" <tr height=18 style='height:18.0pt'>");
-		s.append("  <td class=xl64 style='height:18.0pt;border-top:none'>A00001</td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'>AAA<font class=\"font7\">_</font><font class=\"font6\">BBB</font></td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'>1</td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'>2018-11-12 12:00:00</td>");
-		s.append(" </tr>");
-		s.append(" <tr height=18 style='height:18.0pt'>");
-		s.append("  <td class=xl64 style='height:18.0pt;border-top:none'>B00002</td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'><font class=\"font7\">_______</font></td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'>1.0</td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'>　</td>");
-		s.append(" </tr>");
-		s.append(" <tr height=18 style='height:18.0pt'>");
-		s.append("  <td class=xl64 style='height:18.0pt;border-top:none'>C00003</td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'><font class=\"font7\">̺̺̺̺̺̺̺</font></td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'><font class=\"font8\">(NULL)</font></td>");
-		s.append("  <td class=xl64 style='border-top:none;border-left:none'><font class=\"font8\">(NULL)</font></td>");
-		s.append(" </tr>");
-		s.append("<!--EndFragment-->");
-		s.append("</table>");
-		s.append("</body>");
-		s.append("</html>");
-		s.append("");
-		s.append("");
+		StringBuilder sPreHeader = new StringBuilder();
+		sPreHeader.append("Version:0.9\r\n"); // 11
+		sPreHeader.append("StartHTML:0000000182\r\n"); // 20
+		sPreHeader.append("EndHTML:0000002080\r\n"); // 18
+		sPreHeader.append("StartFragment:0000000218\r\n"); // 24
+		sPreHeader.append("EndFragment:0000002044\r\n"); // 22
+		sPreHeader.append("SourceURL:test\r\n"); // 14
+		// 109 + 12
+
+		StringBuilder sHtmlStart = new StringBuilder();
+		sHtmlStart.append("<html xmlns:v=\"urn:schemas-microsoft-com:vml\"");
+		sHtmlStart.append(" xmlns:o=\"urn:schemas-microsoft-com:office:office\"");
+		sHtmlStart.append(" xmlns:x=\"urn:schemas-microsoft-com:office:excel\"");
+		sHtmlStart.append(" xmlns=\"http://www.w3.org/TR/REC-html40\">");
+		sHtmlStart.append("<head>");
+		sHtmlStart.append("<meta http-equiv=Content-Type content=\"text/html; charset=utf-8\">");
+		sHtmlStart.append("<meta name=ProgId content=Excel.Sheet>");
+		sHtmlStart.append("<meta name=Generator content=\"Microsoft Excel 14\">");
+		sHtmlStart.append("<style>");
+		sHtmlStart.append("<!--");
+		sHtmlStart.append("@page");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	margin:.75in .7in .75in .7in;");
+		sHtmlStart.append("	mso-header-margin:.3in;");
+		sHtmlStart.append("	mso-footer-margin:.3in;");
+		sHtmlStart.append("}");
+		sHtmlStart.append("ruby");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	ruby-align:left;");
+		sHtmlStart.append("}");
+		sHtmlStart.append("table");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	mso-displayed-decimal-separator:\"\\.\";");
+		sHtmlStart.append("	mso-displayed-thousand-separator:\"\\,\";");
+		sHtmlStart.append("}");
+		sHtmlStart.append("rt");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	color:windowtext;");
+		sHtmlStart.append("	font-size:6.0pt;");
+		sHtmlStart.append("	font-weight:400;");
+		sHtmlStart.append("	font-style:normal;");
+		sHtmlStart.append("	text-decoration:none;");
+		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
+		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append("	mso-char-type:katakana;");
+		sHtmlStart.append("	display:none;");
+		sHtmlStart.append("}");
+		sHtmlStart.append("td");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	padding-top:1px;");
+		sHtmlStart.append("	padding-right:1px;");
+		sHtmlStart.append("	padding-left:1px;");
+		sHtmlStart.append("	mso-ignore:padding;");
+		sHtmlStart.append("	color:black;");
+		sHtmlStart.append("	font-size:12.0pt;");
+		sHtmlStart.append("	font-weight:400;");
+		sHtmlStart.append("	font-style:normal;");
+		sHtmlStart.append("	text-decoration:none;");
+		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
+		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append("	mso-number-format:General;");
+		sHtmlStart.append("	text-align:general;");
+		sHtmlStart.append("	vertical-align:bottom;");
+		sHtmlStart.append("	border:none;");
+		sHtmlStart.append("	mso-background-source:auto;");
+		sHtmlStart.append("	mso-pattern:auto;");
+		sHtmlStart.append("	mso-protection:locked visible;");
+		sHtmlStart.append("	white-space:nowrap;");
+		sHtmlStart.append("	mso-rotate:0;");
+		sHtmlStart.append("}");
+		sHtmlStart.append(".xl63");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	font-weight:700;");
+		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
+		sHtmlStart.append("	mso-generic-font-family:auto;");
+		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append("	mso-number-format:\"\\@\";");
+		sHtmlStart.append("	border:.5pt solid windowtext;");
+		sHtmlStart.append("	background:#D8E4BC;");
+		sHtmlStart.append("	mso-pattern:black none;");
+		sHtmlStart.append("}");
+		sHtmlStart.append(".xl64");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
+		sHtmlStart.append("	mso-generic-font-family:auto;");
+		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append("	mso-number-format:\"\\@\";");
+		sHtmlStart.append("	border:.5pt solid windowtext;");
+		sHtmlStart.append("}");
+		sHtmlStart.append(".font6");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	color:black;");
+		sHtmlStart.append("	font-size:12.0pt;");
+		sHtmlStart.append("	font-weight:400;");
+		sHtmlStart.append("	font-style:normal;");
+		sHtmlStart.append("	text-decoration:none;");
+		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
+		sHtmlStart.append("	mso-generic-font-family:auto;");
+		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append("}");
+		sHtmlStart.append(".font7");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	color:red;");
+		sHtmlStart.append("	font-size:12.0pt;");
+		sHtmlStart.append("	font-weight:400;");
+		sHtmlStart.append("	font-style:normal;");
+		sHtmlStart.append("	text-decoration:none;");
+		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
+		sHtmlStart.append("	mso-generic-font-family:auto;");
+		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append("}");
+		sHtmlStart.append(".font8");
+		sHtmlStart.append("{");
+		sHtmlStart.append("	color:blue;");
+		sHtmlStart.append("	font-size:12.0pt;");
+		sHtmlStart.append("	font-weight:700;");
+		sHtmlStart.append("	font-style:normal;");
+		sHtmlStart.append("	text-decoration:none;");
+		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
+		sHtmlStart.append("	mso-generic-font-family:auto;");
+		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append("}");
+		sHtmlStart.append("-->");
+		sHtmlStart.append("</style>");
+		sHtmlStart.append("</head>");
+		sHtmlStart.append("<body link=blue vlink=purple>");
+		sHtmlStart.append("<table border=0 cellpadding=0 cellspacing=0 width=345 style='border-collapse: collapse;width:345pt'>");
+
+		StringBuilder sFrag = new StringBuilder();
+		sFrag.append("<!--StartFragment-->");
+		sFrag.append(" <col width=77 span=3 style='width:77pt'>");
+		sFrag.append(" <col width=114 style='mso-width-source:userset;mso-width-alt:4864;width:114pt'>");
+		sFrag.append(" <tr height=18 style='height:18.0pt'>");
+		sFrag.append("  <td class=xl63 width=77 style='height:18.0pt;width:77pt'>ID</td>");
+		sFrag.append("  <td class=xl63 width=77 style='border-left:none;width:77pt'>NAME</td>");
+		sFrag.append("  <td class=xl63 width=77 style='border-left:none;width:77pt'>AGE</td>");
+		sFrag.append("  <td class=xl63 width=114 style='border-left:none;width:114pt'>DATE</td>");
+		sFrag.append(" </tr>");
+		sFrag.append(" <tr height=18 style='height:18.0pt'>");
+		sFrag.append("  <td class=xl64 style='height:18.0pt;border-top:none'>A00001</td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'>AAA<font class=\"font7\">_</font><font class=\"font6\">BBB</font></td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'>1</td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'>2018-11-12 12:00:00</td>");
+		sFrag.append(" </tr>");
+		sFrag.append(" <tr height=18 style='height:18.0pt'>");
+		sFrag.append("  <td class=xl64 style='height:18.0pt;border-top:none'>B00002</td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'><font class=\"font7\">_______</font></td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'>1.0</td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'>　</td>");
+		sFrag.append(" </tr>");
+		sFrag.append(" <tr height=18 style='height:18.0pt'>");
+		sFrag.append("  <td class=xl64 style='height:18.0pt;border-top:none'>C00003</td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'><font class=\"font7\">_______</font></td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'><font class=\"font8\">(NULL)</font></td>");
+		sFrag.append("  <td class=xl64 style='border-top:none;border-left:none'><font class=\"font8\">(NULL)</font></td>");
+		sFrag.append(" </tr>");
+		sFrag.append("<!--EndFragment-->");
+
+		StringBuilder sHtmlEnd = new StringBuilder();
+		sHtmlEnd.append("</table>");
+		sHtmlEnd.append("</body>");
+		sHtmlEnd.append("</html>");
+
+		int startHTML = sPreHeader.length();
+		int startFragment = startHTML + sHtmlStart.length();
+		int endFragment = startFragment + sFrag.length();
+		int endHTML = endFragment + sHtmlEnd.length();
+
+		StringBuilder sHeader = new StringBuilder();
+		sHeader.append("Version:0.9\r\n"); // 11
+		sHeader.append(String.format("StartHTML:%010d\r\n", startHTML)); // 20
+		sHeader.append(String.format("EndHTML:%010d\r\n", endHTML)); // 18
+		sHeader.append(String.format("StartFragment:%010d\r\n", startFragment)); // 24
+		sHeader.append(String.format("EndFragment:%010d\r\n", endFragment)); // 22
+		sHeader.append("SourceURL:test\r\n"); // 14
+		// 109 + 12
+		
+		StringBuffer s = new StringBuffer();
+		s.append(sHeader.toString());
+		s.append(sHtmlStart.toString());
+		s.append(sFrag.toString());
+		s.append(sHtmlEnd.toString());
 		return s.toString();
 	}
 }
