@@ -112,11 +112,12 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 
 		final StringBuilder sPreHeader = new StringBuilder();
 		sPreHeader.append("Version:0.9\r\n");
-		sPreHeader.append("StartHTML:0000000182\r\n");
-		sPreHeader.append("EndHTML:0000002080\r\n");
-		sPreHeader.append("StartFragment:0000000218\r\n");
-		sPreHeader.append("EndFragment:0000002044\r\n");
+		sPreHeader.append("StartHTML:0000000000\r\n");
+		sPreHeader.append("EndHTML:0000000000\r\n");
+		sPreHeader.append("StartFragment:0000000000\r\n");
+		sPreHeader.append("EndFragment:0000000000\r\n");
 		sPreHeader.append("SourceURL:Munchkin\r\n");
+		System.out.println("preHeader : " + sPreHeader.length());
 
 		final StringBuilder sHtmlStart = new StringBuilder();
 		sHtmlStart.append("<html xmlns:v=\"urn:schemas-microsoft-com:vml\"");
@@ -237,6 +238,7 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 		sHtmlStart.append("<body link=blue vlink=purple>");
 		sHtmlStart
 				.append("<table border=0 cellpadding=0 cellspacing=0 width=345 style='border-collapse: collapse;width:345pt'>");
+		System.out.println("htmlStart : " + sHtmlStart.length());
 
 		final StringBuilder sFrag = new StringBuilder();
 		sFrag.append("<!--StartFragment-->");
@@ -270,11 +272,13 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 			sFrag.append("</tr>");
 		}
 		sFrag.append("<!--EndFragment-->");
+		System.out.println("flag : " + sFrag.length());
 
 		final StringBuilder sHtmlEnd = new StringBuilder();
 		sHtmlEnd.append("</table>");
 		sHtmlEnd.append("</body>");
 		sHtmlEnd.append("</html>");
+		System.out.println("htmlEnd : " + sHtmlEnd.length());
 
 		final int startHTML = sPreHeader.length();
 		final int startFragment = startHTML + sHtmlStart.length();
@@ -282,12 +286,13 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 		final int endHTML = endFragment + sHtmlEnd.length();
 
 		final StringBuilder sHeader = new StringBuilder();
-		sHeader.append("Version:0.9\r\n"); // 11
+		sHeader.append("Version:0.9\r\n");
 		sHeader.append(String.format("StartHTML:%010d\r\n", startHTML));
 		sHeader.append(String.format("EndHTML:%010d\r\n", endHTML));
 		sHeader.append(String.format("StartFragment:%010d\r\n", startFragment));
 		sHeader.append(String.format("EndFragment:%010d\r\n", endFragment));
 		sHeader.append("SourceURL:Munchkin\r\n");
+		System.out.println("sHeader : " + sHeader.length());
 
 		final StringBuffer s = new StringBuffer();
 		s.append(sHeader.toString());
@@ -296,6 +301,7 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 		s.append(sHtmlEnd.toString());
 		html = s.toString();
 
+		System.out.println(html);
 		return html;
 	}
 

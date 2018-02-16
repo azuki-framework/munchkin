@@ -23,6 +23,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -38,6 +42,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+
+import org.azkfw.munchkin.database.model.ObjectEntity;
 
 /**
  * このクラスは、データグリッドパネルクラスです。
@@ -86,6 +92,16 @@ public class DataGridPanel extends JPanel {
 
 		table.setRowHeight(fm.getHeight() + 4 + 2);
 		table.setSelectionBackground(new Color(255, 204, 153));
+		
+		table.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(final KeyEvent e) {
+				if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_C) {
+					doCopy();
+					e.consume();
+				}
+			}
+		});
 
 		final JPanel pnlControl = new JPanel();
 		pnlControl.setPreferredSize(new Dimension(0, 32));
@@ -144,6 +160,39 @@ public class DataGridPanel extends JPanel {
 		return cnt;
 	}
 
+	private void doCopy() {
+		int cnt = table.getSelectedRowCount();
+		if (0 < cnt) {
+			int rows[] = table.getSelectedRows();
+
+			final List<String> columns = new ArrayList<String>();
+			for (int col = 0 ;  col < model.getColumnCount() ; col++) {
+				columns.add(model.getColumnName(col));
+			}
+
+			final List<List<String>> records = new ArrayList<List<String>>();
+			for (int row : rows) {
+				final List<String> record = new ArrayList<String>();
+				int index = table.convertRowIndexToModel(row);
+				for (int col = 0 ;  col < model.getColumnCount() ; col++) {
+					final Object obj = model.getValueAt(index, col);
+					if (null == obj) {
+						record.add(null);
+					} else {
+						record.add(obj.toString());
+					}
+				}
+				records.add(record);
+			}
+
+			final DataGridSelection selection = new DataGridSelection(columns, records);
+
+			final Toolkit kit = Toolkit.getDefaultToolkit();
+			final Clipboard clip = kit.getSystemClipboard();
+			clip.setContents(selection, selection);
+		}
+	}
+	
 	private class MyTableCellRenderer extends DataGridCellTextPanel implements TableCellRenderer {
 		/**  */
 		private static final long serialVersionUID = 1L;
