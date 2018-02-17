@@ -43,8 +43,6 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import org.azkfw.munchkin.database.model.ObjectEntity;
-
 /**
  * このクラスは、データグリッドパネルクラスです。
  * 
@@ -92,13 +90,32 @@ public class DataGridPanel extends JPanel {
 
 		table.setRowHeight(fm.getHeight() + 4 + 2);
 		table.setSelectionBackground(new Color(255, 204, 153));
-		
+
 		table.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyTyped(final KeyEvent e) {
+				if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_C) {
+					//e.consume();
+				}
+			}
+
 			@Override
 			public void keyReleased(final KeyEvent e) {
 				if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_C) {
+					//e.consume();
+				}
+			}
+
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				System.out.println("pressed " + e.getModifiers());
+				if ((e.getKeyCode() == KeyEvent.VK_C) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+					System.out.println("pressed");
 					doCopy();
 					e.consume();
+				} else {
+
 				}
 			}
 		});
@@ -166,7 +183,7 @@ public class DataGridPanel extends JPanel {
 			int rows[] = table.getSelectedRows();
 
 			final List<String> columns = new ArrayList<String>();
-			for (int col = 0 ;  col < model.getColumnCount() ; col++) {
+			for (int col = 0; col < model.getColumnCount(); col++) {
 				columns.add(model.getColumnName(col));
 			}
 
@@ -174,7 +191,7 @@ public class DataGridPanel extends JPanel {
 			for (int row : rows) {
 				final List<String> record = new ArrayList<String>();
 				int index = table.convertRowIndexToModel(row);
-				for (int col = 0 ;  col < model.getColumnCount() ; col++) {
+				for (int col = 0; col < model.getColumnCount(); col++) {
 					final Object obj = model.getValueAt(index, col);
 					if (null == obj) {
 						record.add(null);
@@ -192,7 +209,7 @@ public class DataGridPanel extends JPanel {
 			clip.setContents(selection, selection);
 		}
 	}
-	
+
 	private class MyTableCellRenderer extends DataGridCellTextPanel implements TableCellRenderer {
 		/**  */
 		private static final long serialVersionUID = 1L;
