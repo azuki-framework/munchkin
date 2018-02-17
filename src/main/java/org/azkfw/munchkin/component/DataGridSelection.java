@@ -17,17 +17,17 @@
  */
 package org.azkfw.munchkin.component;
 
-import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.azkfw.munchkin.util.StringBuilderEx;
 
 /**
  *
@@ -36,34 +36,6 @@ import java.util.regex.Pattern;
 public class DataGridSelection implements Transferable, ClipboardOwner {
 
 	private static final Pattern PTN = Pattern.compile("([ ]+)");
-
-	public static void main(final String[] args) {
-		final Toolkit kit = Toolkit.getDefaultToolkit();
-		final Clipboard clip = kit.getSystemClipboard();
-
-		final List<String> columns = new ArrayList<String>();
-		columns.add("ID");
-		columns.add("NAME");
-		columns.add("AGE");
-		columns.add("DATE");
-		final List<List<String>> records = new ArrayList<List<String>>();
-		for (int i = 0; i < 3; i++) {
-			final List<String> record = new ArrayList<String>();
-			for (int j = 0; j < 4; j++) {
-				if (i == j) {
-					record.add(null);
-				} else if (i == 2) {
-					record.add(String.format("     "));
-				} else {
-					record.add(String.format("%d-%d", i, j));
-				}
-			}
-			records.add(record);
-		}
-
-		final DataGridSelection s = new DataGridSelection(columns, records);
-		clip.setContents(s, s);
-	}
 
 	private final DataFlavor[] flavors;
 
@@ -110,16 +82,17 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 			return html;
 		}
 
-		final StringBuilder sPreHeader = new StringBuilder();
-		sPreHeader.append("Version:0.9\r\n");
-		sPreHeader.append("StartHTML:0000000000\r\n");
-		sPreHeader.append("EndHTML:0000000000\r\n");
-		sPreHeader.append("StartFragment:0000000000\r\n");
-		sPreHeader.append("EndFragment:0000000000\r\n");
-		sPreHeader.append("SourceURL:Munchkin\r\n");
-		System.out.println("preHeader : " + sPreHeader.length());
+		final String fontName = "ＭＳ ゴシック";
 
-		final StringBuilder sHtmlStart = new StringBuilder();
+		final StringBuilderEx sPreHeader = new StringBuilderEx();
+		sPreHeader.appendln("Version:0.9");
+		sPreHeader.appendln("StartHTML:%010d", 0);
+		sPreHeader.appendln("EndHTML:%010d", 0);
+		sPreHeader.appendln("StartFragment:%010d", 0);
+		sPreHeader.appendln("EndFragment:%010d", 0);
+		sPreHeader.appendln("SourceURL:Munchkin");
+
+		final StringBuilderEx sHtmlStart = new StringBuilderEx();
 		sHtmlStart.append("<html xmlns:v=\"urn:schemas-microsoft-com:vml\"");
 		sHtmlStart.append(" xmlns:o=\"urn:schemas-microsoft-com:office:office\"");
 		sHtmlStart.append(" xmlns:x=\"urn:schemas-microsoft-com:office:excel\"");
@@ -132,115 +105,113 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 		sHtmlStart.append("<!--");
 		sHtmlStart.append("@page");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	margin:.75in .7in .75in .7in;");
-		sHtmlStart.append("	mso-header-margin:.3in;");
-		sHtmlStart.append("	mso-footer-margin:.3in;");
+		sHtmlStart.append(" margin:.75in .7in .75in .7in;");
+		sHtmlStart.append(" mso-header-margin:.3in;");
+		sHtmlStart.append(" mso-footer-margin:.3in;");
 		sHtmlStart.append("}");
 		sHtmlStart.append("ruby");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	ruby-align:left;");
+		sHtmlStart.append(" ruby-align:left;");
 		sHtmlStart.append("}");
 		sHtmlStart.append("table");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	mso-displayed-decimal-separator:\"\\.\";");
-		sHtmlStart.append("	mso-displayed-thousand-separator:\"\\,\";");
+		sHtmlStart.append(" mso-displayed-decimal-separator:\"\\.\";");
+		sHtmlStart.append(" mso-displayed-thousand-separator:\"\\,\";");
 		sHtmlStart.append("}");
 		sHtmlStart.append("rt");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	color:windowtext;");
-		sHtmlStart.append("	font-size:6.0pt;");
-		sHtmlStart.append("	font-weight:400;");
-		sHtmlStart.append("	font-style:normal;");
-		sHtmlStart.append("	text-decoration:none;");
-		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
-		sHtmlStart.append("	mso-font-charset:128;");
-		sHtmlStart.append("	mso-char-type:katakana;");
-		sHtmlStart.append("	display:none;");
+		sHtmlStart.append(" color:windowtext;");
+		sHtmlStart.append(" font-size:6.0pt;");
+		sHtmlStart.append(" font-weight:400;");
+		sHtmlStart.append(" font-style:normal;");
+		sHtmlStart.append(" text-decoration:none;");
+		sHtmlStart.append(" font-family:\"%s\";", fontName);
+		sHtmlStart.append(" mso-font-charset:128;");
+		sHtmlStart.append(" mso-char-type:katakana;");
+		sHtmlStart.append(" display:none;");
 		sHtmlStart.append("}");
 		sHtmlStart.append("td");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	padding-top:1px;");
-		sHtmlStart.append("	padding-right:1px;");
-		sHtmlStart.append("	padding-left:1px;");
-		sHtmlStart.append("	mso-ignore:padding;");
-		sHtmlStart.append("	color:black;");
-		sHtmlStart.append("	font-size:12.0pt;");
-		sHtmlStart.append("	font-weight:400;");
-		sHtmlStart.append("	font-style:normal;");
-		sHtmlStart.append("	text-decoration:none;");
-		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
-		sHtmlStart.append("	mso-font-charset:128;");
-		sHtmlStart.append("	mso-number-format:General;");
-		sHtmlStart.append("	text-align:general;");
-		sHtmlStart.append("	vertical-align:bottom;");
-		sHtmlStart.append("	border:none;");
-		sHtmlStart.append("	mso-background-source:auto;");
-		sHtmlStart.append("	mso-pattern:auto;");
-		sHtmlStart.append("	mso-protection:locked visible;");
-		sHtmlStart.append("	white-space:nowrap;");
-		sHtmlStart.append("	mso-rotate:0;");
+		sHtmlStart.append(" padding-top:1px;");
+		sHtmlStart.append(" padding-right:1px;");
+		sHtmlStart.append(" padding-left:1px;");
+		sHtmlStart.append(" mso-ignore:padding;");
+		sHtmlStart.append(" color:black;");
+		sHtmlStart.append(" font-size:12.0pt;");
+		sHtmlStart.append(" font-weight:400;");
+		sHtmlStart.append(" font-style:normal;");
+		sHtmlStart.append(" text-decoration:none;");
+		sHtmlStart.append(" font-family:\"%s\";", fontName);
+		sHtmlStart.append(" mso-font-charset:128;");
+		sHtmlStart.append(" mso-number-format:General;");
+		sHtmlStart.append(" text-align:general;");
+		sHtmlStart.append(" vertical-align:bottom;");
+		sHtmlStart.append(" border:none;");
+		sHtmlStart.append(" mso-background-source:auto;");
+		sHtmlStart.append(" mso-pattern:auto;");
+		sHtmlStart.append(" mso-protection:locked visible;");
+		sHtmlStart.append(" white-space:nowrap;");
+		sHtmlStart.append(" mso-rotate:0;");
 		sHtmlStart.append("}");
 		sHtmlStart.append(".xl63");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	font-weight:700;");
-		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
-		sHtmlStart.append("	mso-generic-font-family:auto;");
-		sHtmlStart.append("	mso-font-charset:128;");
-		sHtmlStart.append("	mso-number-format:\"\\@\";");
-		sHtmlStart.append("	border:.5pt solid windowtext;");
-		sHtmlStart.append("	background:#D8E4BC;");
-		sHtmlStart.append("	mso-pattern:black none;");
+		sHtmlStart.append(" font-weight:700;");
+		sHtmlStart.append(" font-family:\"%s\";", fontName);
+		sHtmlStart.append(" mso-generic-font-family:auto;");
+		sHtmlStart.append(" mso-font-charset:128;");
+		sHtmlStart.append(" mso-number-format:\"\\@\";");
+		sHtmlStart.append(" border:.5pt solid windowtext;");
+		sHtmlStart.append(" background:#D8E4BC;");
+		sHtmlStart.append(" mso-pattern:black none;");
 		sHtmlStart.append("}");
 		sHtmlStart.append(".xl64");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
-		sHtmlStart.append("	mso-generic-font-family:auto;");
-		sHtmlStart.append("	mso-font-charset:128;");
-		sHtmlStart.append("	mso-number-format:\"\\@\";");
-		sHtmlStart.append("	border:.5pt solid windowtext;");
+		sHtmlStart.append(" font-family:\"%s\";", fontName);
+		sHtmlStart.append(" mso-generic-font-family:auto;");
+		sHtmlStart.append(" mso-font-charset:128;");
+		sHtmlStart.append(" mso-number-format:\"\\@\";");
+		sHtmlStart.append(" border:.5pt solid windowtext;");
 		sHtmlStart.append("}");
 		sHtmlStart.append(".font6");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	color:black;");
-		sHtmlStart.append("	font-size:12.0pt;");
-		sHtmlStart.append("	font-weight:400;");
-		sHtmlStart.append("	font-style:normal;");
-		sHtmlStart.append("	text-decoration:none;");
-		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
-		sHtmlStart.append("	mso-generic-font-family:auto;");
-		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append(" color:black;");
+		sHtmlStart.append(" font-size:12.0pt;");
+		sHtmlStart.append(" font-weight:400;");
+		sHtmlStart.append(" font-style:normal;");
+		sHtmlStart.append(" text-decoration:none;");
+		sHtmlStart.append(" font-family:\"%s\";", fontName);
+		sHtmlStart.append(" mso-generic-font-family:auto;");
+		sHtmlStart.append(" mso-font-charset:128;");
 		sHtmlStart.append("}");
 		sHtmlStart.append(".font7");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	color:red;");
-		sHtmlStart.append("	font-size:12.0pt;");
-		sHtmlStart.append("	font-weight:400;");
-		sHtmlStart.append("	font-style:normal;");
-		sHtmlStart.append("	text-decoration:none;");
-		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
-		sHtmlStart.append("	mso-generic-font-family:auto;");
-		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append(" color:red;");
+		sHtmlStart.append(" font-size:12.0pt;");
+		sHtmlStart.append(" font-weight:400;");
+		sHtmlStart.append(" font-style:normal;");
+		sHtmlStart.append(" text-decoration:none;");
+		sHtmlStart.append(" font-family:\"%s\";", fontName);
+		sHtmlStart.append(" mso-generic-font-family:auto;");
+		sHtmlStart.append(" mso-font-charset:128;");
 		sHtmlStart.append("}");
 		sHtmlStart.append(".font8");
 		sHtmlStart.append("{");
-		sHtmlStart.append("	color:blue;");
-		sHtmlStart.append("	font-size:12.0pt;");
-		sHtmlStart.append("	font-weight:700;");
-		sHtmlStart.append("	font-style:normal;");
-		sHtmlStart.append("	text-decoration:none;");
-		sHtmlStart.append("	font-family:\"ＭＳ ゴシック\";");
-		sHtmlStart.append("	mso-generic-font-family:auto;");
-		sHtmlStart.append("	mso-font-charset:128;");
+		sHtmlStart.append(" color:blue;");
+		sHtmlStart.append(" font-size:12.0pt;");
+		sHtmlStart.append(" font-weight:700;");
+		sHtmlStart.append(" font-style:normal;");
+		sHtmlStart.append(" text-decoration:none;");
+		sHtmlStart.append(" font-family:\"%s\";", fontName);
+		sHtmlStart.append(" mso-generic-font-family:auto;");
+		sHtmlStart.append(" mso-font-charset:128;");
 		sHtmlStart.append("}");
 		sHtmlStart.append("-->");
 		sHtmlStart.append("</style>");
 		sHtmlStart.append("</head>");
 		sHtmlStart.append("<body link=blue vlink=purple>");
-		sHtmlStart
-				.append("<table border=0 cellpadding=0 cellspacing=0 width=345 style='border-collapse: collapse;width:345pt'>");
-		System.out.println("htmlStart : " + sHtmlStart.length());
+		sHtmlStart.append("<table border=0 cellpadding=0 cellspacing=0 style='border-collapse: collapse;'>");
 
-		final StringBuilder sFrag = new StringBuilder();
+		final StringBuilderEx sFrag = new StringBuilderEx();
 		sFrag.append("<!--StartFragment-->");
 		sFrag.append("<tr>");
 		for (int col = 0; col < columns.size(); col++) {
@@ -272,36 +243,31 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 			sFrag.append("</tr>");
 		}
 		sFrag.append("<!--EndFragment-->");
-		System.out.println("flag : " + sFrag.length());
 
-		final StringBuilder sHtmlEnd = new StringBuilder();
+		final StringBuilderEx sHtmlEnd = new StringBuilderEx();
 		sHtmlEnd.append("</table>");
 		sHtmlEnd.append("</body>");
 		sHtmlEnd.append("</html>");
-		System.out.println("htmlEnd : " + sHtmlEnd.length());
 
 		final int startHTML = sPreHeader.length();
 		final int startFragment = startHTML + sHtmlStart.length();
 		final int endFragment = startFragment + sFrag.length();
 		final int endHTML = endFragment + sHtmlEnd.length();
 
-		final StringBuilder sHeader = new StringBuilder();
-		sHeader.append("Version:0.9\r\n");
-		sHeader.append(String.format("StartHTML:%010d\r\n", startHTML));
-		sHeader.append(String.format("EndHTML:%010d\r\n", endHTML));
-		sHeader.append(String.format("StartFragment:%010d\r\n", startFragment));
-		sHeader.append(String.format("EndFragment:%010d\r\n", endFragment));
-		sHeader.append("SourceURL:Munchkin\r\n");
-		System.out.println("sHeader : " + sHeader.length());
+		final StringBuilderEx sHeader = new StringBuilderEx();
+		sHeader.appendln("Version:0.9");
+		sHeader.appendln("StartHTML:%010d", startHTML);
+		sHeader.appendln("EndHTML:%010d", endHTML);
+		sHeader.appendln("StartFragment:%010d", startFragment);
+		sHeader.appendln("EndFragment:%010d", endFragment);
+		sHeader.appendln("SourceURL:Munchkin");
 
-		final StringBuffer s = new StringBuffer();
+		final StringBuilderEx s = new StringBuilderEx();
 		s.append(sHeader.toString());
 		s.append(sHtmlStart.toString());
 		s.append(sFrag.toString());
 		s.append(sHtmlEnd.toString());
 		html = s.toString();
-
-		System.out.println(html);
 		return html;
 	}
 
