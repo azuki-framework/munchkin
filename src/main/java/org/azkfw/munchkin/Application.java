@@ -34,7 +34,11 @@ public class Application {
 	 *
 	 * @param args 引数
 	 */
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws Exception {
+		System.setProperty("apple.awt.application.name", "Munchkin");
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Munchkin");
+		System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 		final Munchkin munchkin = Munchkin.getInstance();
 		munchkin.load();
