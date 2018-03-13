@@ -17,17 +17,19 @@
  */
 package org.azkfw.munchkin.component;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.Container;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -50,21 +52,22 @@ public class DBConditionPanel extends JPanel {
 	private final List<DBConditionPanelListener> listeners;
 
 	private final JLabel lblSchema;
-	private final JComboBox<SchemaEntity> lstSchema;
+	private final JComboBox<SchemaEntity> cmbSchema;
 	private final JLabel lblType;
-	private final JComboBox<TypeEntity> lstType;
+	private final JComboBox<TypeEntity> cmbType;
 
 	public DBConditionPanel() {
 		listeners = new ArrayList<DBConditionPanelListener>();
 
-		setLayout(new GridLayout(2, 1));
-		setPreferredSize(new Dimension(0, 60 + 12));
-		setBorder(new EmptyBorder(4, 4, 16, 4));
+		//setPreferredSize(new Dimension(0, 60 + 12));
+		setBorder(new EmptyBorder(2, 2, 4, 2));
 
-		lblSchema = new JLabel("Schema");
-		lblSchema.setPreferredSize(new Dimension(60, 0));
-		lstSchema = new JComboBox<SchemaEntity>();
-		lstSchema.setRenderer(new DefaultListCellRenderer() {
+		lblSchema = new JLabel("Schema :");
+		cmbSchema = new JComboBox<SchemaEntity>();
+		lblType = new JLabel("Type :");
+		cmbType = new JComboBox<TypeEntity>();
+
+		cmbSchema.setRenderer(new DefaultListCellRenderer() {
 			/** serialVersionUID */
 			private static final long serialVersionUID = 1L;
 
@@ -72,7 +75,6 @@ public class DBConditionPanel extends JPanel {
 			public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
 					final boolean isSelected, final boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
 				if (MunchkinUtil.isNull(value)) {
 					setText("(NULL)");
 				} else if (value instanceof SchemaEntity) {
@@ -80,20 +82,10 @@ public class DBConditionPanel extends JPanel {
 				} else {
 					setText("-- Unknown --");
 				}
-
 				return this;
 			}
 		});
-		final JPanel pnlUser = new JPanel();
-		pnlUser.setLayout(new BorderLayout());
-		pnlUser.add(BorderLayout.WEST, lblSchema);
-		pnlUser.add(BorderLayout.CENTER, lstSchema);
-		add(pnlUser);
-
-		lblType = new JLabel("Type");
-		lblType.setPreferredSize(new Dimension(60, 0));
-		lstType = new JComboBox<TypeEntity>();
-		lstType.setRenderer(new DefaultListCellRenderer() {
+		cmbType.setRenderer(new DefaultListCellRenderer() {
 			/** serialVersionUID */
 			private static final long serialVersionUID = 1L;
 
@@ -101,7 +93,6 @@ public class DBConditionPanel extends JPanel {
 			public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
 					final boolean isSelected, final boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
 				if (MunchkinUtil.isNull(value)) {
 					setText("(NULL)");
 				} else if (value instanceof TypeEntity) {
@@ -109,29 +100,28 @@ public class DBConditionPanel extends JPanel {
 				} else {
 					setText("-- Unknown --");
 				}
-
 				return this;
 			}
 		});
-		final JPanel pnlType = new JPanel();
-		pnlType.setLayout(new BorderLayout());
-		pnlType.add(BorderLayout.WEST, lblType);
-		pnlType.add(BorderLayout.CENTER, lstType);
-		add(pnlType);
 
-		lstSchema.addItemListener(new ItemListener() {
+		final JComponent[][] compos = { { lblSchema, cmbSchema }, { lblType, cmbType } };
+		initPane(compos, this);
+
+		cmbSchema.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					listeners.forEach(l -> l.dbConditionPanelSchemaChenged((SchemaEntity) lstSchema.getSelectedItem()));
+					final SchemaEntity schema = (SchemaEntity) cmbSchema.getSelectedItem();
+					listeners.forEach(l -> l.dbConditionPanelChengedSchema(schema));
 				}
 			}
 		});
-		lstType.addItemListener(new ItemListener() {
+		cmbType.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					listeners.forEach(l -> l.dbConditionPanelTypeChenged((TypeEntity) lstType.getSelectedItem()));
+					final TypeEntity type = (TypeEntity) cmbType.getSelectedItem();
+					listeners.forEach(l -> l.dbConditionPanelChengedType(type));
 				}
 			}
 		});
@@ -142,31 +132,68 @@ public class DBConditionPanel extends JPanel {
 	}
 
 	public void refresh(final List<SchemaEntity> schemaList, final List<TypeEntity> typeList) {
-		lstSchema.removeAllItems();
-		schemaList.forEach(schema -> lstSchema.addItem(schema));
-		lstSchema.setSelectedIndex(0);
+		cmbSchema.removeAllItems();
+		schemaList.forEach(schema -> cmbSchema.addItem(schema));
+		cmbSchema.setSelectedIndex(0);
 
-		lstType.removeAllItems();
-		typeList.forEach(type -> lstType.addItem(type));
-		lstType.setSelectedIndex(0);
+		cmbType.removeAllItems();
+		typeList.forEach(type -> cmbType.addItem(type));
+		cmbType.setSelectedIndex(0);
 	}
 
 	public void setSelectSchema(final SchemaEntity schema) {
-		lstSchema.setSelectedIndex(0);
-		for (int i = 0; i < lstSchema.getItemCount(); i++) {
-			final SchemaEntity target = lstSchema.getItemAt(i);
+		cmbSchema.setSelectedIndex(0);
+		for (int i = 0; i < cmbSchema.getItemCount(); i++) {
+			final SchemaEntity target = cmbSchema.getItemAt(i);
 			if (MunchkinUtil.isEquals(schema.getName(), target.getName())) {
-				lstSchema.setSelectedIndex(i);
+				cmbSchema.setSelectedIndex(i);
 				return;
 			}
 		}
 	}
 
 	public SchemaEntity getSelectSchema() {
-		return (SchemaEntity) lstSchema.getSelectedItem();
+		return (SchemaEntity) cmbSchema.getSelectedItem();
 	}
 
 	public TypeEntity getSelectType() {
-		return (TypeEntity) lstType.getSelectedItem();
+		return (TypeEntity) cmbType.getSelectedItem();
+	}
+
+	private void initPane(final JComponent[][] compos, final Container container) {
+		final GroupLayout layout = new GroupLayout(container);
+		container.setLayout(layout);
+
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
+
+		final int ny = compos.length;
+		final int nx = compos[0].length;
+
+		final SequentialGroup hg = layout.createSequentialGroup();
+		for (int x = 0; x < nx; x++) {
+			final ParallelGroup pg = layout.createParallelGroup();
+			for (int y = 0; y < ny; y++) {
+				final JComponent c = compos[y][x];
+				if (c != null) {
+					pg.addComponent(c);
+				}
+			}
+			hg.addGroup(pg);
+		}
+		layout.setHorizontalGroup(hg);
+
+		final SequentialGroup vg = layout.createSequentialGroup();
+		for (int y = 0; y < ny; y++) {
+			final ParallelGroup pg = layout.createParallelGroup(GroupLayout.Alignment.BASELINE);
+			for (int x = 0; x < nx; x++) {
+				final JComponent c = compos[y][x];
+				if (c != null) {
+					pg.addComponent(c);
+				}
+			}
+			vg.addGroup(pg);
+		}
+		layout.setVerticalGroup(vg);
 	}
 }

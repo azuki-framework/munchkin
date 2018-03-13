@@ -146,13 +146,13 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 
 		pnlCondition.addDBConditionPanelListener(new DBConditionPanelListener() {
 			@Override
-			public void dbConditionPanelTypeChenged(final TypeEntity type) {
+			public void dbConditionPanelChengedType(final TypeEntity type) {
 				final SchemaEntity schema = pnlCondition.getSelectSchema();
 				getObjectList(schema, type);
 			}
 
 			@Override
-			public void dbConditionPanelSchemaChenged(final SchemaEntity schema) {
+			public void dbConditionPanelChengedSchema(final SchemaEntity schema) {
 				final TypeEntity type = pnlCondition.getSelectType();
 				getObjectList(schema, type);
 			}
