@@ -18,8 +18,13 @@
 package org.azkfw.munchkin.database.model;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.azkfw.munchkin.util.MunchkinUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,27 +33,45 @@ import org.azkfw.munchkin.util.MunchkinUtil;
  */
 public class OracleModel extends TemplateDatabaseModel {
 
+	/** logger */
+	private static final Logger LOGGER = LoggerFactory.getLogger(OracleModel.class);
+
+	private final boolean dbaRole;
+	
 	public OracleModel(final Connection connection) {
 		super(connection);
 
+		dbaRole = isDBARole(connection);
 	}
 
 	@Override
 	protected final void sqlGetDefaultSchema(final SQLBuilder builder) {
 		builder.append("SELECT");
-		builder.append("    '' AS name");
-		builder.append("  , '' AS label");
+		builder.append("    sys_context('userenv', 'session_user') AS name");
+		builder.append("  , sys_context('userenv', 'session_user') AS label");
+		builder.append("FROM");
+		builder.append("    DUAL");
 	}
 
 	@Override
 	protected final void sqlGetSchemaList(final SQLBuilder builder) {
-		builder.append("SELECT");
-		builder.append("    username as name");
-		builder.append("  , username as label");
-		builder.append("FROM");
-		builder.append("    dba_users");
-		builder.append("ORDER BY");
-		builder.append("    username");
+		if (dbaRole) {
+			builder.append("SELECT");
+			builder.append("    username AS name");
+			builder.append("  , username AS label");
+			builder.append("FROM");
+			builder.append("    dba_users");
+			builder.append("ORDER BY");
+			builder.append("    username");
+		} else {
+			builder.append("SELECT");
+			builder.append("    username AS name");
+			builder.append("  , username AS label");
+			builder.append("FROM");
+			builder.append("    user_users");
+			builder.append("ORDER BY");
+			builder.append("    username");
+		}
 	}
 
 	@Override
@@ -75,21 +98,38 @@ public class OracleModel extends TemplateDatabaseModel {
 
 	@Override
 	protected final void sqlGetObjectList(final SQLBuilder builder, final SchemaEntity schema, final TypeEntity type) {
-		builder.append("SELECT");
-		builder.append("    OWNER       AS schema");
-		builder.append("  , OBJECT_NAME AS name");
-		builder.append("  , ''          AS label");
-		builder.append("  , OBJECT_TYPE AS type");
-		builder.append("  , OWNER       AS owner");
-		builder.append("  , LAST_DDL_TIME AS \"UPDATE\"");
-		builder.append("  , STATUS        AS \"STATUS\"");
-		builder.append("FROM");
-		builder.append("    DBA_OBJECTS");
-		builder.append("WHERE");
-		builder.append("    OWNER       = ?", schema.getName());
-		builder.append("AND OBJECT_TYPE = ?", type.getName());
-		builder.append("ORDER BY");
-		builder.append("    OBJECT_NAME");
+		if (dbaRole) {
+			builder.append("SELECT");
+			builder.append("    OWNER         AS schema");
+			builder.append("  , OBJECT_NAME   AS name");
+			builder.append("  , ''            AS label");
+			builder.append("  , OBJECT_TYPE   AS type");
+			builder.append("  , OWNER         AS owner");
+			builder.append("  , LAST_DDL_TIME AS \"UPDATE\"");
+			builder.append("  , STATUS        AS \"STATUS\"");
+			builder.append("FROM");
+			builder.append("    DBA_OBJECTS");
+			builder.append("WHERE");
+			builder.append("    OWNER       = ?", schema.getName());
+			builder.append("AND OBJECT_TYPE = ?", type.getName());
+			builder.append("ORDER BY");
+			builder.append("    OBJECT_NAME");
+		} else {
+			builder.append("SELECT");
+			builder.append("    ?             AS schema", schema.getName());
+			builder.append("  , OBJECT_NAME   AS name");
+			builder.append("  , ''            AS label");
+			builder.append("  , OBJECT_TYPE   AS type");
+			builder.append("  , ?             AS owner", schema.getName());
+			builder.append("  , LAST_DDL_TIME AS \"UPDATE\"");
+			builder.append("  , STATUS        AS \"STATUS\"");
+			builder.append("FROM");
+			builder.append("    USER_OBJECTS");
+			builder.append("WHERE");
+			builder.append("    OBJECT_TYPE = ?", type.getName());
+			builder.append("ORDER BY");
+			builder.append("    OBJECT_NAME");
+		}
 	}
 
 	@Override
@@ -97,20 +137,68 @@ public class OracleModel extends TemplateDatabaseModel {
 		if (MunchkinUtil.isNull(object)) {
 
 		} else if (MunchkinUtil.isEquals(object.getType(), "TABLE")) {
-			builder.append("SELECT");
-			builder.append("    COLUMN_NAME AS \"列名\"");
-			builder.append("  , DATA_TYPE   AS \"データ型\"");
-			builder.append("  , DATA_LENGTH as LENGTH");
-			builder.append("  , DECODE(NULLABLE, 'N', '○', '') as NOTNULL");
-			builder.append("FROM");
-			builder.append("    DBA_TAB_COLUMNS");
-			builder.append("WHERE");
-			builder.append("    OWNER = ?", object.getSchema());
-			builder.append("AND TABLE_NAME = ?", object.getName());
-			builder.append("ORDER BY");
-			builder.append("    COLUMN_ID");
+			if (dbaRole) {
+				builder.append("SELECT");
+				builder.append("    COLUMN_NAME AS \"列名\"");
+				builder.append("  , DATA_TYPE   AS \"データ型\"");
+				builder.append("  , DATA_LENGTH AS LENGTH");
+				builder.append("  , DECODE(NULLABLE, 'N', '○', '') as NOTNULL");
+				builder.append("FROM");
+				builder.append("    DBA_TAB_COLUMNS");
+				builder.append("WHERE");
+				builder.append("    OWNER      = ?", object.getSchema());
+				builder.append("AND TABLE_NAME = ?", object.getName());
+				builder.append("ORDER BY");
+				builder.append("    COLUMN_ID");
+			} else {
+				builder.append("SELECT");
+				builder.append("    COLUMN_NAME AS \"列名\"");
+				builder.append("  , DATA_TYPE   AS \"データ型\"");
+				builder.append("  , DATA_LENGTH AS LENGTH");
+				builder.append("  , DECODE(NULLABLE, 'N', '○', '') as NOTNULL");
+				builder.append("FROM");
+				builder.append("    USER_TAB_COLUMNS");
+				builder.append("WHERE");
+				builder.append("    TABLE_NAME = ?", object.getName());
+				builder.append("ORDER BY");
+				builder.append("    COLUMN_ID");
+			}
 		} else {
 
 		}
+	}
+	
+	
+	private boolean isDBARole(final Connection c) {
+		boolean result = false;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			final StringBuffer sql = new StringBuffer();
+			sql.append("SELECT");
+			sql.append("    count(*) AS CNT");
+			sql.append(" FROM");
+			sql.append("    USER_ROLE_PRIVS");
+			sql.append(" WHERE");
+			sql.append("     USERNAME     = sys_context('userenv', 'session_user')");
+			sql.append(" AND GRANTED_ROLE = 'DBA'");
+
+			ps = getConnection().prepareStatement(sql.toString());
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				final int cnt = rs.getInt(1);
+				if (0 < cnt) {
+					result = true;
+				}
+			}
+		} catch (SQLException ex) {
+			LOGGER.error("DBA user check error.", ex);
+		} finally {
+			release(rs);
+			release(ps);
+		}
+		return result;
 	}
 }
