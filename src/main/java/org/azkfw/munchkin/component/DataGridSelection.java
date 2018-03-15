@@ -23,6 +23,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,7 +36,7 @@ import org.azkfw.munchkin.util.StringBuilderEx;
  */
 public class DataGridSelection implements Transferable, ClipboardOwner {
 
-	private static final Pattern PTN = Pattern.compile("([ ]+)");
+	private static final Pattern PTN = Pattern.compile("([ ]+|[　]+)");
 
 	private final DataFlavor[] flavors;
 
@@ -46,8 +47,9 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 		this.columns = columns;
 		this.records = records;
 
-		flavors = new DataFlavor[1];
-		flavors[0] = new DataFlavor("text/html; document=all; class=java.lang.String; charset=Unicode", "text/html");
+		flavors = new DataFlavor[2];
+		flavors[0] = new DataFlavor("text/html; document=all; class=java.lang.String; charset=UTF-8", "text/html");
+		flavors[1] = new DataFlavor("text/plain; class=java.lang.String; charset=UTF-8", "text/plain");
 	}
 
 	@Override
@@ -67,12 +69,48 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 	public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException, IOException {
 		if (flavors[0].equals(flavor)) {
 			return getHtml();
+		} else if (flavors[1].equals(flavor)) {
+			return getPlain();
 		}
 		throw new UnsupportedFlavorException(flavor);
 	}
 
 	@Override
 	public void lostOwnership(final Clipboard clipboard, final Transferable contents) {
+	}
+
+	private String plain;
+
+	private synchronized String getPlain() {
+		if (null != plain) {
+			return plain;
+		}
+
+		final StringBuilder source = new StringBuilder();
+		int col = 0;
+		for (String column : columns) {
+			if (0 < col) {
+				source.append("\t");
+			}
+			source.append(column);
+			col ++;
+		}
+		source.append(System.lineSeparator());
+
+		for (List<String> record : records) {
+			col = 0;
+			for (String data : record) {
+				if (0 < col) {
+					source.append("\t");
+				}
+				source.append(data);
+				col ++;
+			}
+			source.append(System.lineSeparator());
+		}
+
+		plain = source.toString();
+		return plain;
 	}
 
 	private String html;
@@ -249,10 +287,23 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 		sHtmlEnd.append("</body>");
 		sHtmlEnd.append("</html>");
 
-		final int startHTML = sPreHeader.length();
-		final int startFragment = startHTML + sHtmlStart.length();
-		final int endFragment = startFragment + sFrag.length();
-		final int endHTML = endFragment + sHtmlEnd.length();
+		final String strPreHeader = sPreHeader.toString();
+		final String strHtmlStart = sHtmlStart.toString();
+		final String strFrag = sFrag.toString();
+		final String strHtmlEnd = sHtmlEnd.toString();
+		
+		int startHTML = 0;
+		int startFragment = 0;
+		int endFragment = 0;
+		int endHTML = 0;
+		try {
+			startHTML = strPreHeader.getBytes("UTF-8").length;
+			startFragment = startHTML + strHtmlStart.getBytes("UTF-8").length;
+			endFragment = startFragment + strFrag.getBytes("UTF-8").length;
+			endHTML = endFragment + strHtmlEnd.getBytes("UTF-8").length;
+		} catch (UnsupportedEncodingException ex) {
+			
+		}
 
 		final StringBuilderEx sHeader = new StringBuilderEx();
 		sHeader.appendln("Version:0.9");
@@ -262,11 +313,13 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 		sHeader.appendln("EndFragment:%010d", endFragment);
 		sHeader.appendln("SourceURL:Munchkin");
 
+		final String strHeader = sHeader.toString();
+
 		final StringBuilderEx s = new StringBuilderEx();
-		s.append(sHeader.toString());
-		s.append(sHtmlStart.toString());
-		s.append(sFrag.toString());
-		s.append(sHtmlEnd.toString());
+		s.append(strHeader);
+		s.append(strHtmlStart);
+		s.append(strFrag);
+		s.append(strHtmlEnd);
 		html = s.toString();
 		return html;
 	}
@@ -284,6 +337,7 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 			final Matcher m = PTN.matcher(val);
 			int i = 0;
 			while (m.find(i)) {
+				final String words = m.group(1);
 				int start = m.start(1);
 				int end = m.end(1);
 				if (i < start) {
@@ -292,8 +346,14 @@ public class DataGridSelection implements Transferable, ClipboardOwner {
 					s.append("</font>");
 				}
 				s.append("<font class=\"font7\">");
-				for (int j = start; j < end; j++) {
-					s.append("_");
+				if (words.startsWith(" ")) {
+					for (int j = start; j < end; j++) {
+						s.append("_");
+					}
+				} else if (words.startsWith("　")) {
+					for (int j = start; j < end; j++) {
+						s.append("＿");
+					}
 				}
 				s.append("</font>");
 				i = end;
