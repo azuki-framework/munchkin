@@ -50,7 +50,9 @@ public class DatabaseModelFactory {
 		if (-1 != name.indexOf("ORACLE")) {
 			model = new OracleModel(connection);
 		} else if (-1 != name.indexOf("DB2")) {
-			model =  new DB2Model(connection);
+			model = new DB2Model(connection);
+		} else if (-1 != name.indexOf("POSTGRESQL")) {
+			model = new PostgreSQLModel(connection);
 		} else {
 			LOGGER.error("Unsupported database model.[{}]", name);
 		}
