@@ -18,7 +18,13 @@
 package org.azkfw.munchkin;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Paths;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -68,6 +74,28 @@ public class Munchkin {
 	}
 
 	public boolean load() {
+		
+		final File driverDir = new File("driver");
+		if (driverDir.isDirectory()) {
+			
+			final File[] files = driverDir.listFiles();
+			for (File file: files){
+				try {
+					System.out.println(file.getAbsolutePath());
+
+					ClassLoader loader = ClassLoader.getSystemClassLoader();
+					Method m = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+					m.setAccessible(true);	//protectedメソッドにアクセス許可
+					m.invoke(loader, file.toURI().toURL());
+
+				} catch (MalformedURLException ex) {
+					ex.printStackTrace();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+		
 		final File file = getConfigFile();
 
 		if (file.isFile()) {
