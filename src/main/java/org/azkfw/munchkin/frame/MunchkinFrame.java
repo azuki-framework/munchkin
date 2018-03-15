@@ -47,10 +47,10 @@ import org.azkfw.munchkin.component.SQLEditorPanel;
 import org.azkfw.munchkin.component.SQLEditorPanelListener;
 import org.azkfw.munchkin.component.StatusBar;
 import org.azkfw.munchkin.database.model.DatabaseModel;
+import org.azkfw.munchkin.database.model.DatabaseModelFactory;
 import org.azkfw.munchkin.database.model.MockDatabaseModel;
 import org.azkfw.munchkin.database.model.ObjectDetailEntity;
 import org.azkfw.munchkin.database.model.ObjectEntity;
-import org.azkfw.munchkin.database.model.PostgreSQLModel;
 import org.azkfw.munchkin.database.model.SchemaEntity;
 import org.azkfw.munchkin.database.model.TypeEntity;
 import org.azkfw.munchkin.dialog.DatasourceDialog;
@@ -259,6 +259,11 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	public void exit() {
 		if (null != connection) {
 			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				LOGGER.warn("Connection rollback error.", ex);
+			}
+			try {
 				connection.close();
 			} catch (SQLException ex) {
 				LOGGER.warn("Connection close error.", ex);
@@ -275,7 +280,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 			c = DriverManager.getConnection(datasource.getUrl(), datasource.getUser(), datasource.getPassword());
 			c.setAutoCommit(false);
 
-			model = new PostgreSQLModel(c);
+			model = DatabaseModelFactory.create(c);
 			connection = c;
 
 			info("接続しました。[%s]", datasource.getName());
