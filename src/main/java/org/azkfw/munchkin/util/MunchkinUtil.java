@@ -20,16 +20,28 @@ package org.azkfw.munchkin.util;
 import java.util.List;
 
 /**
- *
+ * このクラスは、Munchkinユーティリティクラスです。
+ * 
  * @author Kawakicchi
- *
  */
 public class MunchkinUtil {
 
+	/**
+	 * オブジェクトが、<code>null</code>か判断する。
+	 *
+	 * @param object オブジェクト
+	 * @return オブジェクトが、<code>null</code>の場合、<code>true</code>を返す。
+	 */
 	public static boolean isNull(final Object object) {
 		return (null == object);
 	}
 
+	/**
+	 * オブジェクトが、<code>null</code>でないか判断する。
+	 *
+	 * @param object オブジェクト
+	 * @return オブジェクトが、<code>null</code>でない場合、<code>true</code>を返す。
+	 */
 	public static boolean isNotNull(final Object object) {
 		return (!isNull(object));
 	}
