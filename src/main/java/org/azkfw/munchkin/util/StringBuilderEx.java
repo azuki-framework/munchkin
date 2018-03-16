@@ -18,37 +18,70 @@
 package org.azkfw.munchkin.util;
 
 /**
- *
+ * このクラスは、文字列生成を行うビルダークラスです。
+ * 
  * @author Kawakicchi
- *
  */
 public class StringBuilderEx {
 
 	private final StringBuilder s;
 
-	private final String ln;
-
+	/**
+	 * コンストラクタ
+	 */
 	public StringBuilderEx() {
 		s = new StringBuilder();
-		ln = System.getProperty("line.separator");
 	}
 
+	/**
+	 * 文字列を追加する。
+	 *
+	 * @param str 文字列
+	 */
 	public void append(final String str) {
 		s.append(str);
 	}
 
+	/**
+	 * 文字列を追加する。
+	 *
+	 * @param format フォーマット
+	 * @param args 引数
+	 */
 	public void append(final String format, final Object... args) {
 		s.append(String.format(format, args));
 	}
 
+	/**
+	 * 文字列を追加する。
+	 * <p>
+	 * 文字列の末尾にシステム改行コードを追加する。
+	 * </p>
+	 *
+	 * @param str 文字列
+	 */
 	public void appendln(final String str) {
-		s.append(str).append(ln);
+		s.append(str).append(System.lineSeparator());
 	}
 
+	/**
+	 * 文字列を追加する。
+	 * <p>
+	 * 文字列の末尾にシステム改行コードを追加する。
+	 * </p>
+	 *
+	 * @param format フォーマット
+	 * @param args 引数
+	 */
 	public void appendln(final String format, final Object... args) {
-		s.append(String.format(format, args)).append(ln);
+		s.append(String.format(format, args)).append(System.lineSeparator());
 	}
 
+	/**
+	 * 文字列の長さを取得する。
+	 *
+	 * @return 文字列数
+	 */
 	public int length() {
 		return s.length();
 	}

@@ -18,13 +18,24 @@
 package org.azkfw.munchkin.util;
 
 /**
+ * このインターフェースは、SQL生成機能を定義したインターフェースです。
  *
  * @author Kawakicchi
- *
  */
 public interface SQLBuilder {
 
+	/**
+	 * SQL行を追加する。
+	 *
+	 * @param line 行
+	 */
 	void append(String line);
 
+	/**
+	 * SQL行を追加する。
+	 *
+	 * @param line 行
+	 * @param params パラメータ
+	 */
 	void append(String line, Object... params);
 }
