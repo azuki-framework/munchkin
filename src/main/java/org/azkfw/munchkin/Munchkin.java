@@ -23,8 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -74,12 +72,12 @@ public class Munchkin {
 	}
 
 	public boolean load() {
-		
+
 		final File driverDir = new File("driver");
 		if (driverDir.isDirectory()) {
-			
+
 			final File[] files = driverDir.listFiles();
-			for (File file: files){
+			for (File file : files) {
 				try {
 					System.out.println(file.getAbsolutePath());
 
@@ -95,7 +93,7 @@ public class Munchkin {
 				}
 			}
 		}
-		
+
 		final File file = getConfigFile();
 
 		if (file.isFile()) {
