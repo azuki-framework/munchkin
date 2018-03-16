@@ -21,6 +21,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+import org.azkfw.munchkin.database.model.db2.DB2Model;
+import org.azkfw.munchkin.database.model.oracle.OracleModel;
+import org.azkfw.munchkin.database.model.postgresql.PostgreSQLModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

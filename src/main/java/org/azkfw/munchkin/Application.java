@@ -20,7 +20,7 @@ package org.azkfw.munchkin;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import org.azkfw.munchkin.frame.MunchkinFrame;
+import org.azkfw.munchkin.ui.frame.MunchkinFrame;
 
 /**
  * このクラスは、Munchkinのアプリケーションクラスです。

@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.azkfw.munchkin.database.model.entity.ObjectDetailEntity;
+import org.azkfw.munchkin.database.model.entity.ObjectEntity;
+import org.azkfw.munchkin.database.model.entity.SchemaEntity;
+import org.azkfw.munchkin.database.model.entity.TypeEntity;
+
 /**
  *
  * @author Kawakicchi
