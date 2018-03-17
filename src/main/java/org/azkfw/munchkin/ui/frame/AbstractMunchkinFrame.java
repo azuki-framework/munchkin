@@ -41,23 +41,33 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 	private final JMenu menuFile;
 	private final JMenuItem menuFileConnection;
 	private final JMenuItem menuFileExit;
+	private final JMenu menuTool;
+	private final JMenuItem menuToolExport;
 	private final JMenu menuHelp;
 	private final JMenuItem menuHelpVersion;
 
 	public AbstractMunchkinFrame() {
 
 		menuBar = new JMenuBar();
+
 		menuFile = new JMenu(Label.MENU_FILE.toString());
-		menuBar.add(menuFile);
 		menuFileConnection = new JMenuItem(Label.MENU_FILE_CONNECTION.toString());
 		menuFile.add(menuFileConnection);
 		menuFile.addSeparator();
 		menuFileExit = new JMenuItem(Label.MENU_FILE_EXIT.toString());
 		menuFile.add(menuFileExit);
+		menuBar.add(menuFile);
+
+		menuTool = new JMenu(Label.MENU_TOOL.toString());
+		menuToolExport = new JMenuItem(Label.MENU_TOOL_EXPORT.toString());
+		menuTool.add(menuToolExport);
+		menuBar.add(menuTool);
+
 		menuHelp = new JMenu(Label.MENU_HELP.toString());
-		menuBar.add(menuHelp);
 		menuHelpVersion = new JMenuItem(Label.MENU_HELP_VERSION.toString());
 		menuHelp.add(menuHelpVersion);
+		menuBar.add(menuHelp);
+
 		setJMenuBar(menuBar);
 
 		menuFileConnection.addActionListener(new ActionListener() {

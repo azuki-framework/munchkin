@@ -50,6 +50,10 @@ public enum Label {
 	/** */
 	MENU_FILE_EXIT,
 	/** */
+	MENU_TOOL,
+	/** */
+	MENU_TOOL_EXPORT,
+	/** */
 	MENU_HELP,
 	/** */
 	MENU_HELP_VERSION,
