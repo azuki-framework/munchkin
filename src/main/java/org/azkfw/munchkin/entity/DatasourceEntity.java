@@ -17,20 +17,27 @@
  */
 package org.azkfw.munchkin.entity;
 
+import java.awt.Color;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+
+import org.azkfw.munchkin.util.MunchkinUtil;
 
 /**
  * このクラスは、データソース設定を保持するクラスです。
  *
  * @author Kawakicchi
  */
-@XmlType(propOrder = { "name", "user", "password", "driver", "url" })
+@XmlType(propOrder = { "name", "user", "password", "driver", "url", "colorHexString", "memo" })
 public class DatasourceEntity {
 
 	/** データソース名 */
 	private String name;
+	/** カラー */
+	private Color color;
 	/** メモ */
 	private String memo;
 
@@ -44,12 +51,21 @@ public class DatasourceEntity {
 	private String url;
 
 	public DatasourceEntity() {
+		name = "";
+		color = Color.white;
+		memo = "";
 
+		user = "";
+		password = "";
+		driver = "";
+		url = "";
 	}
 
 	public DatasourceEntity(final DatasourceEntity datasource) {
 		name = datasource.name;
+		color = datasource.color;
 		memo = datasource.memo;
+
 		user = datasource.user;
 		password = datasource.password;
 		driver = datasource.driver;
@@ -73,6 +89,34 @@ public class DatasourceEntity {
 	 */
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	/**
+	 * カラー を取得する。
+	 *
+	 * @return カラー
+	 */
+	@XmlTransient
+	public Color getColor() {
+		return color;
+	}
+
+	/**
+	 * カラー を設定する。
+	 *
+	 * @param color カラー
+	 */
+	public void setColor(final Color color) {
+		this.color = color;
+	}
+
+	@XmlAttribute(name = "color")
+	public String getColorHexString() {
+		return MunchkinUtil.getHexadecimalFromColor(color);
+	}
+
+	public void setColorHexString(final String hex) {
+		color = MunchkinUtil.getColorFormHexadecimal(hex);
 	}
 
 	/**

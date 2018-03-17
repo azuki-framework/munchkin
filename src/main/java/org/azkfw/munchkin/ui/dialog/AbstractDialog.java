@@ -26,7 +26,7 @@ import javax.swing.JDialog;
  *
  * @author Kawakicchi
  */
-public class AbstractDialog extends JDialog {
+public abstract class AbstractDialog extends JDialog {
 
 	/** serialVersionUID */
 	private static final long serialVersionUID = -690810476497547804L;
@@ -46,8 +46,8 @@ public class AbstractDialog extends JDialog {
 	 */
 	public void moveParentCenter() {
 		final Container parent = getParent();
-		int x = parent.getX() + (parent.getWidth() - getWidth()) / 2;
-		int y = parent.getY() + (parent.getHeight() - getHeight()) / 2;
+		final int x = parent.getX() + (parent.getWidth() - getWidth()) / 2;
+		final int y = parent.getY() + (parent.getHeight() - getHeight()) / 2;
 		setLocation(x, y);
 	}
 }

@@ -17,7 +17,15 @@
  */
 package org.azkfw.munchkin.util;
 
+import java.awt.Color;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * このクラスは、Munchkinユーティリティクラスです。
@@ -25,6 +33,13 @@ import java.util.List;
  * @author Kawakicchi
  */
 public class MunchkinUtil {
+
+	/** Logger */
+	private static final Logger LOGGER = LoggerFactory.getLogger(MunchkinUtil.class);
+
+	/**  */
+	private static final Pattern PTN_HEX_COLOR = Pattern.compile("^#([0-9A-Z]{2})([0-9A-Z]{2})([0-9A-Z]{2})$",
+			Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * オブジェクトが、<code>null</code>か判断する。
@@ -100,5 +115,37 @@ public class MunchkinUtil {
 			}
 		}
 		return false;
+	}
+
+	public static Color getColorFormHexadecimal(final String hex) {
+		Color color = Color.white;
+		if (MunchkinUtil.isNotEmpty(hex)) {
+			final Matcher m = PTN_HEX_COLOR.matcher(hex);
+			if (m.matches()) {
+				final int r = Integer.parseInt(m.group(1), 16);
+				final int g = Integer.parseInt(m.group(2), 16);
+				final int b = Integer.parseInt(m.group(3), 16);
+				color = new Color(r, g, b);
+			}
+		}
+		return color;
+	}
+
+	public static String getHexadecimalFromColor(final Color color) {
+		String str = "#FFFFFF";
+		if (MunchkinUtil.isNotNull(color)) {
+			str = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+		}
+		return str;
+	}
+
+	public static void release(final Connection connection) {
+		if (null != connection) {
+			try {
+				connection.close();
+			} catch (SQLException ex) {
+				LOGGER.warn("Connection close error.", ex);
+			}
+		}
 	}
 }

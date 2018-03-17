@@ -59,6 +59,17 @@ public enum DatabaseDriver {
 
 	@Override
 	public String toString() {
-		return String.format("%s[%s]", label, driver);
+		return String.format("%s [%s]", label, driver);
+	}
+
+	public static DatabaseDriver getDriver(final String driver) {
+		DatabaseDriver d = null;
+		for (DatabaseDriver t : DatabaseDriver.values()) {
+			if (t.driver.equals(driver)) {
+				d = t;
+				break;
+			}
+		}
+		return d;
 	}
 }
