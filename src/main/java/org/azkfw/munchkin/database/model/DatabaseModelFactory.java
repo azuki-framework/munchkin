@@ -28,7 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * このクラスは、データベースモデルを生成するファクトリクラスです。
+ * 
  * @author Kawakicchi
  */
 public class DatabaseModelFactory {
@@ -40,6 +41,13 @@ public class DatabaseModelFactory {
 
 	}
 
+	/**
+	 * データベースモデルを作成する。
+	 *
+	 * @param connection コネクション
+	 * @return データベースモデル
+	 * @throws SQLException SQL操作に起因する問題が発生
+	 */
 	public static DatabaseModel create(final Connection connection) throws SQLException {
 		final DatabaseMetaData meta = connection.getMetaData();
 		LOGGER.trace("DatabaseName    : {}", meta.getDatabaseProductName());

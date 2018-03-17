@@ -27,9 +27,9 @@ import org.azkfw.munchkin.database.model.entity.SchemaEntity;
 import org.azkfw.munchkin.database.model.entity.TypeEntity;
 
 /**
- *
+ * このインターフェースは、データベースのモデルを定義するインターフェースです。
+ * 
  * @author Kawakicchi
- *
  */
 public interface DatabaseModel {
 

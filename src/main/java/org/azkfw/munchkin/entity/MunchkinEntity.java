@@ -29,7 +29,6 @@ import org.azkfw.munchkin.util.MunchkinUtil;
 /**
  *
  * @author Kawakicchi
- *
  */
 @XmlRootElement(name = "munchkin")
 public class MunchkinEntity {
