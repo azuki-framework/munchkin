@@ -45,8 +45,9 @@ public class Munchkin {
 	/** logger */
 	private static final Logger LOGGER = LoggerFactory.getLogger(Munchkin.class);
 
+	/** ベースディレクトリ */
 	private File baseDir;
-
+	/** */
 	private MunchkinEntity config;
 
 	/**
@@ -64,10 +65,12 @@ public class Munchkin {
 		return INSTANCE;
 	}
 
-	private File getConfigFile() {
-		return Paths.get(baseDir.getAbsolutePath(), "conf", "config.xml").toFile();
-	}
-
+	/**
+	 * 設定を読み込む。
+	 *
+	 * @param baseDir ベースディレクトリ
+	 * @return 結果
+	 */
 	public boolean load(final File baseDir) {
 		this.baseDir = baseDir;
 
@@ -78,23 +81,21 @@ public class Munchkin {
 			for (File file : files) {
 				try {
 					LOGGER.info("Load jar file.[{}]", file.getAbsolutePath());
-
 					final ClassLoader loader = ClassLoader.getSystemClassLoader();
 					final Method m = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
 					m.setAccessible(true);	//protectedメソッドにアクセス許可
 					m.invoke(loader, file.toURI().toURL());
-
 				} catch (MalformedURLException ex) {
-					ex.printStackTrace();
+					LOGGER.error("Driver library load error.", ex);
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					LOGGER.error("Driver library load error.", ex);
 				}
 			}
 		}
 
 		final File file = getConfigFile();
 		if (file.isFile()) {
-			LOGGER.debug("Load config file.");
+			LOGGER.debug("Load config file.[{}]", file.getAbsolutePath());
 			config = JAXB.unmarshal(file, MunchkinEntity.class);
 		} else {
 			config = new MunchkinEntity();
@@ -110,6 +111,11 @@ public class Munchkin {
 		return true;
 	}
 
+	/**
+	 * 設定を書き込む。
+	 *
+	 * @return 結果
+	 */
 	public boolean store() {
 		final File file = getConfigFile();
 
@@ -121,5 +127,9 @@ public class Munchkin {
 
 	public MunchkinEntity getConfig() {
 		return config;
+	}
+
+	private File getConfigFile() {
+		return Paths.get(baseDir.getAbsolutePath(), "conf", "config.xml").toFile();
 	}
 }
