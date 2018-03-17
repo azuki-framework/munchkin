@@ -45,17 +45,14 @@ public class Munchkin {
 	/** logger */
 	private static final Logger LOGGER = LoggerFactory.getLogger(Munchkin.class);
 
-	private MunchkinEntity config;
+	private File baseDir;
 
-	private final File munchkinDir;
+	private MunchkinEntity config;
 
 	/**
 	 * コンストラクタ
 	 */
 	private Munchkin() {
-		final File userDir = new File(System.getProperty("user.home"));
-		munchkinDir = Paths.get(userDir.getAbsolutePath(), "Munchkin").toFile();
-		munchkinDir.mkdirs();
 	}
 
 	/**
@@ -68,21 +65,22 @@ public class Munchkin {
 	}
 
 	private File getConfigFile() {
-		return Paths.get(munchkinDir.getAbsolutePath(), "config.xml").toFile();
+		return Paths.get(baseDir.getAbsolutePath(), "conf", "config.xml").toFile();
 	}
 
-	public boolean load() {
+	public boolean load(final File baseDir) {
+		this.baseDir = baseDir;
 
-		final File driverDir = new File("driver");
+		// Load driver jar file
+		final File driverDir = Paths.get(this.baseDir.getAbsolutePath(), "driver").toFile();
 		if (driverDir.isDirectory()) {
-
 			final File[] files = driverDir.listFiles();
 			for (File file : files) {
 				try {
-					System.out.println(file.getAbsolutePath());
+					LOGGER.info("Load jar file.[{}]", file.getAbsolutePath());
 
-					ClassLoader loader = ClassLoader.getSystemClassLoader();
-					Method m = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+					final ClassLoader loader = ClassLoader.getSystemClassLoader();
+					final Method m = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
 					m.setAccessible(true);	//protectedメソッドにアクセス許可
 					m.invoke(loader, file.toURI().toURL());
 
@@ -95,7 +93,6 @@ public class Munchkin {
 		}
 
 		final File file = getConfigFile();
-
 		if (file.isFile()) {
 			LOGGER.debug("Load config file.");
 			config = JAXB.unmarshal(file, MunchkinEntity.class);
