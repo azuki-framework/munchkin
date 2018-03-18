@@ -48,6 +48,8 @@ public enum Label {
 	/** */
 	MENU_FILE_CONNECTION,
 	/** */
+	MENU_FILE_DATASOURCE,
+	/** */
 	MENU_FILE_EXIT,
 	/** */
 	MENU_TOOL,

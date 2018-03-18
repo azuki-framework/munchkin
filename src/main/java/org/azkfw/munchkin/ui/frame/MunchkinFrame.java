@@ -59,6 +59,7 @@ import org.azkfw.munchkin.ui.component.StatusBar;
 import org.azkfw.munchkin.ui.dialog.DatasourceDialog;
 import org.azkfw.munchkin.ui.dialog.DatasourceDialogListener;
 import org.azkfw.munchkin.ui.dialog.DatasourceListDialog;
+import org.azkfw.munchkin.ui.dialog.DatasourcesDialog;
 import org.azkfw.munchkin.ui.dialog.VersionDialog;
 import org.azkfw.munchkin.util.MunchkinUtil;
 import org.slf4j.Logger;
@@ -386,6 +387,15 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		config.getDatasources().forEach(d -> datasources.add(new DatasourceEntity(d)));
 
 		final DatasourceListDialog dlg = new DatasourceListDialog(this, datasources);
+		dlg.setVisible(true);
+	}
+
+	@Override
+	protected void doMenuFileDatasource() {
+		final List<DatasourceEntity> datasources = new ArrayList<DatasourceEntity>();
+		config.getDatasources().forEach(d -> datasources.add(new DatasourceEntity(d)));
+
+		final DatasourcesDialog dlg = new DatasourcesDialog(datasources);
 		dlg.setVisible(true);
 	}
 

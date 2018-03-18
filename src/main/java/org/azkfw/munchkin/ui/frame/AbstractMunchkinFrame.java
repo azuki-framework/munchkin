@@ -40,6 +40,7 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 	private final JMenuBar menuBar;
 	private final JMenu menuFile;
 	private final JMenuItem menuFileConnection;
+	private final JMenuItem menuFileDatasource;
 	private final JMenuItem menuFileExit;
 	private final JMenu menuTool;
 	private final JMenuItem menuToolExport;
@@ -53,6 +54,8 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 		menuFile = new JMenu(Label.MENU_FILE.toString());
 		menuFileConnection = new JMenuItem(Label.MENU_FILE_CONNECTION.toString());
 		menuFile.add(menuFileConnection);
+		menuFileDatasource = new JMenuItem(Label.MENU_FILE_DATASOURCE.toString());
+		menuFile.add(menuFileDatasource);
 		menuFile.addSeparator();
 		menuFileExit = new JMenuItem(Label.MENU_FILE_EXIT.toString());
 		menuFile.add(menuFileExit);
@@ -76,6 +79,12 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 				doMenuFileConnection();
 			}
 		});
+		menuFileDatasource.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				doMenuFileDatasource();
+			}
+		});
 		menuFileExit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -91,6 +100,8 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 	}
 
 	protected abstract void doMenuFileConnection();
+
+	protected abstract void doMenuFileDatasource();
 
 	protected abstract void doMenuFileExit();
 
