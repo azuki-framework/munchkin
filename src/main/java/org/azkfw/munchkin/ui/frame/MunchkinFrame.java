@@ -312,8 +312,10 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 
 	private void getObjectList(final SchemaEntity schema, final TypeEntity type) {
 		try {
-			final List<ObjectEntity> objects = model.getObjectList(schema, type);
-			pnlObjectList.setObjectList(objects);
+			if (MunchkinUtil.isNotNullAll(schema, type)) {
+				final List<ObjectEntity> objects = model.getObjectList(schema, type);
+				pnlObjectList.setObjectList(objects);
+			}
 		} catch (SQLException ex) {
 			LOGGER.error("", ex);
 		}
