@@ -122,6 +122,15 @@ public class MunchkinUtil {
 		return false;
 	}
 
+	public static boolean isEqualsAny(final char chr, final char... chrs) {
+		for (char c : chrs) {
+			if (chr == c) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static Color getColorFormHexadecimal(final String hex) {
 		Color color = Color.white;
 		if (MunchkinUtil.isNotEmpty(hex)) {
