@@ -20,22 +20,20 @@ package org.azkfw.munchkin.ui.component;
 import java.awt.Insets;
 
 import javax.swing.JTextPane;
-
-import org.azkfw.munchkin.ui.TableDataCellEditorKit;
+import javax.swing.text.StyledEditorKit;
 
 /**
  *
  * @author Kawakicchi
- *
  */
-public class DataGridCellTextPanel extends JTextPane {
+public class DataGridStringCell extends JTextPane {
 
 	/** serialVersionUID */
 	private static final long serialVersionUID = -3719195992712551281L;
 
-	public DataGridCellTextPanel() {
+	public DataGridStringCell(final StyledEditorKit kit) {
 		setEditable(false);
-		setEditorKit(new TableDataCellEditorKit());
+		setEditorKit(kit);
 		setMargin(new Insets(2, 2, 2, 2));
 	}
 }

@@ -45,6 +45,7 @@ import javax.swing.text.StyleConstants;
 
 import org.azkfw.munchkin.ui.ColumnWidths;
 import org.azkfw.munchkin.ui.DataGridSelection;
+import org.azkfw.munchkin.ui.TableDataCellEditorKit;
 
 /**
  * このクラスは、データグリッドパネルクラスです。
@@ -112,13 +113,9 @@ public class DataGridPanel extends JPanel {
 
 			@Override
 			public void keyPressed(final KeyEvent e) {
-				System.out.println("pressed " + e.getModifiers());
 				if ((e.getKeyCode() == KeyEvent.VK_C) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					System.out.println("pressed");
 					doCopy();
 					e.consume();
-				} else {
-
 				}
 			}
 		});
@@ -151,7 +148,7 @@ public class DataGridPanel extends JPanel {
 		final FontMetrics fm = table.getFontMetrics(table.getFont());
 
 		final TableColumnModel mdlColumn = table.getColumnModel();
-		final MyTableCellRenderer renderer = new MyTableCellRenderer(table);
+		final MyStringCellRenderer renderer = new MyStringCellRenderer(table);
 		for (int i = 0; i < mdlColumn.getColumnCount(); i++) {
 			mdlColumn.getColumn(i).setCellRenderer(renderer);
 		}
@@ -213,8 +210,8 @@ public class DataGridPanel extends JPanel {
 		}
 	}
 
-	private class MyTableCellRenderer extends DataGridCellTextPanel implements TableCellRenderer {
-		/**  */
+	private class MyStringCellRenderer extends DataGridStringCell implements TableCellRenderer {
+		/** serialVersionUID */
 		private static final long serialVersionUID = 1L;
 
 		private final SimpleAttributeSet asString;
@@ -223,7 +220,9 @@ public class DataGridPanel extends JPanel {
 
 		private final Color color;
 
-		public MyTableCellRenderer(final JTable table) {
+		public MyStringCellRenderer(final JTable table) {
+			super(new TableDataCellEditorKit());
+
 			setFont(table.getFont());
 			setOpaque(true);
 
@@ -248,8 +247,8 @@ public class DataGridPanel extends JPanel {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(final JTable table, final Object value,
-				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
+				final boolean hasFocus, final int row, final int column) {
 
 			if (isSelected) {
 				setBackground(table.getSelectionBackground());
@@ -286,7 +285,6 @@ public class DataGridPanel extends JPanel {
 		}
 
 		private void setAttri(final SimpleAttributeSet as) {
-			//getStyledDocument().setCharacterAttributes(0, getDocument().getLength(), as, true);
 			getStyledDocument().setParagraphAttributes(0, getDocument().getLength(), as, true);
 		}
 	}
