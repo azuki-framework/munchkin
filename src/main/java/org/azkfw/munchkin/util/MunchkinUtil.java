@@ -71,7 +71,12 @@ public class MunchkinUtil {
 	}
 
 	public static boolean isNotNullAll(final Object... objects) {
-		return (!isNullAll(objects));
+		for (Object object : objects) {
+			if (isNull(object)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public static boolean isNotNullAny(final Object... objects) {
