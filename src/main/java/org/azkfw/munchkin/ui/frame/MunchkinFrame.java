@@ -46,6 +46,7 @@ import org.azkfw.munchkin.database.model.entity.TypeEntity;
 import org.azkfw.munchkin.entity.DatasourceEntity;
 import org.azkfw.munchkin.entity.MunchkinEntity;
 import org.azkfw.munchkin.entity.SQLHistoryEntity;
+import org.azkfw.munchkin.task.TaskManager;
 import org.azkfw.munchkin.ui.component.ConsolePanel;
 import org.azkfw.munchkin.ui.component.DBConditionPanel;
 import org.azkfw.munchkin.ui.component.DBConditionPanelListener;
@@ -82,6 +83,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	private static final int TAB_DATAGRID = 1;
 
 	private final MunchkinEntity config;
+	private final TaskManager manager;
 
 	private DatabaseModel model;
 	private Connection connection;
@@ -107,6 +109,8 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		setLayout(new BorderLayout());
 
 		config = Munchkin.getInstance().getConfig();
+		manager = new TaskManager();
+		manager.start();
 
 		model = new MockDatabaseModel();
 
@@ -167,70 +171,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		pnlSqlEditor.addSQLEditorPanelListener(new SQLEditorPanelListener() {
 			@Override
 			public void sqlEditorPanelExecSQL(final String sql) {
-				// TODO: スレッド化
-				PreparedStatement ps = null;
-				ResultSet rs = null;
-				try {
-					String row = sql.toLowerCase().trim();
-					if (row.startsWith("select")) {
-						ps = connection.prepareStatement(sql);
-						rs = ps.executeQuery();
-						int cnt = pnlDataGrid.setData(rs);
-						info("%d件 表示しました。", cnt);
-						tabBottom.setSelectedIndex(TAB_DATAGRID);
-
-						config.addHistorySql(new SQLHistoryEntity(sql));
-
-					} else if (row.startsWith("insert")) {
-						ps = connection.prepareStatement(sql);
-						int cnt = ps.executeUpdate();
-						info("%d件 登録しました。", cnt);
-
-						config.addHistorySql(new SQLHistoryEntity(sql));
-
-					} else if (row.startsWith("update")) {
-						ps = connection.prepareStatement(sql);
-						int cnt = ps.executeUpdate();
-						info("%d件 更新しました。", cnt);
-
-						config.addHistorySql(new SQLHistoryEntity(sql));
-
-					} else if (row.startsWith("delete")) {
-						ps = connection.prepareStatement(sql);
-						int cnt = ps.executeUpdate();
-						info("%d件 削除しました。", cnt);
-
-						config.addHistorySql(new SQLHistoryEntity(sql));
-
-					} else {
-						LOGGER.error("Unknown sql.");
-					}
-
-				} catch (SQLException ex) {
-					fatal("エラーが発生しました。[%s]", ex.getMessage());
-					try {
-						connection.rollback();
-						info("ロールバックしました。");
-					} catch (SQLException ex2) {
-
-					}
-					LOGGER.error("Execute sql error.", ex);
-				} finally {
-					if (null != rs) {
-						try {
-							rs.close();
-						} catch (SQLException ex) {
-							LOGGER.warn("ResultSet close error.", ex);
-						}
-					}
-					if (null != ps) {
-						try {
-							ps.close();
-						} catch (SQLException ex) {
-							LOGGER.warn("PreparedStatement close error.", ex);
-						}
-					}
-				}
+				execute(sql);
 			}
 		});
 
@@ -258,6 +199,8 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	}
 
 	public void exit() {
+		manager.stopForWait();
+
 		if (null != connection) {
 			try {
 				connection.rollback();
@@ -292,6 +235,73 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		} catch (SQLException ex) {
 			fatal("接続に失敗しました。[%s]", ex.getMessage());
 			LOGGER.error("Database connection error.", ex);
+		}
+	}
+
+	private void execute(final String sql) {
+		// TODO: スレッド化
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			String row = sql.toLowerCase().trim();
+			if (row.startsWith("select")) {
+				ps = connection.prepareStatement(sql);
+				rs = ps.executeQuery();
+				int cnt = pnlDataGrid.setData(rs);
+				info("%d件 表示しました。", cnt);
+				tabBottom.setSelectedIndex(TAB_DATAGRID);
+
+				config.addHistorySql(new SQLHistoryEntity(sql));
+
+			} else if (row.startsWith("insert")) {
+				ps = connection.prepareStatement(sql);
+				int cnt = ps.executeUpdate();
+				info("%d件 登録しました。", cnt);
+
+				config.addHistorySql(new SQLHistoryEntity(sql));
+
+			} else if (row.startsWith("update")) {
+				ps = connection.prepareStatement(sql);
+				int cnt = ps.executeUpdate();
+				info("%d件 更新しました。", cnt);
+
+				config.addHistorySql(new SQLHistoryEntity(sql));
+
+			} else if (row.startsWith("delete")) {
+				ps = connection.prepareStatement(sql);
+				int cnt = ps.executeUpdate();
+				info("%d件 削除しました。", cnt);
+
+				config.addHistorySql(new SQLHistoryEntity(sql));
+
+			} else {
+				LOGGER.error("Unknown sql.");
+			}
+
+		} catch (SQLException ex) {
+			fatal("エラーが発生しました。[%s]", ex.getMessage());
+			try {
+				connection.rollback();
+				info("ロールバックしました。");
+			} catch (SQLException ex2) {
+
+			}
+			LOGGER.error("Execute sql error.", ex);
+		} finally {
+			if (null != rs) {
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+					LOGGER.warn("ResultSet close error.", ex);
+				}
+			}
+			if (null != ps) {
+				try {
+					ps.close();
+				} catch (SQLException ex) {
+					LOGGER.warn("PreparedStatement close error.", ex);
+				}
+			}
 		}
 	}
 
