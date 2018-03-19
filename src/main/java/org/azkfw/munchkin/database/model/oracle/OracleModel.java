@@ -42,7 +42,7 @@ public class OracleModel extends TemplateDatabaseModel {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OracleModel.class);
 
 	private final boolean dbaRole;
-	
+
 	public OracleModel(final Connection connection) {
 		super(connection);
 
@@ -86,19 +86,19 @@ public class OracleModel extends TemplateDatabaseModel {
 		builder.append("  , label AS label");
 		builder.append("FROM");
 		builder.append("(");
-		builder.append("            SELECT  1 AS order, 'TABLE'        AS name, 'テーブル'     AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT  2 AS order, 'VIEW'         AS name, 'ビュー'       AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT  3 AS order, 'SYNONYM'      AS name, 'シノニム'      AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT  4 AS order, 'FUNCTION'     AS name, 'ファンクション'  AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT  5 AS order, 'PROCEDURE'    AS name, 'プロシージャ'  AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT  6 AS order, 'PACKAGE'      AS name, 'パッケージ'    AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT  7 AS order, 'PACKAGE BODY' AS name, 'パッケージ本体' AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT  8 AS order, 'SEQUENCE'     AS name, 'シーケンス'    AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT  9 AS order, 'TRIGGER'      AS name, 'トリガー'     AS label FROM DUAL");
-		builder.append("  UNION ALL SELECT 10 AS order, 'INDEX'        AS name, 'インデックス'  AS label FROM DUAL");
-		builder.append(") AS t");
+		builder.append("            SELECT  1 AS \"order\", 'TABLE'        AS name, 'テーブル'     AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT  2 AS \"order\", 'VIEW'         AS name, 'ビュー'       AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT  3 AS \"order\", 'SYNONYM'      AS name, 'シノニム'      AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT  4 AS \"order\", 'FUNCTION'     AS name, 'ファンクション'  AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT  5 AS \"order\", 'PROCEDURE'    AS name, 'プロシージャ'  AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT  6 AS \"order\", 'PACKAGE'      AS name, 'パッケージ'    AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT  7 AS \"order\", 'PACKAGE BODY' AS name, 'パッケージ本体' AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT  8 AS \"order\", 'SEQUENCE'     AS name, 'シーケンス'    AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT  9 AS \"order\", 'TRIGGER'      AS name, 'トリガー'     AS label FROM DUAL");
+		builder.append("  UNION ALL SELECT 10 AS \"order\", 'INDEX'        AS name, 'インデックス'  AS label FROM DUAL");
+		builder.append(") t");
 		builder.append("ORDER BY");
-		builder.append("    order");
+		builder.append("    \"order\"");
 	}
 
 	@Override
@@ -172,8 +172,7 @@ public class OracleModel extends TemplateDatabaseModel {
 
 		}
 	}
-	
-	
+
 	private boolean isDBARole(final Connection c) {
 		boolean result = false;
 		PreparedStatement ps = null;

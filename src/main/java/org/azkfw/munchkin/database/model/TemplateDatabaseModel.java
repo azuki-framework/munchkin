@@ -92,7 +92,7 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				}
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}" , builder.getSQL());
+				LOGGER.error("SQL : {}", builder.getSQL());
 				throw ex;
 			} finally {
 				release(rs);
@@ -142,9 +142,8 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 					schemas.add(schema);
 				}
 
-				
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}" , builder.getSQL());
+				LOGGER.error("SQL : {}", builder.getSQL());
 				throw ex;
 			} finally {
 				release(rs);
@@ -195,7 +194,7 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				}
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}" , builder.getSQL());
+				LOGGER.error("SQL : {}", builder.getSQL());
 				throw ex;
 			} finally {
 				release(rs);
@@ -224,7 +223,8 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 	protected abstract void sqlGetObjectList(SQLBuilder builder, SchemaEntity schema, TypeEntity type);
 
 	@Override
-	public final List<ObjectEntity> getObjectList(final SchemaEntity schema, final TypeEntity type) throws SQLException {
+	public final List<ObjectEntity> getObjectList(final SchemaEntity schema, final TypeEntity type)
+			throws SQLException {
 		final List<ObjectEntity> objects = new ArrayList<ObjectEntity>();
 
 		final MySQLBuilder builder = new MySQLBuilder();
@@ -253,7 +253,7 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				}
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}" , builder.getSQL());
+				LOGGER.error("SQL : {}", builder.getSQL());
 				throw ex;
 			} finally {
 				release(rs);
@@ -309,7 +309,7 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				detail = new ObjectDetailEntity(columnNames, records);
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}" , builder.getSQL());
+				LOGGER.error("SQL : {}", builder.getSQL());
 				throw ex;
 			} finally {
 				release(rs);
