@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,7 @@ import org.azkfw.munchkin.ui.ColumnWidths;
 import org.azkfw.munchkin.ui.DataGridSelection;
 import org.azkfw.munchkin.ui.TableDataCellEditorKit;
 import org.azkfw.munchkin.ui.component.DataGridStringCell;
+import org.azkfw.munchkin.util.MunchkinUtil;
 
 /**
  * このクラスは、データグリッドパネルクラスです。
@@ -64,12 +66,16 @@ public class DataGridPanel extends JPanel {
 	private final DefaultTableModel model;
 	private final JTable table;
 
+	private final Font font;
+	private final FontMetrics fontMetrics;
+
+	private long maxReadSize = 1000;
+
 	public DataGridPanel() {
 		listeners = new ArrayList<DataGridPanelListener>();
 
 		setLayout(new BorderLayout());
 
-		Font font = null;
 		if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
 			font = new Font("ＭＳ ゴシック", Font.PLAIN, 14);
 		} else if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
@@ -87,13 +93,14 @@ public class DataGridPanel extends JPanel {
 				return false;
 			}
 		};
+
 		table = new JTable(model);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setFont(font);
 
-		final FontMetrics fm = table.getFontMetrics(font);
+		fontMetrics = table.getFontMetrics(font);
 
-		table.setRowHeight(fm.getHeight() + 4 + 2);
+		table.setRowHeight(fontMetrics.getHeight() + 4 + 2);
 		table.setSelectionBackground(new Color(255, 204, 153));
 
 		table.addKeyListener(new KeyAdapter() {
@@ -132,55 +139,66 @@ public class DataGridPanel extends JPanel {
 		listeners.add(listener);
 	}
 
+	public long getMaxReadSize() {
+		return maxReadSize;
+	}
+
 	public synchronized void clearData() {
 		model.setRowCount(0);
 		model.setColumnCount(0);
 	}
 
-	public synchronized int setData(final ResultSet rs) throws SQLException {
+	public synchronized long setData(final ResultSet rs) throws SQLException {
 		model.setRowCount(0);
 		model.setColumnCount(0);
-
-		int cnt = 0;
 
 		rs.setFetchSize(1000);
 
 		final ResultSetMetaData meta = rs.getMetaData();
-		for (int i = 0; i < meta.getColumnCount(); i++) {
-			model.addColumn(meta.getColumnName(i + 1));
+		for (int col = 1; col <= meta.getColumnCount(); col++) {
+			model.addColumn(meta.getColumnName(col));
 		}
 
 		final ColumnWidths widths = new ColumnWidths(meta.getColumnCount(), 60);
-		final FontMetrics fm = table.getFontMetrics(table.getFont());
+
+		final MyStringCellRenderer rendererString = new MyStringCellRenderer(table);
+		final MyDateCellRenderer rendererDate = new MyDateCellRenderer(table);
 
 		final TableColumnModel mdlColumn = table.getColumnModel();
-		final MyStringCellRenderer renderer = new MyStringCellRenderer(table);
 		for (int i = 0; i < mdlColumn.getColumnCount(); i++) {
-			mdlColumn.getColumn(i).setCellRenderer(renderer);
+			int type = meta.getColumnType(i + 1);
+			if (MunchkinUtil.isEqualsAny(type, Types.TIMESTAMP, Types.TIMESTAMP_WITH_TIMEZONE)) {
+				mdlColumn.getColumn(i).setCellRenderer(rendererDate);
+			} else {
+				mdlColumn.getColumn(i).setCellRenderer(rendererString);
+			}
 		}
 
+		long readSize = 0;
 		while (rs.next()) {
-			final List<Object> record = new ArrayList<Object>();
-			for (int i = 0; i < meta.getColumnCount(); i++) {
-				Object obj = rs.getObject(i + 1);
-				record.add(obj);
+			if (readSize < maxReadSize) {
+				final List<Object> record = new ArrayList<Object>();
+				for (int i = 0; i < meta.getColumnCount(); i++) {
+					Object obj = rs.getObject(i + 1);
+					record.add(obj);
 
-				final String str = (null != obj) ? obj.toString() : "(NULL)";
-				final int width = fm.stringWidth(str);
-				widths.setWidth(i, width);
-			}
-			model.addRow(record.toArray());
-			cnt++;
-			if (1000 <= cnt) {
+					final String str = (null != obj) ? obj.toString() : "(NULL)";
+					final int width = fontMetrics.stringWidth(str);
+					widths.setWidth(i, width);
+				}
+				model.addRow(record.toArray());
+			} else {
+				readSize = -1;
 				break;
 			}
+			readSize++;
 		}
 
 		for (int i = 0; i < mdlColumn.getColumnCount(); i++) {
 			mdlColumn.getColumn(i).setPreferredWidth(widths.getWidth(i) + 4 + 2);
 		}
 
-		return cnt;
+		return readSize;
 	}
 
 	private void doCopy() {
@@ -228,6 +246,85 @@ public class DataGridPanel extends JPanel {
 
 		public MyStringCellRenderer(final JTable table) {
 			super(new TableDataCellEditorKit());
+
+			setFont(table.getFont());
+			setOpaque(true);
+
+			color = new Color(255, 239, 224);
+
+			asString = new SimpleAttributeSet();
+			StyleConstants.setForeground(asString, table.getForeground());
+			StyleConstants.setAlignment(asString, StyleConstants.ALIGN_LEFT);
+			StyleConstants.setFontFamily(asString, getFont().getFamily());
+			StyleConstants.setFontSize(asString, getFont().getSize());
+			asNumber = new SimpleAttributeSet();
+			StyleConstants.setForeground(asNumber, table.getForeground());
+			StyleConstants.setAlignment(asNumber, StyleConstants.ALIGN_RIGHT);
+			StyleConstants.setFontFamily(asNumber, getFont().getFamily());
+			StyleConstants.setFontSize(asNumber, getFont().getSize());
+
+			asNull = new SimpleAttributeSet();
+			StyleConstants.setForeground(asNull, new Color(65, 105, 225));
+			StyleConstants.setFontFamily(asNull, getFont().getFamily());
+			StyleConstants.setBold(asNull, true);
+			StyleConstants.setFontSize(asNull, getFont().getSize());
+		}
+
+		@Override
+		public Component getTableCellRendererComponent(final JTable table, final Object value,
+				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+
+			if (isSelected) {
+				setBackground(table.getSelectionBackground());
+			} else {
+				if (0 == row % 2) {
+					setBackground(table.getBackground());
+				} else {
+					setBackground(color);
+				}
+			}
+
+			if (null == value) {
+				setText("(NULL)");
+				setAttri(asNull);
+			} else {
+				setText(value.toString());
+				if (value instanceof Short) {
+					setAttri(asNumber);
+				} else if (value instanceof Integer) {
+					setAttri(asNumber);
+				} else if (value instanceof Long) {
+					setAttri(asNumber);
+				} else if (value instanceof Float) {
+					setAttri(asNumber);
+				} else if (value instanceof Double) {
+					setAttri(asNumber);
+				} else if (value instanceof BigDecimal) {
+					setAttri(asNumber);
+				} else {
+					setAttri(asString);
+				}
+			}
+			return this;
+		}
+
+		private void setAttri(final SimpleAttributeSet as) {
+			getStyledDocument().setParagraphAttributes(0, getDocument().getLength(), as, true);
+		}
+	}
+
+	private class MyDateCellRenderer extends DataGridStringCell implements TableCellRenderer {
+		/** serialVersionUID */
+		private static final long serialVersionUID = 1L;
+
+		private final SimpleAttributeSet asString;
+		private final SimpleAttributeSet asNumber;
+		private final SimpleAttributeSet asNull;
+
+		private final Color color;
+
+		public MyDateCellRenderer(final JTable table) {
+			super();
 
 			setFont(table.getFont());
 			setOpaque(true);

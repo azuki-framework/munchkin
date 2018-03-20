@@ -31,9 +31,15 @@ public class DataGridStringCell extends JTextPane {
 	/** serialVersionUID */
 	private static final long serialVersionUID = -3719195992712551281L;
 
+	public DataGridStringCell() {
+		this(null);
+	}
+
 	public DataGridStringCell(final StyledEditorKit kit) {
 		setEditable(false);
-		setEditorKit(kit);
 		setMargin(new Insets(2, 2, 2, 2));
+		if (null != kit) {
+			setEditorKit(kit);
+		}
 	}
 }

@@ -124,6 +124,15 @@ public class MunchkinUtil {
 		return false;
 	}
 
+	public static boolean isEqualsAny(final int value, final int... values) {
+		for (int v : values) {
+			if (value == v) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean isEqualsAny(final char chr, final char... chrs) {
 		for (char c : chrs) {
 			if (chr == c) {

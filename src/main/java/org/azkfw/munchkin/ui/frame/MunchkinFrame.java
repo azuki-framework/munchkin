@@ -260,8 +260,12 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 				rs = ps.executeQuery();
 				final long end = System.currentTimeMillis();
 
-				int cnt = pnlDataGrid.setData(rs);
-				info("%d件 表示しました。", cnt);
+				long cnt = pnlDataGrid.setData(rs);
+				if (-1 == cnt) {
+					info("%d件 表示しました。", pnlDataGrid.getMaxReadSize());
+				} else {
+					info("%d件 表示しました。", cnt);
+				}
 				tabBottom.setSelectedIndex(TAB_DATAGRID);
 
 				final long time = end - start;
