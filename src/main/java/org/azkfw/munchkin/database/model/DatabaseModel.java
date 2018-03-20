@@ -33,16 +33,61 @@ import org.azkfw.munchkin.database.model.entity.TypeEntity;
  */
 public interface DatabaseModel {
 
+	/**
+	 * SQLを実行する。
+	 *
+	 * @param sql SQL文
+	 * @return 結果
+	 * @throws SQLException SQL操作に起因する問題が発生した場合
+	 */
 	boolean execute(String sql) throws SQLException;
 
+	/**
+	 * SQLを実行する。
+	 *
+	 * @param sql SQL文
+	 * @param params パラメータ
+	 * @return 結果
+	 * @throws SQLException SQL操作に起因する問題が発生した場合
+	 */
 	boolean execute(String sql, List<Object> params) throws SQLException;
 
+	/**
+	 * SQLを実行する。
+	 *
+	 * @param sql SQL文
+	 * @return 更新件数
+	 * @throws SQLException SQL操作に起因する問題が発生した場合
+	 */
 	int executeUpdate(String sql) throws SQLException;
 
+	/**
+	 * SQLを実行する。
+	 *
+	 * @param sql SQL文
+	 * @param params パラメータ
+	 * @return 更新件数
+	 * @throws SQLException SQL操作に起因する問題が発生した場合
+	 */
 	int executeUpdate(String sql, List<Object> params) throws SQLException;
 
+	/**
+	 * SQLを実行する。
+	 *
+	 * @param sql SQL文
+	 * @return 結果
+	 * @throws SQLException SQL操作に起因する問題が発生した場合
+	 */
 	List<Map<String, Object>> executeQuery(String sql) throws SQLException;
 
+	/**
+	 * SQLを実行する。
+	 *
+	 * @param sql SQL文
+	 * @param params パラメータ
+	 * @return 結果
+	 * @throws SQLException SQL操作に起因する問題が発生した場合
+	 */
 	List<Map<String, Object>> executeQuery(String sql, List<Object> params) throws SQLException;
 
 	/**

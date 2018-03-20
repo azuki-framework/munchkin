@@ -35,9 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * 　
+ * 
  * @author Kawakicchi
- *
  */
 public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 
@@ -223,8 +223,7 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 	protected abstract void sqlGetObjectList(SQLBuilder builder, SchemaEntity schema, TypeEntity type);
 
 	@Override
-	public final List<ObjectEntity> getObjectList(final SchemaEntity schema, final TypeEntity type)
-			throws SQLException {
+	public final List<ObjectEntity> getObjectList(final SchemaEntity schema, final TypeEntity type) throws SQLException {
 		final List<ObjectEntity> objects = new ArrayList<ObjectEntity>();
 
 		final MySQLBuilder builder = new MySQLBuilder();

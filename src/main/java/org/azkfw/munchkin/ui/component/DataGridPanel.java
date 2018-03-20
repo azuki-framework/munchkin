@@ -131,6 +131,11 @@ public class DataGridPanel extends JPanel {
 		listeners.add(listener);
 	}
 
+	public synchronized void clearData() {
+		model.setRowCount(0);
+		model.setColumnCount(0);
+	}
+
 	public synchronized int setData(final ResultSet rs) throws SQLException {
 		model.setRowCount(0);
 		model.setColumnCount(0);
@@ -247,8 +252,8 @@ public class DataGridPanel extends JPanel {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
-				final boolean hasFocus, final int row, final int column) {
+		public Component getTableCellRendererComponent(final JTable table, final Object value,
+				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 
 			if (isSelected) {
 				setBackground(table.getSelectionBackground());

@@ -38,7 +38,6 @@ import javax.swing.JTabbedPane;
 import org.azkfw.munchkin.Munchkin;
 import org.azkfw.munchkin.database.model.DatabaseModel;
 import org.azkfw.munchkin.database.model.DatabaseModelFactory;
-import org.azkfw.munchkin.database.model.MockDatabaseModel;
 import org.azkfw.munchkin.database.model.entity.ObjectDetailEntity;
 import org.azkfw.munchkin.database.model.entity.ObjectEntity;
 import org.azkfw.munchkin.database.model.entity.SchemaEntity;
@@ -114,8 +113,6 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		config = Munchkin.getInstance().getConfig();
 		manager = new TaskManager();
 		manager.start();
-
-		model = new MockDatabaseModel();
 
 		pnlCondition = new DBConditionPanel();
 		pnlObjectList = new DBObjectListPanel();
@@ -222,7 +219,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		dispose();
 	}
 
-	private void connect(final DatasourceEntity datasource) {
+	public void connect(final DatasourceEntity datasource) {
 		Connection c = null;
 		try {
 			Class.forName(datasource.getDriver());
@@ -243,8 +240,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		}
 	}
 
-	private void execute(final String sql) {
-		// TODO: スレッド化
+	public void execute(final String sql) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -259,22 +255,19 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 				config.addHistorySql(new SQLHistoryEntity(sql));
 
 			} else if (row.startsWith("insert")) {
-				ps = connection.prepareStatement(sql);
-				int cnt = ps.executeUpdate();
+				final int cnt = model.executeUpdate(sql);
 				info("%d件 登録しました。", cnt);
 
 				config.addHistorySql(new SQLHistoryEntity(sql));
 
 			} else if (row.startsWith("update")) {
-				ps = connection.prepareStatement(sql);
-				int cnt = ps.executeUpdate();
+				final int cnt = model.executeUpdate(sql);
 				info("%d件 更新しました。", cnt);
 
 				config.addHistorySql(new SQLHistoryEntity(sql));
 
 			} else if (row.startsWith("delete")) {
-				ps = connection.prepareStatement(sql);
-				int cnt = ps.executeUpdate();
+				final int cnt = model.executeUpdate(sql);
 				info("%d件 削除しました。", cnt);
 
 				config.addHistorySql(new SQLHistoryEntity(sql));
@@ -293,20 +286,8 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 			}
 			LOGGER.error("Execute sql error.", ex);
 		} finally {
-			if (null != rs) {
-				try {
-					rs.close();
-				} catch (SQLException ex) {
-					LOGGER.warn("ResultSet close error.", ex);
-				}
-			}
-			if (null != ps) {
-				try {
-					ps.close();
-				} catch (SQLException ex) {
-					LOGGER.warn("PreparedStatement close error.", ex);
-				}
-			}
+			MunchkinUtil.release(rs);
+			MunchkinUtil.release(ps);
 		}
 	}
 

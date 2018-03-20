@@ -29,7 +29,6 @@ import org.azkfw.munchkin.util.SQLBuilder;
 /**
  *
  * @author Kawakicchi
- *
  */
 public class PostgreSQLModel extends TemplateDatabaseModel {
 

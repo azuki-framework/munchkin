@@ -19,6 +19,8 @@ package org.azkfw.munchkin.util;
 
 import java.awt.Color;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -159,6 +161,26 @@ public class MunchkinUtil {
 				connection.close();
 			} catch (SQLException ex) {
 				LOGGER.warn("Connection close error.", ex);
+			}
+		}
+	}
+
+	public static void release(final PreparedStatement preparedStatement) {
+		if (null != preparedStatement) {
+			try {
+				preparedStatement.close();
+			} catch (SQLException ex) {
+				LOGGER.warn("PreparedStatement close error.", ex);
+			}
+		}
+	}
+
+	public static void release(final ResultSet resultSet) {
+		if (null != resultSet) {
+			try {
+				resultSet.close();
+			} catch (SQLException ex) {
+				LOGGER.warn("ResultSet close error.", ex);
 			}
 		}
 	}

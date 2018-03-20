@@ -62,12 +62,21 @@ public abstract class AbstractDatabaseModel implements DatabaseModel {
 		PreparedStatement ps = null;
 		try {
 			ps = getConnection().prepareStatement(sql);
+
 			if (MunchkinUtil.isNotNull(params)) {
-				for (int i = 0; i < params.size(); i++) {
-					ps.setObject(i + 1, params.get(i));
+				int index = 0;
+				for (Object param : params) {
+					ps.setObject(++index, param);
 				}
 			}
+
 			rslt = ps.execute();
+
+		} catch (SQLException ex) {
+			LOGGER.error("SQL execute error.", ex);
+			LOGGER.error("SQL : {}", sql);
+			LOGGER.error("Parameter : {}", params);
+			throw ex;
 		} finally {
 			release(ps);
 		}
@@ -85,12 +94,21 @@ public abstract class AbstractDatabaseModel implements DatabaseModel {
 		PreparedStatement ps = null;
 		try {
 			ps = getConnection().prepareStatement(sql);
+
 			if (MunchkinUtil.isNotNull(params)) {
-				for (int i = 0; i < params.size(); i++) {
-					ps.setObject(i + 1, params.get(i));
+				int index = 0;
+				for (Object param : params) {
+					ps.setObject(++index, param);
 				}
 			}
+
 			rslt = ps.executeUpdate();
+
+		} catch (SQLException ex) {
+			LOGGER.error("SQL execute error.", ex);
+			LOGGER.error("SQL : {}", sql);
+			LOGGER.error("Parameter : {}", params);
+			throw ex;
 		} finally {
 			release(ps);
 		}
@@ -99,37 +117,50 @@ public abstract class AbstractDatabaseModel implements DatabaseModel {
 
 	@Override
 	public List<Map<String, Object>> executeQuery(final String sql) throws SQLException {
-		return executeQuery(sql, null);
+		return executeQuery(sql, (List<Object>) null);
 	}
 
 	@Override
 	public List<Map<String, Object>> executeQuery(final String sql, final List<Object> params) throws SQLException {
 		final List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
 			ps = getConnection().prepareStatement(sql);
+
 			if (MunchkinUtil.isNotNull(params)) {
-				for (int i = 0; i < params.size(); i++) {
-					ps.setObject(i + 1, params.get(i));
+				int index = 0;
+				for (Object param : params) {
+					ps.setObject(++index, param);
 				}
 			}
+
 			rs = ps.executeQuery();
 			rs.setFetchSize(1000);
 
 			final ResultSetMetaData meta = rs.getMetaData();
 			while (rs.next()) {
+
 				final Map<String, Object> record = new HashMap<String, Object>();
-				for (int i = 0; i < meta.getColumnCount(); i++) {
-					record.put(meta.getColumnName(i + 1), rs.getObject(i + 1));
+				for (int col = 1; col <= meta.getColumnCount(); col++) {
+					final String name = meta.getColumnName(col);
+					final Object value = rs.getObject(col);
+					record.put(name, value);
 				}
 				records.add(record);
 			}
 
+		} catch (SQLException ex) {
+			LOGGER.error("SQL execute error.", ex);
+			LOGGER.error("SQL : {}", sql);
+			LOGGER.error("Parameter : {}", params);
+			throw ex;
 		} finally {
 			release(rs);
 			release(ps);
 		}
+
 		return records;
 	}
 
