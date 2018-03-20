@@ -15,29 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.ui.component;
-
-import org.azkfw.munchkin.database.model.entity.SchemaEntity;
-import org.azkfw.munchkin.database.model.entity.TypeEntity;
+package org.azkfw.munchkin.ui.panel;
 
 /**
- * このインターフェースは、オブジェクト条件パネルのイベントを定義するインターフェースです。
- * 
+ *
  * @author Kawakicchi
+ *
  */
-public interface DBConditionPanelListener {
+public interface DBObjectDetailPanelListener {
 
-	/**
-	 * スキーマが変更された場合に呼び出される。
-	 *
-	 * @param schema スキーマ
-	 */
-	void dbConditionPanelChengedSchema(SchemaEntity schema);
-
-	/**
-	 * タイプが変更された場合に呼び出される。
-	 *
-	 * @param type タイプ
-	 */
-	void dbConditionPanelChengedType(TypeEntity type);
 }

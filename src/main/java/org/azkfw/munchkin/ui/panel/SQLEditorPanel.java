@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.ui.component;
+package org.azkfw.munchkin.ui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -41,6 +41,7 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
 import org.azkfw.munchkin.ui.SQLTextEditor;
+import org.azkfw.munchkin.ui.component.TextLineNumberView;
 
 /**
  * このクラスは、SQLエディターパネルクラスです。

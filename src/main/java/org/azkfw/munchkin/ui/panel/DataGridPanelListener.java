@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.ui.component;
+package org.azkfw.munchkin.ui.panel;
 
 /**
  *

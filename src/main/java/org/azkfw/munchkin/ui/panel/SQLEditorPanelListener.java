@@ -15,13 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.ui.component;
+package org.azkfw.munchkin.ui.panel;
 
 /**
- * このインターフェースは、SQL実行履歴パネルのイベントを定義したリスナーインターフェースです。
- * 
+ *
  * @author Kawakicchi
+ *
  */
-public interface SqlHistoryPanelListener {
+public interface SQLEditorPanelListener {
 
+	void sqlEditorPanelExecSQL(String sql);
 }

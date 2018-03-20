@@ -15,16 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.ui.component;
-
-import org.azkfw.munchkin.database.model.entity.ObjectEntity;
+package org.azkfw.munchkin.ui.panel;
 
 /**
- *
+ * このインターフェースは、SQL実行履歴パネルのイベントを定義したリスナーインターフェースです。
+ * 
  * @author Kawakicchi
- *
  */
-public interface DBObjectListPanelListener {
+public interface SqlHistoryPanelListener {
 
-	void dbObjectListPanelChengedObject(ObjectEntity object);
 }

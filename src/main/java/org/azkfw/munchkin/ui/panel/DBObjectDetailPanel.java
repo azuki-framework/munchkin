@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.azkfw.munchkin.ui.component;
+package org.azkfw.munchkin.ui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,15 +34,13 @@ import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
-import org.azkfw.munchkin.database.model.entity.ObjectEntity;
+import org.azkfw.munchkin.database.model.entity.ObjectDetailEntity;
 import org.azkfw.munchkin.ui.ColumnWidths;
 import org.azkfw.munchkin.util.MunchkinUtil;
 
@@ -50,13 +48,13 @@ import org.azkfw.munchkin.util.MunchkinUtil;
  *
  * @author Kawakicchi
  */
-public class DBObjectListPanel extends JPanel {
+public class DBObjectDetailPanel extends JPanel {
 
 	/** serialVersionUID */
-	private static final long serialVersionUID = 84902710794456375L;
+	private static final long serialVersionUID = 7484142852594382091L;
 
 	/** listener */
-	private final List<DBObjectListPanelListener> listeners;
+	private final List<DBObjectDetailPanelListener> listeners;
 
 	private final DefaultTableModel model;
 	private final TableRowSorter<DefaultTableModel> sorter;
@@ -66,8 +64,8 @@ public class DBObjectListPanel extends JPanel {
 	private final JTextField txtFilter;
 	private final JTable table;
 
-	public DBObjectListPanel() {
-		listeners = new ArrayList<DBObjectListPanelListener>();
+	public DBObjectDetailPanel() {
+		listeners = new ArrayList<DBObjectDetailPanelListener>();
 
 		setLayout(new BorderLayout(0, 4));
 		setBorder(new EmptyBorder(4, 4, 4, 4));
@@ -81,10 +79,6 @@ public class DBObjectListPanel extends JPanel {
 				return false;
 			}
 		};
-		model.addColumn("ID");
-		model.addColumn("名前");
-		model.addColumn("コメント");
-		model.addColumn("タイプ");
 
 		sorter = new TableRowSorter<DefaultTableModel>(model);
 
@@ -115,64 +109,41 @@ public class DBObjectListPanel extends JPanel {
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setSelectionBackground(new Color(255, 204, 153));
 		table.setSelectionForeground(table.getForeground());
-		table.getColumnModel().getColumn(1).setCellRenderer(renderer);
-		table.getColumnModel().getColumn(2).setCellRenderer(renderer);
-		table.getColumnModel().getColumn(3).setCellRenderer(renderer);
-
-		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (e.getValueIsAdjusting()) {
-					return;
-				}
-				ObjectEntity obj = null;
-				if (0 < table.getSelectedRowCount()) {
-					int i = table.getSelectedRow();
-					int index = table.convertRowIndexToModel(i);
-					obj = (ObjectEntity) model.getValueAt(index, 0);
-				}
-				doChangeObject(obj);
-			}
-		});
-
-		table.removeColumn(table.getColumn("ID"));
 
 		add(BorderLayout.NORTH, txtFilter);
 		add(BorderLayout.CENTER, new JScrollPane(table));
 	}
 
-	public synchronized void addDBObjectListPanelListener(final DBObjectListPanelListener listener) {
+	public synchronized void addDBObjectDetailListener(final DBObjectDetailPanelListener listener) {
 		listeners.add(listener);
 	}
 
-	public void setObjectList(final List<ObjectEntity> objects) {
+	public void setObjectDetail(final ObjectDetailEntity detail) {
 		model.setRowCount(0);
+		model.setColumnCount(0);
 
-		if (MunchkinUtil.isNotEmpty(objects)) {
+		if (MunchkinUtil.isNotNull(detail)) {
+			final List<String> columnNames = detail.getColumnNames();
+			for (String name : columnNames) {
+				model.addColumn(name);
+			}
 
-			final ColumnWidths widths = new ColumnWidths(3, 60);
+			final ColumnWidths widths = new ColumnWidths(columnNames.size(), 60);
 			final FontMetrics fm = table.getFontMetrics(table.getFont());
 
-			objects.forEach(obj -> {
-				final List<Object> objs = new ArrayList<Object>();
-				final String name = obj.getName();
-				final String label = obj.getLabel();
-				final String type = obj.getType();
+			for (List<Object> record : detail.getRecords()) {
+				model.addRow(record.toArray());
 
-				objs.add(obj);
-				objs.add(name);
-				objs.add(label);
-				objs.add(type);
-				model.addRow(objs.toArray());
-
-				widths.setWidth(0, (null != name) ? fm.stringWidth(name) : 0);
-				widths.setWidth(1, (null != label) ? fm.stringWidth(label) : 0);
-				widths.setWidth(2, (null != type) ? fm.stringWidth(type) : 0);
-			});
+				for (int i = 0; i < columnNames.size(); i++) {
+					final Object obj = record.get(i);
+					widths.setWidth(i, (null != obj) ? fm.stringWidth(obj.toString()) : 0);
+				}
+			}
 
 			final TableColumnModel mdlColumn = table.getColumnModel();
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < columnNames.size(); i++) {
 				final TableColumn column = mdlColumn.getColumn(i);
+				column.setCellRenderer(renderer);
 				column.setPreferredWidth(widths.getWidth(i) + 4 + 2);
 			}
 		}
@@ -181,14 +152,10 @@ public class DBObjectListPanel extends JPanel {
 	private void doFiltering(final String text) {
 		RowFilter<DefaultTableModel, Object> filter = null;
 		try {
-			filter = RowFilter.regexFilter(text, 1);
+			filter = RowFilter.regexFilter(text, 0);
 		} catch (Exception ex) {
 		}
 		sorter.setRowFilter(filter);
-	}
-
-	private void doChangeObject(final ObjectEntity object) {
-		listeners.forEach(l -> l.dbObjectListPanelChengedObject(object));
 	}
 
 	private class MyTableCellRenderer extends DefaultTableCellRenderer {
