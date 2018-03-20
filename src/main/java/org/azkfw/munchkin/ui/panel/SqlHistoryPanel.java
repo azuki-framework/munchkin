@@ -18,6 +18,7 @@
 package org.azkfw.munchkin.ui.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FontMetrics;
 import java.text.SimpleDateFormat;
@@ -63,6 +64,8 @@ public class SqlHistoryPanel extends JPanel {
 
 	private long maxHistory = 100;
 	private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+	private long thresholdTime = 2000;
 
 	/**
 	 * コンストラクタ
@@ -125,7 +128,7 @@ public class SqlHistoryPanel extends JPanel {
 		tcm.getColumn(1).setPreferredWidth(fm.stringWidth("9999999 ms") + 4 + 2);
 		tcm.getColumn(2).setPreferredWidth(200);
 
-		tcm.getColumn(1).setCellRenderer(new HorizontalAlignmentTableRenderer());
+		tcm.getColumn(1).setCellRenderer(new TimeTableCellRenderer(thresholdTime));
 
 		add(BorderLayout.CENTER, split);
 	}
@@ -205,23 +208,41 @@ public class SqlHistoryPanel extends JPanel {
 			}
 		}
 
-		objs[2] = String.format("%d ms", history.getTime());
+		objs[2] = Long.valueOf(history.getTime());
 		objs[3] = history.getSql();
 
 		return objs;
 	}
 
-	private static class HorizontalAlignmentTableRenderer extends DefaultTableCellRenderer {
+	private static class TimeTableCellRenderer extends DefaultTableCellRenderer {
 
 		/** serialVersionUID */
 		private static final long serialVersionUID = 1L;
+
+		private final long threshold;
+
+		public TimeTableCellRenderer(final long threshold) {
+			this.threshold = threshold;
+		}
 
 		@Override
 		public Component getTableCellRendererComponent(final JTable table, final Object value,
 				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 			final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			if (c instanceof JLabel) {
+				final Long l = (Long) value;
+
 				final JLabel label = (JLabel) c;
+
+				final String str = String.format("%d ms", l);
+				label.setText(str);
+
+				if (l >= threshold) {
+					setForeground(Color.red);
+				} else {
+					setForeground(table.getForeground());
+				}
+
 				label.setHorizontalAlignment(SwingConstants.RIGHT);
 			}
 			return c;
