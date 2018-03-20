@@ -157,6 +157,7 @@ public class SQLEditorPanel extends JPanel {
 	public void setText(final String text) {
 		txtEditor.setText(text);
 		txtEditor.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
+		txtEditor.setCaretPosition(0);
 	}
 
 	public synchronized void addSQLEditorPanelListener(final SQLEditorPanelListener listener) {
