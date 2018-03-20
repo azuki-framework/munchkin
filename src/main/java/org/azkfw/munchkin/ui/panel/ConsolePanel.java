@@ -28,15 +28,18 @@ import javax.swing.JViewport;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import org.azkfw.munchkin.ui.VisibleCaret;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * このクラスは、コンソールパネルクラスです。
+ * 
  * @author Kawakicchi
  */
 public class ConsolePanel extends JPanel {
@@ -47,24 +50,34 @@ public class ConsolePanel extends JPanel {
 	/** logger */
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConsolePanel.class);
 
+	/** Level [FATAL] */
 	private static final String LEVEL_FATAL = "FATAL";
+	/** Level [WARN] */
 	private static final String LEVEL_WARN = "WARN";
+	/** Level [INFO] */
 	private static final String LEVEL_INFO = "INFO";
+	/** Level [DEBUG] */
 	private static final String LEVEL_DEBUG = "DEBUG";
+	/** Level [TRACE] */
 	private static final String LEVEL_TRACE = "TRACE";
 
+	/** AttributeSet [FATAL] */
 	private final SimpleAttributeSet asFatal;
+	/** AttributeSet [WARN] */
 	private final SimpleAttributeSet asWarn;
+	/** AttributeSet [INFO] */
 	private final SimpleAttributeSet asInfo;
+	/** AttributeSet [DEBUG] */
 	private final SimpleAttributeSet asDebug;
+	/** AttributeSet [TRACE] */
 	private final SimpleAttributeSet asTrace;
 
-	private final JTextPane txtConsole;
+	private final JTextPane text;
 
 	public ConsolePanel() {
 		setLayout(new BorderLayout());
 
-		txtConsole = new JTextPane() {
+		text = new JTextPane() {
 			/** serialVersionUID */
 			private static final long serialVersionUID = 1L;
 
@@ -83,13 +96,17 @@ public class ConsolePanel extends JPanel {
 				return false;
 			}
 		};
-		txtConsole.setEditable(false);
+		text.setEditable(false);
+
+		final Caret orgCaret = text.getCaret();
+		final Caret newCaret = new VisibleCaret(orgCaret.getBlinkRate());
+		text.setCaret(newCaret);
 
 		final JPanel pnlControl = new JPanel();
 		pnlControl.setPreferredSize(new Dimension(0, 32));
 
 		add(BorderLayout.NORTH, pnlControl);
-		add(BorderLayout.CENTER, new JScrollPane(txtConsole));
+		add(BorderLayout.CENTER, new JScrollPane(text));
 
 		asFatal = new SimpleAttributeSet();
 		StyleConstants.setForeground(asFatal, Color.RED);
@@ -103,53 +120,54 @@ public class ConsolePanel extends JPanel {
 		StyleConstants.setForeground(asTrace, Color.GRAY);
 	}
 
-	public synchronized void fatal(final String log) {
+	public void fatal(final String log) {
 		insert(LEVEL_FATAL, log, asFatal);
 	}
 
-	public synchronized void fatal(final String log, final Object... objs) {
+	public void fatal(final String log, final Object... objs) {
 		insert(LEVEL_FATAL, String.format(log, objs), asFatal);
 	}
 
-	public synchronized void warn(final String log) {
+	public void warn(final String log) {
 		insert(LEVEL_WARN, log, asWarn);
 	}
 
-	public synchronized void warn(final String log, final Object... objs) {
+	public void warn(final String log, final Object... objs) {
 		insert(LEVEL_WARN, String.format(log, objs), asWarn);
 	}
 
-	public synchronized void info(final String log) {
+	public void info(final String log) {
 		insert(LEVEL_INFO, log, asInfo);
 	}
 
-	public synchronized void info(final String log, final Object... objs) {
+	public void info(final String log, final Object... objs) {
 		insert(LEVEL_INFO, String.format(log, objs), asInfo);
 	}
 
-	public synchronized void debug(final String log) {
+	public void debug(final String log) {
 		insert(LEVEL_DEBUG, log, asDebug);
 	}
 
-	public synchronized void debug(final String log, final Object... objs) {
+	public void debug(final String log, final Object... objs) {
 		insert(LEVEL_DEBUG, String.format(log, objs), asDebug);
 	}
 
-	public synchronized void trace(final String log) {
+	public void trace(final String log) {
 		insert(LEVEL_TRACE, log, asTrace);
 	}
 
-	public synchronized void trace(final String log, final Object... objs) {
+	public void trace(final String log, final Object... objs) {
 		insert(LEVEL_TRACE, String.format(log, objs), asTrace);
 	}
 
 	private synchronized void insert(final String level, final String log, final AttributeSet as) {
 		final String msg = String.format("[%-5s] %s\n", level, log);
 
-		final Document doc = txtConsole.getDocument();
+		final Document doc = text.getDocument();
 		final int offset = doc.getLength();
 		try {
-			txtConsole.getDocument().insertString(offset, msg, as);
+			doc.insertString(offset, msg, as);
+			text.setCaretPosition(doc.getLength() - 1);
 		} catch (BadLocationException ex) {
 			LOGGER.error("TextPanel insert error.", ex);
 		}
