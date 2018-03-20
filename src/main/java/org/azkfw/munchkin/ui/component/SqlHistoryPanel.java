@@ -38,8 +38,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.Caret;
 
 import org.azkfw.munchkin.entity.SQLHistoryEntity;
+import org.azkfw.munchkin.ui.VisibleCaret;
 import org.azkfw.munchkin.util.MunchkinUtil;
 
 /**
@@ -101,6 +103,10 @@ public class SqlHistoryPanel extends JPanel {
 
 		text = new JTextPane();
 		text.setEditable(false);
+
+		final Caret orgCaret = text.getCaret();
+		final Caret newCaret = new VisibleCaret(orgCaret.getBlinkRate());
+		text.setCaret(newCaret);
 
 		final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split.setLeftComponent(new JScrollPane(table));
