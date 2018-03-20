@@ -25,13 +25,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -43,6 +43,7 @@ import javax.swing.text.Caret;
 
 import org.azkfw.munchkin.entity.SQLHistoryEntity;
 import org.azkfw.munchkin.ui.VisibleCaret;
+import org.azkfw.munchkin.ui.component.SQLTextPanel;
 import org.azkfw.munchkin.util.MunchkinUtil;
 
 /**
@@ -60,7 +61,7 @@ public class SqlHistoryPanel extends JPanel {
 	private final DefaultTableModel model;
 
 	private final JTable table;
-	private final JTextPane text;
+	private final SQLTextPanel text;
 
 	private long maxHistory = 100;
 	private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -104,8 +105,10 @@ public class SqlHistoryPanel extends JPanel {
 			}
 		});
 
-		text = new JTextPane();
+		text = new SQLTextPanel();
 		text.setEditable(false);
+		text.setKeywordPattern(Pattern.compile("^(select|as)$", Pattern.CASE_INSENSITIVE));
+		text.setParameterPattern(Pattern.compile("^:(.+)$", Pattern.CASE_INSENSITIVE));
 
 		final Caret orgCaret = text.getCaret();
 		final Caret newCaret = new VisibleCaret(orgCaret.getBlinkRate());
