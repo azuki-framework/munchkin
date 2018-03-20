@@ -23,13 +23,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Comparator;
 
 import javax.xml.bind.JAXB;
 
-import org.azkfw.munchkin.entity.MunchkinEntity;
-import org.azkfw.munchkin.entity.SQLHistoryEntity;
+import org.azkfw.munchkin.entity.ConfigurationEntity;
+import org.azkfw.munchkin.entity.HistoryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +46,9 @@ public class Munchkin {
 	/** ベースディレクトリ */
 	private File baseDir;
 	/** */
-	private MunchkinEntity config;
+	private ConfigurationEntity config;
+	/** */
+	private HistoryEntity history;
 
 	/**
 	 * コンストラクタ
@@ -93,20 +93,21 @@ public class Munchkin {
 			}
 		}
 
-		final File file = getConfigFile();
-		if (file.isFile()) {
-			LOGGER.debug("Load config file.[{}]", file.getAbsolutePath());
-			config = JAXB.unmarshal(file, MunchkinEntity.class);
+		final File configFile = getConfigFile();
+		if (configFile.isFile()) {
+			LOGGER.debug("Load config file.[{}]", configFile.getAbsolutePath());
+			config = JAXB.unmarshal(configFile, ConfigurationEntity.class);
 		} else {
-			config = new MunchkinEntity();
+			config = new ConfigurationEntity();
 		}
 
-		Collections.sort(config.getHistorySqls(), new Comparator<SQLHistoryEntity>() {
-			@Override
-			public int compare(final SQLHistoryEntity o1, final SQLHistoryEntity o2) {
-				return o1.getOrder() - o2.getOrder();
-			}
-		});
+		final File historyFile = getHistoryFile();
+		if (historyFile.isFile()) {
+			LOGGER.debug("Load history file.[{}]", historyFile.getAbsolutePath());
+			history = JAXB.unmarshal(historyFile, HistoryEntity.class);
+		} else {
+			history = new HistoryEntity();
+		}
 
 		return true;
 	}
@@ -117,19 +118,30 @@ public class Munchkin {
 	 * @return 結果
 	 */
 	public boolean store() {
-		final File file = getConfigFile();
-
+		final File configFile = getConfigFile();
 		LOGGER.debug("Store config file.");
-		JAXB.marshal(config, file);
+		JAXB.marshal(config, configFile);
+
+		final File historyFile = getHistoryFile();
+		LOGGER.debug("Store history file.");
+		JAXB.marshal(history, historyFile);
 
 		return true;
 	}
 
-	public MunchkinEntity getConfig() {
+	public ConfigurationEntity getConfig() {
 		return config;
+	}
+
+	public HistoryEntity getHistory() {
+		return history;
 	}
 
 	private File getConfigFile() {
 		return Paths.get(baseDir.getAbsolutePath(), "conf", "config.xml").toFile();
+	}
+
+	private File getHistoryFile() {
+		return Paths.get(baseDir.getAbsolutePath(), "conf", "history.xml").toFile();
 	}
 }

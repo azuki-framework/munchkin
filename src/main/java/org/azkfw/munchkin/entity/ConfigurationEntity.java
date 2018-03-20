@@ -24,24 +24,19 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.azkfw.munchkin.util.MunchkinUtil;
-
 /**
  *
  * @author Kawakicchi
  */
-@XmlRootElement(name = "munchkin")
-public class MunchkinEntity {
+@XmlRootElement(name = "munchkin-config")
+public class ConfigurationEntity {
 
 	private final List<DatasourceEntity> datasources;
 
-	private final List<SQLHistoryEntity> historySqls;
-
 	private String sqlTextEditorText;
 
-	public MunchkinEntity() {
+	public ConfigurationEntity() {
 		datasources = new ArrayList<DatasourceEntity>();
-		historySqls = new ArrayList<SQLHistoryEntity>();
 		sqlTextEditorText = "";
 	}
 
@@ -58,28 +53,6 @@ public class MunchkinEntity {
 	@XmlElement(name = "datasource")
 	public List<DatasourceEntity> getDatasources() {
 		return datasources;
-	}
-
-	public void addHistorySql(final SQLHistoryEntity historySql) {
-		for (int i = historySqls.size() - 1; i >= 0; i--) {
-			SQLHistoryEntity sql = historySqls.get(i);
-			if (MunchkinUtil.isEquals(historySql.getSql(), sql.getSql())) {
-				historySqls.remove(i);
-			}
-		}
-		historySqls.add(0, historySql);
-		for (int i = historySqls.size() - 1; i >= 100; i--) {
-			historySqls.remove(i);
-		}
-		for (int i = 0; i < historySqls.size(); i++) {
-			historySqls.get(i).setOrder(i + 1);
-		}
-	}
-
-	@XmlElementWrapper(name = "historySqls")
-	@XmlElement(name = "historySql")
-	public List<SQLHistoryEntity> getHistorySqls() {
-		return historySqls;
 	}
 
 	public void setSqlTextEditorText(final String text) {

@@ -29,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -42,8 +43,9 @@ import org.azkfw.munchkin.database.model.entity.ObjectDetailEntity;
 import org.azkfw.munchkin.database.model.entity.ObjectEntity;
 import org.azkfw.munchkin.database.model.entity.SchemaEntity;
 import org.azkfw.munchkin.database.model.entity.TypeEntity;
+import org.azkfw.munchkin.entity.ConfigurationEntity;
 import org.azkfw.munchkin.entity.DatasourceEntity;
-import org.azkfw.munchkin.entity.MunchkinEntity;
+import org.azkfw.munchkin.entity.HistoryEntity;
 import org.azkfw.munchkin.entity.SQLHistoryEntity;
 import org.azkfw.munchkin.task.TaskManager;
 import org.azkfw.munchkin.ui.component.ConsolePanel;
@@ -83,7 +85,9 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	private static final int TAB_DATAGRID = 1;
 	private static final int TAB_SQLHISTORY = 2;
 
-	private final MunchkinEntity config;
+	private final ConfigurationEntity config;
+	private final HistoryEntity history;
+
 	private final TaskManager manager;
 
 	private DatabaseModel model;
@@ -111,6 +115,8 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		setLayout(new BorderLayout());
 
 		config = Munchkin.getInstance().getConfig();
+		history = Munchkin.getInstance().getHistory();
+
 		manager = new TaskManager();
 		manager.start();
 
@@ -244,33 +250,58 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			String row = sql.toLowerCase().trim();
+			final String row = sql.toLowerCase().trim();
+
 			if (row.startsWith("select")) {
+				final Date date = new Date();
+
+				final long start = System.currentTimeMillis();
 				ps = connection.prepareStatement(sql);
 				rs = ps.executeQuery();
+				final long end = System.currentTimeMillis();
+
 				int cnt = pnlDataGrid.setData(rs);
 				info("%d件 表示しました。", cnt);
 				tabBottom.setSelectedIndex(TAB_DATAGRID);
 
-				config.addHistorySql(new SQLHistoryEntity(sql));
+				final long time = end - start;
+				pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
 
 			} else if (row.startsWith("insert")) {
+				final Date date = new Date();
+
+				final long start = System.currentTimeMillis();
 				final int cnt = model.executeUpdate(sql);
+				final long end = System.currentTimeMillis();
+
 				info("%d件 登録しました。", cnt);
 
-				config.addHistorySql(new SQLHistoryEntity(sql));
+				final long time = end - start;
+				pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
 
 			} else if (row.startsWith("update")) {
+				final Date date = new Date();
+
+				final long start = System.currentTimeMillis();
 				final int cnt = model.executeUpdate(sql);
+				final long end = System.currentTimeMillis();
+
 				info("%d件 更新しました。", cnt);
 
-				config.addHistorySql(new SQLHistoryEntity(sql));
+				final long time = end - start;
+				pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
 
 			} else if (row.startsWith("delete")) {
+				final Date date = new Date();
+
+				final long start = System.currentTimeMillis();
 				final int cnt = model.executeUpdate(sql);
+				final long end = System.currentTimeMillis();
+
 				info("%d件 削除しました。", cnt);
 
-				config.addHistorySql(new SQLHistoryEntity(sql));
+				final long time = end - start;
+				pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
 
 			} else {
 				LOGGER.error("Unknown sql.");
@@ -331,7 +362,9 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		spltLeft.setDividerLocation(spltLeft.getHeight() / 2);
 		spltRight.setDividerLocation(spltRight.getHeight() / 2);
 
+		// 
 		pnlSqlEditor.setText(config.getSqlTextEditorText());
+		pnlSqlHistory.setSqlHistorys(history.getHistorySqls());
 
 		if (MunchkinUtil.isEmpty(config.getDatasources())) {
 			final DatasourceDialog dlg = new DatasourceDialog(this);
@@ -356,7 +389,9 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	}
 
 	private void doClosed() {
+		// 
 		config.setSqlTextEditorText(pnlSqlEditor.getText());
+		history.setHistorySqls(pnlSqlHistory.getSqlHistorys());
 	}
 
 	public void info(final String message) {

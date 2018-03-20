@@ -17,42 +17,101 @@
  */
 package org.azkfw.munchkin.entity;
 
+import java.io.Serializable;
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
 /**
- *
+ * このクラスは、SQL実行履歴情報を保持するエンティティクラスです。
+ * 
  * @author Kawakicchi
  */
-public class SQLHistoryEntity {
+public class SQLHistoryEntity implements Serializable {
 
-	private int order;
+	/** serialVersionUID */
+	private static final long serialVersionUID = 8438700471851379667L;
+
+	/** 実行日時 */
+	private Date date;
+	/** 処理時間[ms] */
+	private long time;
+	/** 実行SQL */
 	private String sql;
 
+	/**
+	 * コンストラクタ
+	 */
 	public SQLHistoryEntity() {
-		this.order = -1;
-		this.sql = null;
 	}
 
-	public SQLHistoryEntity(final String sql) {
-		this.order = -1;
+	/**
+	 * コンストラクタ
+	 *
+	 * @param date 実行日時
+	 * @param time 処理時間[ms]
+	 * @param sql 実行SQL
+	 */
+	public SQLHistoryEntity(final Date date, final long time, final String sql) {
+		this.date = date;
+		this.time = time;
 		this.sql = sql;
 	}
 
+	/**
+	 * 実行日時を取得する。
+	 *
+	 * @return 実行日時
+	 */
 	@XmlAttribute
-	public int getOrder() {
-		return order;
+	public Date getDate() {
+		return date;
 	}
 
-	public void setOrder(final int order) {
-		this.order = order;
+	/**
+	 * 実行日時を設定する。
+	 *
+	 * @param date 実行日時
+	 */
+	public void setDate(final Date date) {
+		this.date = date;
 	}
 
+	/**
+	 * 処理時間を取得する。
+	 *
+	 * @return 処理時間[ms]
+	 */
+	@XmlAttribute
+	public long getTime() {
+		return time;
+	}
+
+	/**
+	 * 処理時間を設定する。
+	 *
+	 * @param time 処理時間[ms]
+	 */
+	public void setTime(final long time) {
+		this.time = time;
+	}
+
+	/**
+	 * 実行SQLを取得する。
+	 *
+	 * @return 実行SQL
+	 */
 	@XmlValue
 	public String getSql() {
 		return sql;
 	}
 
+	/**
+	 * 実行SQLを設定する。
+	 *
+	 * @param sql 実行SQL
+	 */
 	public void setSql(final String sql) {
 		this.sql = sql;
 	}
