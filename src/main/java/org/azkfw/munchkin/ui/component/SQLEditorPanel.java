@@ -37,6 +37,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
 import org.azkfw.munchkin.ui.SQLTextEditor;
@@ -155,6 +156,7 @@ public class SQLEditorPanel extends JPanel {
 
 	public void setText(final String text) {
 		txtEditor.setText(text);
+		txtEditor.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 	}
 
 	public synchronized void addSQLEditorPanelListener(final SQLEditorPanelListener listener) {
@@ -180,7 +182,6 @@ public class SQLEditorPanel extends JPanel {
 			putValue(SHORT_DESCRIPTION, "元に戻す");
 			putValue(LONG_DESCRIPTION, "元に戻す");
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke('Z', Event.CTRL_MASK));
-			//putValue(SMALL_ICON, SwingUtilities.getImageIcon("/resources/EditUndo.png"));
 		}
 
 		@Override
@@ -204,7 +205,6 @@ public class SQLEditorPanel extends JPanel {
 			putValue(SHORT_DESCRIPTION, "やり直し");
 			putValue(LONG_DESCRIPTION, "やり直し");
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke('Y', Event.CTRL_MASK));
-			//putValue(SMALL_ICON, SwingUtil.getImageIcon("/resources/EditRedo.png"));
 		}
 
 		@Override
