@@ -56,6 +56,7 @@ import org.azkfw.munchkin.ui.component.DBObjectListPanelListener;
 import org.azkfw.munchkin.ui.component.DataGridPanel;
 import org.azkfw.munchkin.ui.component.SQLEditorPanel;
 import org.azkfw.munchkin.ui.component.SQLEditorPanelListener;
+import org.azkfw.munchkin.ui.component.SqlHistoryPanel;
 import org.azkfw.munchkin.ui.component.StatusBar;
 import org.azkfw.munchkin.ui.dialog.DatasourceDialog;
 import org.azkfw.munchkin.ui.dialog.DatasourceDialogListener;
@@ -81,6 +82,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 
 	private static final int TAB_CONSOLE = 0;
 	private static final int TAB_DATAGRID = 1;
+	private static final int TAB_SQLHISTORY = 2;
 
 	private final MunchkinEntity config;
 	private final TaskManager manager;
@@ -102,6 +104,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	private final JTabbedPane tabBottom;
 	private final ConsolePanel pnlConsole;
 	private final DataGridPanel pnlDataGrid;
+	private final SqlHistoryPanel pnlSqlHistory;
 
 	public MunchkinFrame() {
 		setTitle("Munchkin");
@@ -120,10 +123,12 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		pnlSqlEditor = new SQLEditorPanel();
 		pnlConsole = new ConsolePanel();
 		pnlDataGrid = new DataGridPanel();
+		pnlSqlHistory = new SqlHistoryPanel();
 
 		tabBottom = new JTabbedPane();
 		tabBottom.add("コンソール", pnlConsole);
 		tabBottom.add("データ", pnlDataGrid);
+		tabBottom.add("実行履歴", pnlSqlHistory);
 
 		final JPanel pnlOb = new JPanel();
 		pnlOb.setLayout(new BorderLayout());

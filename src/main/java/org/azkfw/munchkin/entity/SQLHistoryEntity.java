@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlValue;
 /**
  *
  * @author Kawakicchi
- *
  */
 public class SQLHistoryEntity {
 
