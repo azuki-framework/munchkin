@@ -20,13 +20,18 @@ package org.azkfw.munchkin.ui.panel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Event;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -41,7 +46,10 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.undo.UndoManager;
 
 import org.azkfw.munchkin.ui.SQLTextEditor;
+import org.azkfw.munchkin.ui.component.ImageButton;
 import org.azkfw.munchkin.ui.component.TextLineNumberView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * このクラスは、SQLエディターパネルクラスです。
@@ -53,12 +61,19 @@ public class SQLEditorPanel extends JPanel {
 	/** serialVersionUID */
 	private static final long serialVersionUID = -6756071304148806058L;
 
+	/** Logger */
+	private static final Logger LOGGER = LoggerFactory.getLogger(SQLEditorPanel.class);
+
 	public static final String ACTION_KEY_UNDO = "undo";
 	public static final String ACTION_KEY_REDO = "redo";
 
 	private final List<SQLEditorPanelListener> listeners;
 
 	private final SQLTextEditor txtEditor;
+
+	private final ImageButton btnExecute;
+	private final BufferedImage imgExecuteEna;
+	private final BufferedImage imgExecuteDis;
 
 	private final UndoManager undoManager;
 
@@ -86,7 +101,14 @@ public class SQLEditorPanel extends JPanel {
 		scroll.setRowHeaderView(numberView);
 
 		final JPanel pnlControl = new JPanel();
-		pnlControl.setPreferredSize(new Dimension(0, 32));
+		pnlControl.setPreferredSize(new Dimension(0, 36));
+		pnlControl.setLayout(new FlowLayout(FlowLayout.LEFT, 6, 0));
+
+		imgExecuteEna = loadImage("play_ena.png");
+		imgExecuteDis = loadImage("play_dis.png");
+
+		btnExecute = new ImageButton(imgExecuteEna);
+		pnlControl.add(btnExecute);
 
 		add(BorderLayout.NORTH, pnlControl);
 		add(BorderLayout.CENTER, scroll);
@@ -141,6 +163,13 @@ public class SQLEditorPanel extends JPanel {
 			public void changedUpdate(final DocumentEvent e) {
 			}
 		});
+		btnExecute.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				btnExecute.setEnabled(false);
+				btnExecute.setImage(imgExecuteDis);
+			}
+		});
 	}
 
 	public void undo() {
@@ -169,6 +198,16 @@ public class SQLEditorPanel extends JPanel {
 		for (SQLEditorPanelListener l : listeners) {
 			l.sqlEditorPanelExecSQL(sql);
 		}
+	}
+
+	private BufferedImage loadImage(final String path) {
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(getClass().getResourceAsStream(path));
+		} catch (IOException ex) {
+			LOGGER.error("Image load error.", ex);
+		}
+		return image;
 	}
 
 	/**
