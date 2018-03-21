@@ -111,6 +111,8 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	private final DataGridPanel pnlDataGrid;
 	private final SqlHistoryPanel pnlSqlHistory;
 
+	private Boolean busy = Boolean.FALSE;
+
 	public MunchkinFrame() {
 		setTitle("Munchkin");
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -205,7 +207,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 
 		final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final Rectangle rect = env.getMaximumWindowBounds();
-		rect.height -= 100;
+		rect.height -= 140;
 		setBounds(rect);
 	}
 
@@ -229,119 +231,175 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	}
 
 	public void connect(final DatasourceEntity datasource) {
-		Connection c = null;
-		try {
-			Class.forName(datasource.getDriver());
-			c = DriverManager.getConnection(datasource.getUrl(), datasource.getUser(), datasource.getPassword());
-			c.setAutoCommit(false);
-
-			model = DatabaseModelFactory.create(c);
-			connection = c;
-
-			info("接続しました。[%s]", datasource.getName());
-
-		} catch (ClassNotFoundException ex) {
-			fatal("接続に失敗しました。[%s]", ex.getMessage());
-			LOGGER.error("Driver class not found.", ex);
-		} catch (SQLException ex) {
-			fatal("接続に失敗しました。[%s]", ex.getMessage());
-			LOGGER.error("Database connection error.", ex);
+		synchronized (busy) {
+			if (busy) {
+				return;
+			}
+			busy = Boolean.TRUE;
 		}
+
+		final Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Connection c = null;
+				try {
+					Class.forName(datasource.getDriver());
+					c = DriverManager.getConnection(datasource.getUrl(), datasource.getUser(), datasource.getPassword());
+					c.setAutoCommit(false);
+
+					model = DatabaseModelFactory.create(c);
+					connection = c;
+
+					info("接続しました。[%s]", datasource.getName());
+
+				} catch (ClassNotFoundException ex) {
+					fatal("接続に失敗しました。[%s]", ex.getMessage());
+					LOGGER.error("Driver class not found.", ex);
+
+					busy = Boolean.FALSE;
+					return;
+				} catch (SQLException ex) {
+					fatal("接続に失敗しました。[%s]", ex.getMessage());
+					LOGGER.error("Database connection error.", ex);
+
+					busy = Boolean.FALSE;
+					return;
+				} catch (Exception ex) {
+					fatal("接続に失敗しました。[%s]", ex.getMessage());
+					LOGGER.error("Undefined error.", ex);
+
+					busy = Boolean.FALSE;
+					return;
+				}
+
+				try {
+					final List<SchemaEntity> schemas = model.getSchemaList();
+					final List<TypeEntity> types = model.getTypeList();
+
+					pnlCondition.refresh(schemas, types);
+
+					final SchemaEntity schema = model.getDefaultSchema();
+					pnlCondition.setSelectSchema(schema);
+
+				} catch (SQLException ex) {
+					LOGGER.error("", ex);
+
+					busy = Boolean.FALSE;
+					return;
+				} catch (Exception ex) {
+					LOGGER.error("Undefined error.", ex);
+
+					busy = Boolean.FALSE;
+					return;
+				}
+
+				busy = Boolean.FALSE;
+			}
+		});
+		thread.start();
 	}
 
 	public void execute(final String sql) {
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			final String row = sql.toLowerCase().trim();
+		synchronized (busy) {
+			if (busy) {
+				return;
+			}
+			busy = Boolean.TRUE;
+		}
 
-			if (row.startsWith("select")) {
-				final Date date = new Date();
+		final Thread thread = new Thread(new Runnable() {
 
-				final long start = System.currentTimeMillis();
-				ps = connection.prepareStatement(sql);
-				rs = ps.executeQuery();
-				final long end = System.currentTimeMillis();
+			@Override
+			public void run() {
+				pnlSqlEditor.setExecuteButtonEnabled(false);
 
-				long cnt = pnlDataGrid.setData(rs);
-				if (-1 == cnt) {
-					info("%d件 表示しました。", pnlDataGrid.getMaxReadSize());
-				} else {
-					info("%d件 表示しました。", cnt);
+				PreparedStatement ps = null;
+				ResultSet rs = null;
+				try {
+					final String row = sql.toLowerCase().trim();
+
+					if (row.startsWith("select")) {
+						final Date date = new Date();
+
+						final long start = System.currentTimeMillis();
+						ps = connection.prepareStatement(sql);
+						rs = ps.executeQuery();
+						final long end = System.currentTimeMillis();
+
+						long cnt = pnlDataGrid.setData(rs);
+						if (-1 == cnt) {
+							info("%d件 表示しました。", pnlDataGrid.getMaxReadSize());
+						} else {
+							info("%d件 表示しました。", cnt);
+						}
+						tabBottom.setSelectedIndex(TAB_DATAGRID);
+
+						final long time = end - start;
+						pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
+
+					} else if (row.startsWith("insert")) {
+						final Date date = new Date();
+
+						final long start = System.currentTimeMillis();
+						final int cnt = model.executeUpdate(sql);
+						final long end = System.currentTimeMillis();
+
+						info("%d件 登録しました。", cnt);
+
+						final long time = end - start;
+						pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
+
+					} else if (row.startsWith("update")) {
+						final Date date = new Date();
+
+						final long start = System.currentTimeMillis();
+						final int cnt = model.executeUpdate(sql);
+						final long end = System.currentTimeMillis();
+
+						info("%d件 更新しました。", cnt);
+
+						final long time = end - start;
+						pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
+
+					} else if (row.startsWith("delete")) {
+						final Date date = new Date();
+
+						final long start = System.currentTimeMillis();
+						final int cnt = model.executeUpdate(sql);
+						final long end = System.currentTimeMillis();
+
+						info("%d件 削除しました。", cnt);
+
+						final long time = end - start;
+						pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
+
+					} else {
+						LOGGER.error("Unknown sql.");
+					}
+
+				} catch (SQLException ex) {
+					fatal("エラーが発生しました。[%s]", ex.getMessage());
+					try {
+						connection.rollback();
+						info("ロールバックしました。");
+					} catch (SQLException ex2) {
+
+					}
+					LOGGER.error("Execute sql error.", ex);
+				} catch (Exception ex) {
+					LOGGER.error("Undefined error.", ex);
+
+				} finally {
+					MunchkinUtil.release(rs);
+					MunchkinUtil.release(ps);
 				}
-				tabBottom.setSelectedIndex(TAB_DATAGRID);
 
-				final long time = end - start;
-				pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
+				pnlSqlEditor.setExecuteButtonEnabled(true);
 
-			} else if (row.startsWith("insert")) {
-				final Date date = new Date();
-
-				final long start = System.currentTimeMillis();
-				final int cnt = model.executeUpdate(sql);
-				final long end = System.currentTimeMillis();
-
-				info("%d件 登録しました。", cnt);
-
-				final long time = end - start;
-				pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
-
-			} else if (row.startsWith("update")) {
-				final Date date = new Date();
-
-				final long start = System.currentTimeMillis();
-				final int cnt = model.executeUpdate(sql);
-				final long end = System.currentTimeMillis();
-
-				info("%d件 更新しました。", cnt);
-
-				final long time = end - start;
-				pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
-
-			} else if (row.startsWith("delete")) {
-				final Date date = new Date();
-
-				final long start = System.currentTimeMillis();
-				final int cnt = model.executeUpdate(sql);
-				final long end = System.currentTimeMillis();
-
-				info("%d件 削除しました。", cnt);
-
-				final long time = end - start;
-				pnlSqlHistory.addSqlHistory(new SQLHistoryEntity(date, time, sql));
-
-			} else {
-				LOGGER.error("Unknown sql.");
+				busy = Boolean.FALSE;
 			}
-
-		} catch (SQLException ex) {
-			fatal("エラーが発生しました。[%s]", ex.getMessage());
-			try {
-				connection.rollback();
-				info("ロールバックしました。");
-			} catch (SQLException ex2) {
-
-			}
-			LOGGER.error("Execute sql error.", ex);
-		} finally {
-			MunchkinUtil.release(rs);
-			MunchkinUtil.release(ps);
-		}
-	}
-
-	private void refreshCondition() {
-		try {
-			final List<SchemaEntity> schemas = model.getSchemaList();
-			final List<TypeEntity> types = model.getTypeList();
-
-			pnlCondition.refresh(schemas, types);
-
-			final SchemaEntity schema = model.getDefaultSchema();
-			pnlCondition.setSelectSchema(schema);
-
-		} catch (SQLException ex) {
-			LOGGER.error("", ex);
-		}
+		});
+		thread.start();
 	}
 
 	private void getObjectList(final SchemaEntity schema, final TypeEntity type) {
@@ -380,7 +438,6 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 				public void datasourceDialogOK(final DatasourceDialog dialog, final DatasourceEntity ds) {
 					datasource.addDatasource(ds);
 					connect(ds);
-					refreshCondition();
 				}
 
 				@Override
@@ -391,7 +448,6 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		} else {
 			final DatasourceEntity ds = datasource.getDatasources().get(0);
 			connect(ds);
-			refreshCondition();
 		}
 	}
 

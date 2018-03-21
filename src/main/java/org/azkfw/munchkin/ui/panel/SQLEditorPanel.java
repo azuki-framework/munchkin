@@ -117,13 +117,7 @@ public class SQLEditorPanel extends JPanel {
 			@Override
 			public void keyReleased(final KeyEvent e) {
 				if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_ENTER) {
-					String text = txtEditor.getSelectedText();
-					if (null == text) {
-						text = txtEditor.getText();
-					}
-					if (0 < text.length()) {
-						doExecSQL(text);
-					}
+					callExecSQL();
 					e.consume();
 				}
 			}
@@ -166,8 +160,8 @@ public class SQLEditorPanel extends JPanel {
 		btnExecute.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				btnExecute.setEnabled(false);
-				btnExecute.setImage(imgExecuteDis);
+				setExecuteButtonEnabled(false);
+				callExecSQL();
 			}
 		});
 	}
@@ -190,13 +184,29 @@ public class SQLEditorPanel extends JPanel {
 		txtEditor.setCaretPosition(0);
 	}
 
+	public void setExecuteButtonEnabled(final boolean enabled) {
+		btnExecute.setEnabled(enabled);
+		if (enabled) {
+			btnExecute.setImage(imgExecuteEna);
+		} else {
+			btnExecute.setImage(imgExecuteDis);
+		}
+	}
+
 	public synchronized void addSQLEditorPanelListener(final SQLEditorPanelListener listener) {
 		listeners.add(listener);
 	}
 
-	private void doExecSQL(final String sql) {
-		for (SQLEditorPanelListener l : listeners) {
-			l.sqlEditorPanelExecSQL(sql);
+	private void callExecSQL() {
+		String sql = txtEditor.getSelectedText();
+		if (null == sql) {
+			sql = txtEditor.getText();
+		}
+
+		if (0 < sql.length()) {
+			for (SQLEditorPanelListener l : listeners) {
+				l.sqlEditorPanelExecSQL(sql);
+			}
 		}
 	}
 
