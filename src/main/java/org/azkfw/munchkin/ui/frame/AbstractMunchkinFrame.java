@@ -42,6 +42,8 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 	private final JMenuItem menuFileConnection;
 	private final JMenuItem menuFileDatasource;
 	private final JMenuItem menuFileExit;
+	private final JMenu menuSql;
+	private final JMenuItem menuSqlExecute;
 	private final JMenu menuTool;
 	private final JMenuItem menuToolExport;
 	private final JMenu menuHelp;
@@ -60,6 +62,11 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 		menuFileExit = new JMenuItem(Label.MENU_FILE_EXIT.toString());
 		menuFile.add(menuFileExit);
 		menuBar.add(menuFile);
+
+		menuSql = new JMenu(Label.MENU_SQL.toString());
+		menuSqlExecute = new JMenuItem(Label.MENU_SQL_EXECUTE.toString());
+		menuSql.add(menuSqlExecute);
+		menuBar.add(menuSql);
 
 		menuTool = new JMenu(Label.MENU_TOOL.toString());
 		menuToolExport = new JMenuItem(Label.MENU_TOOL_EXPORT.toString());
@@ -91,6 +98,12 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 				doMenuFileExit();
 			}
 		});
+		menuSqlExecute.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				doMenuSqlExecute();
+			}
+		});
 		menuHelpVersion.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -104,6 +117,8 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 	protected abstract void doMenuFileDatasource();
 
 	protected abstract void doMenuFileExit();
+
+	protected abstract void doMenuSqlExecute();
 
 	protected abstract void doMenuHelpVersion();
 }

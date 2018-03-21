@@ -501,6 +501,14 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	}
 
 	@Override
+	protected void doMenuSqlExecute() {
+		final String sql = pnlSqlEditor.getSelectedText();
+		if (MunchkinUtil.isNotEmpty(sql)) {
+			execute(sql);
+		}
+	}
+
+	@Override
 	protected void doMenuHelpVersion() {
 		final VersionDialog dlg = new VersionDialog(this);
 		dlg.setVisible(true);

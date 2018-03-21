@@ -178,6 +178,14 @@ public class SQLEditorPanel extends JPanel {
 		return txtEditor.getText();
 	}
 
+	public String getSelectedText() {
+		String text = txtEditor.getSelectedText();
+		if (null == text) {
+			text = txtEditor.getText();
+		}
+		return text;
+	}
+
 	public void setText(final String text) {
 		txtEditor.setText(text);
 		txtEditor.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
@@ -198,10 +206,7 @@ public class SQLEditorPanel extends JPanel {
 	}
 
 	private void callExecSQL() {
-		String sql = txtEditor.getSelectedText();
-		if (null == sql) {
-			sql = txtEditor.getText();
-		}
+		final String sql = getSelectedText();
 
 		if (0 < sql.length()) {
 			for (SQLEditorPanelListener l : listeners) {

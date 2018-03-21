@@ -52,6 +52,10 @@ public enum Label {
 	/** */
 	MENU_FILE_EXIT,
 	/** */
+	MENU_SQL,
+	/** */
+	MENU_SQL_EXECUTE,
+	/** */
 	MENU_TOOL,
 	/** */
 	MENU_TOOL_EXPORT,
