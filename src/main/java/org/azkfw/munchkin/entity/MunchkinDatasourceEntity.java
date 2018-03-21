@@ -28,16 +28,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Kawakicchi
  */
-@XmlRootElement(name = "munchkin-config")
-public class ConfigurationEntity {
+@XmlRootElement(name = "munchkin-datasource")
+public class MunchkinDatasourceEntity {
 
 	private final List<DatasourceEntity> datasources;
 
-	private String sqlTextEditorText;
-
-	public ConfigurationEntity() {
+	public MunchkinDatasourceEntity() {
 		datasources = new ArrayList<DatasourceEntity>();
-		sqlTextEditorText = "";
 	}
 
 	public void addDatasource(final DatasourceEntity datasource) {
@@ -53,14 +50,5 @@ public class ConfigurationEntity {
 	@XmlElement(name = "datasource")
 	public List<DatasourceEntity> getDatasources() {
 		return datasources;
-	}
-
-	public void setSqlTextEditorText(final String text) {
-		sqlTextEditorText = text;
-	}
-
-	@XmlElement(name = "SQLTextEditor")
-	public String getSqlTextEditorText() {
-		return sqlTextEditorText;
 	}
 }

@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Kawakicchi
  */
 @XmlRootElement(name = "munchkin-history")
-public class HistoryEntity {
+public class MunchkinHistoryEntity {
 
 	/** SQL実行履歴情報リスト */
 	private final List<SQLHistoryEntity> historySqls;
@@ -38,7 +38,7 @@ public class HistoryEntity {
 	/**
 	 * コンストラクタ
 	 */
-	public HistoryEntity() {
+	public MunchkinHistoryEntity() {
 		historySqls = new ArrayList<SQLHistoryEntity>();
 	}
 

@@ -43,9 +43,10 @@ import org.azkfw.munchkin.database.model.entity.ObjectDetailEntity;
 import org.azkfw.munchkin.database.model.entity.ObjectEntity;
 import org.azkfw.munchkin.database.model.entity.SchemaEntity;
 import org.azkfw.munchkin.database.model.entity.TypeEntity;
-import org.azkfw.munchkin.entity.ConfigurationEntity;
 import org.azkfw.munchkin.entity.DatasourceEntity;
-import org.azkfw.munchkin.entity.HistoryEntity;
+import org.azkfw.munchkin.entity.MunchkinConfigEntity;
+import org.azkfw.munchkin.entity.MunchkinDatasourceEntity;
+import org.azkfw.munchkin.entity.MunchkinHistoryEntity;
 import org.azkfw.munchkin.entity.SQLHistoryEntity;
 import org.azkfw.munchkin.task.TaskManager;
 import org.azkfw.munchkin.ui.component.StatusBar;
@@ -85,8 +86,9 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	private static final int TAB_DATAGRID = 1;
 	private static final int TAB_SQLHISTORY = 2;
 
-	private final ConfigurationEntity config;
-	private final HistoryEntity history;
+	private final MunchkinConfigEntity config;
+	private final MunchkinDatasourceEntity datasource;
+	private final MunchkinHistoryEntity history;
 
 	private final TaskManager manager;
 
@@ -115,6 +117,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		setLayout(new BorderLayout());
 
 		config = Munchkin.getInstance().getConfig();
+		datasource = Munchkin.getInstance().getDatasource();
 		history = Munchkin.getInstance().getHistory();
 
 		manager = new TaskManager();
@@ -370,13 +373,13 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		pnlSqlEditor.setText(config.getSqlTextEditorText());
 		pnlSqlHistory.setSqlHistorys(history.getHistorySqls());
 
-		if (MunchkinUtil.isEmpty(config.getDatasources())) {
+		if (MunchkinUtil.isEmpty(datasource.getDatasources())) {
 			final DatasourceDialog dlg = new DatasourceDialog(this);
 			dlg.addDatasourceDialogListener(new DatasourceDialogListener() {
 				@Override
-				public void datasourceDialogOK(final DatasourceDialog dialog, final DatasourceEntity datasource) {
-					config.addDatasource(datasource);
-					connect(datasource);
+				public void datasourceDialogOK(final DatasourceDialog dialog, final DatasourceEntity ds) {
+					datasource.addDatasource(ds);
+					connect(ds);
 					refreshCondition();
 				}
 
@@ -386,8 +389,8 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 			});
 			dlg.setVisible(true);
 		} else {
-			final DatasourceEntity datasource = config.getDatasources().get(0);
-			connect(datasource);
+			final DatasourceEntity ds = datasource.getDatasources().get(0);
+			connect(ds);
 			refreshCondition();
 		}
 	}
@@ -421,7 +424,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	@Override
 	protected void doMenuFileConnection() {
 		final List<DatasourceEntity> datasources = new ArrayList<DatasourceEntity>();
-		config.getDatasources().forEach(d -> datasources.add(new DatasourceEntity(d)));
+		datasource.getDatasources().forEach(d -> datasources.add(new DatasourceEntity(d)));
 
 		final DatasourceListDialog dlg = new DatasourceListDialog(this, datasources);
 		dlg.setVisible(true);
@@ -430,7 +433,7 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	@Override
 	protected void doMenuFileDatasource() {
 		final List<DatasourceEntity> datasources = new ArrayList<DatasourceEntity>();
-		config.getDatasources().forEach(d -> datasources.add(new DatasourceEntity(d)));
+		datasource.getDatasources().forEach(d -> datasources.add(new DatasourceEntity(d)));
 
 		final DatasourcesDialog dlg = new DatasourcesDialog(datasources);
 		dlg.setVisible(true);

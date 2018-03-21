@@ -26,8 +26,9 @@ import java.nio.file.Paths;
 
 import javax.xml.bind.JAXB;
 
-import org.azkfw.munchkin.entity.ConfigurationEntity;
-import org.azkfw.munchkin.entity.HistoryEntity;
+import org.azkfw.munchkin.entity.MunchkinConfigEntity;
+import org.azkfw.munchkin.entity.MunchkinDatasourceEntity;
+import org.azkfw.munchkin.entity.MunchkinHistoryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,10 +46,13 @@ public class Munchkin {
 
 	/** ベースディレクトリ */
 	private File baseDir;
+
 	/** */
-	private ConfigurationEntity config;
+	private MunchkinConfigEntity config;
 	/** */
-	private HistoryEntity history;
+	private MunchkinDatasourceEntity datasource;
+	/** */
+	private MunchkinHistoryEntity history;
 
 	/**
 	 * コンストラクタ
@@ -96,17 +100,25 @@ public class Munchkin {
 		final File configFile = getConfigFile();
 		if (configFile.isFile()) {
 			LOGGER.debug("Load config file.[{}]", configFile.getAbsolutePath());
-			config = JAXB.unmarshal(configFile, ConfigurationEntity.class);
+			config = JAXB.unmarshal(configFile, MunchkinConfigEntity.class);
 		} else {
-			config = new ConfigurationEntity();
+			config = new MunchkinConfigEntity();
+		}
+
+		final File datasourceFile = getDatasourceFile();
+		if (datasourceFile.isFile()) {
+			LOGGER.debug("Load datasource file.[{}]", datasourceFile.getAbsolutePath());
+			datasource = JAXB.unmarshal(datasourceFile, MunchkinDatasourceEntity.class);
+		} else {
+			datasource = new MunchkinDatasourceEntity();
 		}
 
 		final File historyFile = getHistoryFile();
 		if (historyFile.isFile()) {
 			LOGGER.debug("Load history file.[{}]", historyFile.getAbsolutePath());
-			history = JAXB.unmarshal(historyFile, HistoryEntity.class);
+			history = JAXB.unmarshal(historyFile, MunchkinHistoryEntity.class);
 		} else {
-			history = new HistoryEntity();
+			history = new MunchkinHistoryEntity();
 		}
 
 		return true;
@@ -122,6 +134,10 @@ public class Munchkin {
 		LOGGER.debug("Store config file.");
 		JAXB.marshal(config, configFile);
 
+		final File datasourceFile = getDatasourceFile();
+		LOGGER.debug("Store datasource file.");
+		JAXB.marshal(datasource, datasourceFile);
+
 		final File historyFile = getHistoryFile();
 		LOGGER.debug("Store history file.");
 		JAXB.marshal(history, historyFile);
@@ -129,16 +145,24 @@ public class Munchkin {
 		return true;
 	}
 
-	public ConfigurationEntity getConfig() {
+	public MunchkinConfigEntity getConfig() {
 		return config;
 	}
 
-	public HistoryEntity getHistory() {
+	public MunchkinDatasourceEntity getDatasource() {
+		return datasource;
+	}
+
+	public MunchkinHistoryEntity getHistory() {
 		return history;
 	}
 
 	private File getConfigFile() {
 		return Paths.get(baseDir.getAbsolutePath(), "conf", "config.xml").toFile();
+	}
+
+	private File getDatasourceFile() {
+		return Paths.get(baseDir.getAbsolutePath(), "conf", "datasource.xml").toFile();
 	}
 
 	private File getHistoryFile() {
