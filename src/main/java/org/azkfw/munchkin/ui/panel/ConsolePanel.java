@@ -20,7 +20,13 @@ package org.azkfw.munchkin.ui.panel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -34,6 +40,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import org.azkfw.munchkin.ui.VisibleCaret;
+import org.azkfw.munchkin.ui.component.ImageButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +81,8 @@ public class ConsolePanel extends JPanel {
 
 	private final JTextPane text;
 
+	private final ImageButton btnDelete;
+
 	public ConsolePanel() {
 		setLayout(new BorderLayout());
 
@@ -103,7 +112,12 @@ public class ConsolePanel extends JPanel {
 		text.setCaret(newCaret);
 
 		final JPanel pnlControl = new JPanel();
-		pnlControl.setPreferredSize(new Dimension(0, 32));
+		pnlControl.setPreferredSize(new Dimension(0, 24));
+		pnlControl.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 2));
+
+		btnDelete = new ImageButton(loadImage("delete_ena.png"));
+		btnDelete.setPreferredSize(new Dimension(16, 16));
+		pnlControl.add(btnDelete);
 
 		add(BorderLayout.NORTH, pnlControl);
 		add(BorderLayout.CENTER, new JScrollPane(text));
@@ -118,6 +132,15 @@ public class ConsolePanel extends JPanel {
 		StyleConstants.setForeground(asDebug, Color.GREEN);
 		asTrace = new SimpleAttributeSet();
 		StyleConstants.setForeground(asTrace, Color.GRAY);
+
+		btnDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				btnDelete.setEnabled(false);
+				text.setText("");
+				btnDelete.setEnabled(true);
+			}
+		});
 	}
 
 	public void fatal(final String log) {
@@ -158,6 +181,16 @@ public class ConsolePanel extends JPanel {
 
 	public void trace(final String log, final Object... objs) {
 		insert(LEVEL_TRACE, String.format(log, objs), asTrace);
+	}
+
+	private BufferedImage loadImage(final String path) {
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(getClass().getResourceAsStream(path));
+		} catch (IOException ex) {
+			LOGGER.error("Image load error.", ex);
+		}
+		return image;
 	}
 
 	private synchronized void insert(final String level, final String log, final AttributeSet as) {
