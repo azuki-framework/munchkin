@@ -91,6 +91,17 @@ public interface DatabaseModel {
 	List<Map<String, Object>> executeQuery(String sql, List<Object> params) throws SQLException;
 
 	/**
+	 * SQLを実行する。
+	 *
+	 * @param sql SQL文
+	 * @param params パラメータ
+	 * @param handler ハンドラ
+	 * @return 結果
+	 * @throws SQLException SQL操作に起因する問題が発生した場合
+	 */
+	long executeQuery(String sql, List<Object> params, QueryHandler handler) throws SQLException;
+
+	/**
 	 * デフォルトスキーマ情報を取得する。
 	 *
 	 * @return スキーマ情報
