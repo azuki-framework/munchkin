@@ -39,11 +39,7 @@ import javax.swing.InputMap;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
 import javax.swing.text.DefaultEditorKit;
-import javax.swing.undo.UndoManager;
 
 import org.azkfw.munchkin.ui.SQLTextEditor;
 import org.azkfw.munchkin.ui.component.ImageButton;
@@ -75,14 +71,11 @@ public class SQLEditorPanel extends JPanel {
 	private final BufferedImage imgExecuteEna;
 	private final BufferedImage imgExecuteDis;
 
-	private final UndoManager undoManager;
-
 	/**
 	 * コンストラクタ
 	 */
 	public SQLEditorPanel() {
 		listeners = new ArrayList<SQLEditorPanelListener>();
-		undoManager = new UndoManager();
 
 		setLayout(new BorderLayout());
 
@@ -115,7 +108,7 @@ public class SQLEditorPanel extends JPanel {
 
 		txtEditor.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(final KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 				if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_ENTER) {
 					callExecSQL();
 					e.consume();
@@ -135,28 +128,6 @@ public class SQLEditorPanel extends JPanel {
 			amap.put(ACTION_KEY_REDO, redoAction);
 			imap.put((KeyStroke) redoAction.getValue(Action.ACCELERATOR_KEY), ACTION_KEY_REDO);
 		}
-		txtEditor.getDocument().addDocumentListener(new DocumentListener() {
-
-			@Override
-			public void removeUpdate(final DocumentEvent e) {
-				if (e instanceof DefaultDocumentEvent) {
-					DefaultDocumentEvent de = (DefaultDocumentEvent) e;
-					undoManager.addEdit(de);
-				}
-			}
-
-			@Override
-			public void insertUpdate(final DocumentEvent e) {
-				if (e instanceof DefaultDocumentEvent) {
-					DefaultDocumentEvent de = (DefaultDocumentEvent) e;
-					undoManager.addEdit(de);
-				}
-			}
-
-			@Override
-			public void changedUpdate(final DocumentEvent e) {
-			}
-		});
 		btnExecute.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -167,11 +138,11 @@ public class SQLEditorPanel extends JPanel {
 	}
 
 	public void undo() {
-
+		txtEditor.undo();
 	}
 
 	public void redo() {
-
+		txtEditor.redo();
 	}
 
 	public String getText() {
@@ -242,9 +213,7 @@ public class SQLEditorPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			if (undoManager.canUndo()) {
-				undoManager.undo();
-			}
+			undo();
 		}
 	}
 
@@ -265,9 +234,7 @@ public class SQLEditorPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			if (undoManager.canRedo()) {
-				undoManager.redo();
-			}
+			redo();
 		}
 	}
 }

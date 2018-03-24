@@ -22,11 +22,17 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentEvent.EventType;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.undo.UndoManager;
 
 import org.azkfw.munchkin.sql.parser.BasicSQLParser;
 import org.azkfw.munchkin.sql.parser.token.Token;
@@ -41,9 +47,10 @@ public class SQLTextPanel extends JTextPane {
 	/** serialVersionUID */
 	private static final long serialVersionUID = -6907569671824215526L;
 
-	private BasicSQLParser parser;
+	private final UndoManager undoManager;
 
 	private boolean parsing;
+	private BasicSQLParser parser;
 
 	private final SimpleAttributeSet asDefault;
 	private final SimpleAttributeSet asComment;
@@ -54,9 +61,10 @@ public class SQLTextPanel extends JTextPane {
 	private final SimpleAttributeSet asParameter;
 
 	public SQLTextPanel() {
-		parser = new BasicSQLParser();
+		undoManager = new UndoManager();
 
 		parsing = false;
+		parser = new BasicSQLParser();
 
 		asDefault = new SimpleAttributeSet();
 		StyleConstants.setForeground(asDefault, Color.black);
@@ -88,6 +96,25 @@ public class SQLTextPanel extends JTextPane {
 			public void changedUpdate(final DocumentEvent e) {
 			}
 		});
+
+		getDocument().addUndoableEditListener(new UndoableEditListener() {
+			@Override
+			public void undoableEditHappened(final UndoableEditEvent e) {
+				final DefaultDocumentEvent event = (DefaultDocumentEvent) e.getEdit();
+
+				if (EventType.CHANGE.equals(event.getType())) {
+					// Redoが効かなくなる
+					// undoManager.addEdit(new IgnoreUndoableEdit(e.getEdit()));
+				} else {
+					undoManager.addEdit(e.getEdit());
+				}
+			}
+		});
+	}
+
+	@Override
+	public void setText(final String text) {
+		super.setText(text);
 	}
 
 	public void setKeywordPattern(final Pattern pattern) {
@@ -98,6 +125,22 @@ public class SQLTextPanel extends JTextPane {
 		parser.setParameterPattern(pattern);
 	}
 
+	public boolean undo() {
+		if (undoManager.canUndo()) {
+			undoManager.undo();
+			return true;
+		}
+		return false;
+	}
+
+	public boolean redo() {
+		if (undoManager.canRedo()) {
+			undoManager.redo();
+			return true;
+		}
+		return false;
+	}
+
 	private void doChanged() {
 		synchronized (this) {
 			if (parsing) {
@@ -106,10 +149,9 @@ public class SQLTextPanel extends JTextPane {
 			parsing = true;
 		}
 
-		final Thread thread = new Thread(new Runnable() {
+		final Runnable r = new Runnable() {
 			@Override
 			public void run() {
-
 				while (true) {
 					final String targetSql = getText();
 					parser.parse(targetSql);
@@ -119,11 +161,10 @@ public class SQLTextPanel extends JTextPane {
 						break;
 					}
 				}
-
 				parsing = false;
 			}
-		});
-		thread.start();
+		};
+		SwingUtilities.invokeLater(r);
 	}
 
 	private void setAttribute(final List<Token> tokens) {
