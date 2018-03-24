@@ -40,10 +40,28 @@ public class StatusBar extends JPanel {
 		setBorder(new EmptyBorder(2, 2, 2, 2));
 
 		lblMessage = new JLabel("");
-		progressBar = new JProgressBar();
+		progressBar = new JProgressBar(0, 100);
 		progressBar.setPreferredSize(new Dimension(200, 0));
+		progressBar.setValue(0);
 
 		add(BorderLayout.CENTER, lblMessage);
 		add(BorderLayout.EAST, progressBar);
+	}
+
+	public void setMessage(final String message) {
+		lblMessage.setText(message);
+	}
+
+	public void setMessage(final String format, final Object... args) {
+		lblMessage.setText(String.format(format, args));
+	}
+
+	public void setProgressValue(final int value) {
+		if (-1 == value) {
+			progressBar.setIndeterminate(true);
+		} else {
+			progressBar.setIndeterminate(false);
+			progressBar.setValue(value);
+		}
 	}
 }

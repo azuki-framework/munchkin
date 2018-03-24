@@ -17,8 +17,6 @@
  */
 package org.azkfw.munchkin.ui.frame;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
@@ -31,10 +29,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 
 import org.azkfw.munchkin.Munchkin;
 import org.azkfw.munchkin.database.model.DatabaseModel;
@@ -49,22 +43,14 @@ import org.azkfw.munchkin.entity.MunchkinDatasourceEntity;
 import org.azkfw.munchkin.entity.MunchkinHistoryEntity;
 import org.azkfw.munchkin.entity.SQLHistoryEntity;
 import org.azkfw.munchkin.task.TaskManager;
-import org.azkfw.munchkin.ui.component.StatusBar;
 import org.azkfw.munchkin.ui.dialog.DatasourceDialog;
 import org.azkfw.munchkin.ui.dialog.DatasourceDialogListener;
 import org.azkfw.munchkin.ui.dialog.DatasourceListDialog;
 import org.azkfw.munchkin.ui.dialog.DatasourcesDialog;
 import org.azkfw.munchkin.ui.dialog.VersionDialog;
-import org.azkfw.munchkin.ui.panel.ConsolePanel;
-import org.azkfw.munchkin.ui.panel.DBConditionPanel;
 import org.azkfw.munchkin.ui.panel.DBConditionPanelListener;
-import org.azkfw.munchkin.ui.panel.DBObjectDetailPanel;
-import org.azkfw.munchkin.ui.panel.DBObjectListPanel;
 import org.azkfw.munchkin.ui.panel.DBObjectListPanelListener;
-import org.azkfw.munchkin.ui.panel.DataGridPanel;
-import org.azkfw.munchkin.ui.panel.SQLEditorPanel;
 import org.azkfw.munchkin.ui.panel.SQLEditorPanelListener;
-import org.azkfw.munchkin.ui.panel.SqlHistoryPanel;
 import org.azkfw.munchkin.util.MunchkinUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,10 +68,6 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	/** logger */
 	private static final Logger LOGGER = LoggerFactory.getLogger(MunchkinFrame.class);
 
-	private static final int TAB_CONSOLE = 0;
-	private static final int TAB_DATAGRID = 1;
-	private static final int TAB_SQLHISTORY = 2;
-
 	private final MunchkinConfigEntity config;
 	private final MunchkinDatasourceEntity datasource;
 	private final MunchkinHistoryEntity history;
@@ -95,28 +77,9 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	private DatabaseModel model;
 	private Connection connection;
 
-	private final JPanel toolBar;
-	private final StatusBar statusBar;
-
-	private final JSplitPane spltMain;
-	private final JSplitPane spltLeft;
-	private final JSplitPane spltRight;
-
-	private final DBConditionPanel pnlCondition;
-	private final DBObjectListPanel pnlObjectList;
-	private final DBObjectDetailPanel pnlObjectDetail;
-	private final SQLEditorPanel pnlSqlEditor;
-	private final JTabbedPane tabBottom;
-	private final ConsolePanel pnlConsole;
-	private final DataGridPanel pnlDataGrid;
-	private final SqlHistoryPanel pnlSqlHistory;
-
 	private Boolean busy = Boolean.FALSE;
 
 	public MunchkinFrame() {
-		setTitle("Munchkin");
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		setLayout(new BorderLayout());
 
 		config = Munchkin.getInstance().getConfig();
 		datasource = Munchkin.getInstance().getDatasource();
@@ -124,43 +87,6 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 
 		manager = new TaskManager();
 		manager.start();
-
-		pnlCondition = new DBConditionPanel();
-		pnlObjectList = new DBObjectListPanel();
-		pnlObjectDetail = new DBObjectDetailPanel();
-		pnlSqlEditor = new SQLEditorPanel();
-		pnlConsole = new ConsolePanel();
-		pnlDataGrid = new DataGridPanel();
-		pnlSqlHistory = new SqlHistoryPanel();
-
-		tabBottom = new JTabbedPane();
-		tabBottom.add("コンソール", pnlConsole);
-		tabBottom.add("データ", pnlDataGrid);
-		tabBottom.add("実行履歴", pnlSqlHistory);
-
-		final JPanel pnlOb = new JPanel();
-		pnlOb.setLayout(new BorderLayout());
-		pnlOb.add(BorderLayout.NORTH, pnlCondition);
-		pnlOb.add(BorderLayout.CENTER, pnlObjectList);
-
-		spltLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		spltLeft.setTopComponent(pnlOb);
-		spltLeft.setBottomComponent(pnlObjectDetail);
-
-		spltRight = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		spltRight.setTopComponent(pnlSqlEditor);
-		spltRight.setBottomComponent(tabBottom);
-
-		spltMain = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		spltMain.setLeftComponent(spltLeft);
-		spltMain.setRightComponent(spltRight);
-		add(BorderLayout.CENTER, spltMain);
-
-		toolBar = new JPanel();
-		toolBar.setPreferredSize(new Dimension(0, 30));
-		add(BorderLayout.NORTH, toolBar);
-		statusBar = new StatusBar();
-		add(BorderLayout.SOUTH, statusBar);
 
 		pnlCondition.addDBConditionPanelListener(new DBConditionPanelListener() {
 			@Override
@@ -211,31 +137,13 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		setBounds(rect);
 	}
 
-	public void exit() {
-		manager.stopForWait();
-
-		if (null != connection) {
-			try {
-				connection.rollback();
-			} catch (SQLException ex) {
-				LOGGER.warn("Connection rollback error.", ex);
-			}
-			try {
-				connection.close();
-			} catch (SQLException ex) {
-				LOGGER.warn("Connection close error.", ex);
-			}
-		}
-
-		dispose();
-	}
-
 	public void connect(final DatasourceEntity datasource) {
 		synchronized (busy) {
 			if (busy) {
 				return;
 			}
 			busy = Boolean.TRUE;
+			setStatusMessage("データベースへ接続中...[%s]", datasource.getName());
 		}
 
 		final Thread thread = new Thread(new Runnable() {
@@ -250,22 +158,26 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 					model = DatabaseModelFactory.create(c);
 					connection = c;
 
-					info("接続しました。[%s]", datasource.getName());
+					setStatusMessage("データベースへ接続しました。[%s]", datasource.getName());
+					info("データベースへ接続しました。[%s]", datasource.getName());
 
 				} catch (ClassNotFoundException ex) {
-					fatal("接続に失敗しました。[%s]", ex.getMessage());
+					setStatusMessage("データベースの接続に失敗しました。");
+					fatal("データベースの接続に失敗しました。[%s]", ex.getMessage());
 					LOGGER.error("Driver class not found.", ex);
 
 					busy = Boolean.FALSE;
 					return;
 				} catch (SQLException ex) {
-					fatal("接続に失敗しました。[%s]", ex.getMessage());
+					setStatusMessage("データベースの接続に失敗しました。");
+					fatal("データベースの接続に失敗しました。[%s]", ex.getMessage());
 					LOGGER.error("Database connection error.", ex);
 
 					busy = Boolean.FALSE;
 					return;
 				} catch (Exception ex) {
-					fatal("接続に失敗しました。[%s]", ex.getMessage());
+					setStatusMessage("データベースの接続に失敗しました。");
+					fatal("データベースの接続に失敗しました。[%s]", ex.getMessage());
 					LOGGER.error("Undefined error.", ex);
 
 					busy = Boolean.FALSE;
@@ -305,10 +217,10 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 				return;
 			}
 			busy = Boolean.TRUE;
+			setStatusMessage("SQL実行中...");
 		}
 
 		final Thread thread = new Thread(new Runnable() {
-
 			@Override
 			public void run() {
 				pnlSqlEditor.setExecuteButtonEnabled(false);
@@ -402,6 +314,25 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		thread.start();
 	}
 
+	public void exit() {
+		manager.stopForWait();
+
+		if (null != connection) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				LOGGER.warn("Connection rollback error.", ex);
+			}
+			try {
+				connection.close();
+			} catch (SQLException ex) {
+				LOGGER.warn("Connection close error.", ex);
+			}
+		}
+
+		dispose();
+	}
+
 	private void getObjectList(final SchemaEntity schema, final TypeEntity type) {
 		try {
 			if (MunchkinUtil.isNotNullAll(schema, type)) {
@@ -423,9 +354,6 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 	}
 
 	private void doOpened() {
-		spltMain.setDividerLocation(spltMain.getWidth() / 4);
-		spltLeft.setDividerLocation(spltLeft.getHeight() / 2);
-		spltRight.setDividerLocation(spltRight.getHeight() / 2);
 
 		// 
 		pnlSqlEditor.setText(config.getSqlTextEditorText());
@@ -455,26 +383,6 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		// 
 		config.setSqlTextEditorText(pnlSqlEditor.getText());
 		history.setHistorySqls(pnlSqlHistory.getSqlHistorys());
-	}
-
-	public void info(final String message) {
-		pnlConsole.info(message);
-		tabBottom.setSelectedIndex(TAB_CONSOLE);
-	}
-
-	public void info(final String message, final Object... objs) {
-		pnlConsole.info(message, objs);
-		tabBottom.setSelectedIndex(TAB_CONSOLE);
-	}
-
-	public void fatal(final String message) {
-		pnlConsole.fatal(message);
-		tabBottom.setSelectedIndex(TAB_CONSOLE);
-	}
-
-	public void fatal(final String message, final Object... objs) {
-		pnlConsole.fatal(message, objs);
-		tabBottom.setSelectedIndex(TAB_CONSOLE);
 	}
 
 	@Override

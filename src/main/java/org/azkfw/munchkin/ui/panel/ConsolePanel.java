@@ -25,6 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -57,6 +59,9 @@ public class ConsolePanel extends JPanel {
 	/** logger */
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConsolePanel.class);
 
+	/** Date format */
+	private static final SimpleDateFormat SDF_DATE = new SimpleDateFormat("HH:mm:ss");
+
 	/** Level [FATAL] */
 	private static final String LEVEL_FATAL = "FATAL";
 	/** Level [WARN] */
@@ -79,14 +84,17 @@ public class ConsolePanel extends JPanel {
 	/** AttributeSet [TRACE] */
 	private final SimpleAttributeSet asTrace;
 
-	private final JTextPane text;
+	private final JTextPane txtConsole;
 
 	private final ImageButton btnDelete;
 
+	/**
+	 * コンストラクタ
+	 */
 	public ConsolePanel() {
 		setLayout(new BorderLayout());
 
-		text = new JTextPane() {
+		txtConsole = new JTextPane() {
 			/** serialVersionUID */
 			private static final long serialVersionUID = 1L;
 
@@ -105,11 +113,11 @@ public class ConsolePanel extends JPanel {
 				return false;
 			}
 		};
-		text.setEditable(false);
+		txtConsole.setEditable(false);
 
-		final Caret orgCaret = text.getCaret();
+		final Caret orgCaret = txtConsole.getCaret();
 		final Caret newCaret = new VisibleCaret(orgCaret.getBlinkRate());
-		text.setCaret(newCaret);
+		txtConsole.setCaret(newCaret);
 
 		final JPanel pnlControl = new JPanel();
 		pnlControl.setPreferredSize(new Dimension(0, 24));
@@ -120,7 +128,7 @@ public class ConsolePanel extends JPanel {
 		pnlControl.add(btnDelete);
 
 		add(BorderLayout.NORTH, pnlControl);
-		add(BorderLayout.CENTER, new JScrollPane(text));
+		add(BorderLayout.CENTER, new JScrollPane(txtConsole));
 
 		asFatal = new SimpleAttributeSet();
 		StyleConstants.setForeground(asFatal, Color.RED);
@@ -136,51 +144,115 @@ public class ConsolePanel extends JPanel {
 		btnDelete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				btnDelete.setEnabled(false);
-				text.setText("");
-				btnDelete.setEnabled(true);
+				clear();
 			}
 		});
 	}
 
-	public void fatal(final String log) {
-		insert(LEVEL_FATAL, log, asFatal);
+	/**
+	 * コンソールログをクリアする。
+	 */
+	public void clear() {
+		synchronized (this) {
+			btnDelete.setEnabled(false);
+			txtConsole.setText("");
+			btnDelete.setEnabled(true);
+		}
 	}
 
-	public void fatal(final String log, final Object... objs) {
-		insert(LEVEL_FATAL, String.format(log, objs), asFatal);
+	/**
+	 * ログ[FATAL]を出力する。
+	 *
+	 * @param message メッセージ
+	 */
+	public void fatal(final String message) {
+		insert(LEVEL_FATAL, message, asFatal);
 	}
 
-	public void warn(final String log) {
-		insert(LEVEL_WARN, log, asWarn);
+	/**
+	 * ログ[FATAL]を出力する。
+	 *
+	 * @param format フォーマット
+	 * @param objs パラメータ
+	 */
+	public void fatal(final String format, final Object... objs) {
+		insert(LEVEL_FATAL, String.format(format, objs), asFatal);
 	}
 
-	public void warn(final String log, final Object... objs) {
-		insert(LEVEL_WARN, String.format(log, objs), asWarn);
+	/**
+	 * ログ[WARN]を出力する。
+	 *
+	 * @param message メッセージ
+	 */
+	public void warn(final String message) {
+		insert(LEVEL_WARN, message, asWarn);
 	}
 
-	public void info(final String log) {
-		insert(LEVEL_INFO, log, asInfo);
+	/**
+	 * ログ[WARN]を出力する。
+	 *
+	 * @param format フォーマット
+	 * @param objs パラメータ
+	 */
+	public void warn(final String format, final Object... objs) {
+		insert(LEVEL_WARN, String.format(format, objs), asWarn);
 	}
 
-	public void info(final String log, final Object... objs) {
-		insert(LEVEL_INFO, String.format(log, objs), asInfo);
+	/**
+	 * ログ[INFO]を出力する。
+	 *
+	 * @param message メッセージ
+	 */
+	public void info(final String message) {
+		insert(LEVEL_INFO, message, asInfo);
 	}
 
-	public void debug(final String log) {
-		insert(LEVEL_DEBUG, log, asDebug);
+	/**
+	 * ログ[INFO]を出力する。
+	 *
+	 * @param format フォーマット
+	 * @param objs パラメータ
+	 */
+	public void info(final String format, final Object... objs) {
+		insert(LEVEL_INFO, String.format(format, objs), asInfo);
 	}
 
-	public void debug(final String log, final Object... objs) {
-		insert(LEVEL_DEBUG, String.format(log, objs), asDebug);
+	/**
+	 * ログ[DEBUG]を出力する。
+	 *
+	 * @param message メッセージ
+	 */
+	public void debug(final String message) {
+		insert(LEVEL_DEBUG, message, asDebug);
 	}
 
-	public void trace(final String log) {
-		insert(LEVEL_TRACE, log, asTrace);
+	/**
+	 * ログ[DEBUG]を出力する。
+	 *
+	 * @param format フォーマット
+	 * @param objs パラメータ
+	 */
+	public void debug(final String format, final Object... objs) {
+		insert(LEVEL_DEBUG, String.format(format, objs), asDebug);
 	}
 
-	public void trace(final String log, final Object... objs) {
-		insert(LEVEL_TRACE, String.format(log, objs), asTrace);
+	/**
+	 * ログ[TRACE]を出力する。
+	 *
+	 * @param message メッセージ
+	 */
+	public void trace(final String message) {
+		insert(LEVEL_TRACE, message, asTrace);
+	}
+
+	/**
+	 * ログ[TRACE]を出力する。
+	 *
+	 * @param format フォーマット
+	 * @param objs パラメータ
+	 */
+	public void trace(final String format, final Object... objs) {
+		insert(LEVEL_TRACE, String.format(format, objs), asTrace);
 	}
 
 	private BufferedImage loadImage(final String path) {
@@ -194,13 +266,16 @@ public class ConsolePanel extends JPanel {
 	}
 
 	private synchronized void insert(final String level, final String log, final AttributeSet as) {
-		final String msg = String.format("[%-5s] %s\n", level, log);
+		final String date = SDF_DATE.format(new Date());
+		final String msg = String.format("%s [%-5s] %s\n", date, level, log);
 
-		final Document doc = text.getDocument();
-		final int offset = doc.getLength();
+		final Document doc = txtConsole.getDocument();
 		try {
-			doc.insertString(offset, msg, as);
-			text.setCaretPosition(doc.getLength() - 1);
+			synchronized (this) {
+				final int offset = doc.getLength();
+				doc.insertString(offset, msg, as);
+				txtConsole.setCaretPosition(doc.getLength() - 1);
+			}
 		} catch (BadLocationException ex) {
 			LOGGER.error("TextPanel insert error.", ex);
 		}
