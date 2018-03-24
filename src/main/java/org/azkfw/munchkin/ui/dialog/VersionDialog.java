@@ -19,7 +19,7 @@ package org.azkfw.munchkin.ui.dialog;
 
 import java.awt.Frame;
 
-import org.azkfw.munchkin.message.Label;
+import org.azkfw.munchkin.label.Label;
 
 /**
  *

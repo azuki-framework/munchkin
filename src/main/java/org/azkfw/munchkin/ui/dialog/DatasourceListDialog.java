@@ -33,7 +33,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import org.azkfw.munchkin.entity.DatasourceEntity;
-import org.azkfw.munchkin.message.Label;
+import org.azkfw.munchkin.label.Label;
 
 /**
  *

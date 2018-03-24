@@ -51,7 +51,7 @@ import javax.swing.JTextPane;
 
 import org.azkfw.munchkin.entity.DatabaseDriver;
 import org.azkfw.munchkin.entity.DatasourceEntity;
-import org.azkfw.munchkin.message.Label;
+import org.azkfw.munchkin.label.Label;
 import org.azkfw.munchkin.util.MunchkinUtil;
 
 /**

@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
-import org.azkfw.munchkin.message.Label;
+import org.azkfw.munchkin.label.Label;
 import org.azkfw.munchkin.ui.component.StatusBar;
 import org.azkfw.munchkin.ui.panel.ConsolePanel;
 import org.azkfw.munchkin.ui.panel.DBConditionPanel;
