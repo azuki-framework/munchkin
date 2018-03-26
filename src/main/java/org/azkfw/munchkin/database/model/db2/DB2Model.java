@@ -41,21 +41,22 @@ public class DB2Model extends TemplateDatabaseModel {
 	@Override
 	protected final void sqlGetDefaultSchema(final SQLBuilder builder) {
 		builder.append("SELECT");
-		builder.append("    CURRENT SCHEMA AS name");
-		builder.append("  , CURRENT SCHEMA AS label");
-		builder.append(" FROM");
+		builder.append("    TRIM(CURRENT SCHEMA) AS name");
+		builder.append("  , TRIM(CURRENT SCHEMA) AS label");
+		builder.append("FROM");
 		builder.append("    SYSIBM.SYSDUMMY1");
 	}
 
 	@Override
 	protected final void sqlGetSchemaList(final SQLBuilder builder) {
 		builder.append("SELECT");
-		builder.append(" DISTINCT");
-		builder.append("    CREATOR as name");
-		builder.append("  , CREATOR as label");
-		builder.append(" FROM");
+		builder.append("DISTINCT");
+		builder.append("    TRIM(CREATOR) AS name");
+		builder.append("  , TRIM(CREATOR) AS label");
+		builder.append("FROM");
 		builder.append("    SYSIBM.SYSTABLES");
-		builder.append(" ORDER BY CREATOR");
+		builder.append("ORDER BY");
+		builder.append("    TRIM(CREATOR)");
 	}
 
 	@Override
@@ -78,21 +79,21 @@ public class DB2Model extends TemplateDatabaseModel {
 
 		} else if (MunchkinUtil.isEqualsAny(type.getName(), "TABLE", "VIEW")) {
 			builder.append("SELECT");
-			builder.append("    CREATOR AS schema");
-			builder.append("  , NAME    AS name");
+			builder.append("    TRIM(CREATOR) AS schema");
+			builder.append("  , TRIM(NAME)    AS name");
 			if (MunchkinUtil.isEquals(type.getName(), "VIEW")) {
 				builder.append("  , 'VIEW' AS type");
 			} else {
 				builder.append("  , 'TABLE' AS type");
 			}
-			builder.append("  , REMARKS AS label");
+			builder.append("  , TRIM(REMARKS) AS label");
 			builder.append(" FROM");
 			builder.append("    SYSIBM.SYSTABLES");
 			builder.append(" WHERE");
 			if (MunchkinUtil.isEquals(type.getName(), "VIEW")) {
-				builder.append("     TYPE    = ?",  "V");
+				builder.append("     TYPE    = ?", "V");
 			} else {
-				builder.append("     TYPE    = ?",  "T");
+				builder.append("     TYPE    = ?", "T");
 			}
 			if (null != schema) {
 				builder.append(" AND CREATOR = ?", schema.getName());
