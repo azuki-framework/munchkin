@@ -62,8 +62,8 @@ public class PostgreSQLModel extends TemplateDatabaseModel {
 		builder.append("  , label AS label");
 		builder.append("FROM");
 		builder.append("(");
-		builder.append("            SELECT 1 AS \"order\", 'table' AS name, 'table' AS label");
-		builder.append("  UNION ALL SELECT 2 AS \"order\", 'view'  AS name, 'view'  AS label");
+		builder.append("            SELECT 1 AS \"order\", 'TABLE' AS name, 'テーブル' AS label");
+		builder.append("  UNION ALL SELECT 2 AS \"order\", 'VIEW'  AS name, 'ビュー'  AS label");
 		builder.append(") AS t");
 		builder.append("ORDER BY");
 		builder.append("    \"order\"");
@@ -73,7 +73,7 @@ public class PostgreSQLModel extends TemplateDatabaseModel {
 	protected final void sqlGetObjectList(final SQLBuilder builder, final SchemaEntity schema, final TypeEntity type) {
 		if (MunchkinUtil.isNull(type)) {
 
-		} else if (MunchkinUtil.isEquals(type.getName(), "table")) {
+		} else if (MunchkinUtil.isEquals(type.getName(), "TABLE")) {
 			builder.append("SELECT");
 			builder.append("    A.schemaname  AS schema");
 			builder.append("  , A.relname     AS name");
@@ -88,17 +88,9 @@ public class PostgreSQLModel extends TemplateDatabaseModel {
 			builder.append("    ON");
 			builder.append("        A.relid    = B.objoid");
 			builder.append("    AND B.objsubid = 0");
-			if (MunchkinUtil.isNotNullAny(schema, type)) {
+			if (MunchkinUtil.isNotNull(schema)) {
 				builder.append("WHERE");
-				boolean first = true;
-				if (MunchkinUtil.isNotNull(schema)) {
-					if (first) {
-						first = false;
-						builder.append("    A.schemaname = ?", schema.getName());
-					} else {
-						builder.append("AND A.schemaname = ?", schema.getName());
-					}
-				}
+				builder.append("    A.schemaname = ?", schema.getName());
 			}
 			builder.append("ORDER BY");
 			builder.append("    A.relname");
@@ -111,7 +103,7 @@ public class PostgreSQLModel extends TemplateDatabaseModel {
 	protected void sqlGetObjectDetail(final SQLBuilder builder, final ObjectEntity object) {
 		if (MunchkinUtil.isNull(object)) {
 
-		} else if (MunchkinUtil.isEquals(object.getType(), "table")) {
+		} else if (MunchkinUtil.isEquals(object.getType(), "TABLE")) {
 			builder.append("SELECT");
 			//builder.append("    tbl.relname     AS \"テーブル名\"");
 			//builder.append("  , pd.description  AS \"テーブルコメント\"");

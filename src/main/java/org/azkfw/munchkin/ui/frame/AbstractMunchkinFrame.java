@@ -178,6 +178,12 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 				doMenuSqlExecute();
 			}
 		});
+		menuToolExport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				doMenuToolExport();
+			}
+		});
 		menuHelpVersion.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -315,6 +321,8 @@ public abstract class AbstractMunchkinFrame extends JFrame {
 	protected abstract void doMenuFileExit();
 
 	protected abstract void doMenuSqlExecute();
+
+	protected abstract void doMenuToolExport();
 
 	protected abstract void doMenuHelpVersion();
 }

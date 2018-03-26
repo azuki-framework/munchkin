@@ -47,6 +47,7 @@ import org.azkfw.munchkin.ui.dialog.DatasourceDialog;
 import org.azkfw.munchkin.ui.dialog.DatasourceDialogListener;
 import org.azkfw.munchkin.ui.dialog.DatasourceListDialog;
 import org.azkfw.munchkin.ui.dialog.DatasourcesDialog;
+import org.azkfw.munchkin.ui.dialog.ExportDialog;
 import org.azkfw.munchkin.ui.dialog.VersionDialog;
 import org.azkfw.munchkin.ui.panel.DBConditionPanelListener;
 import org.azkfw.munchkin.ui.panel.DBObjectListPanelListener;
@@ -414,6 +415,12 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 		if (MunchkinUtil.isNotEmpty(sql)) {
 			execute(sql);
 		}
+	}
+
+	@Override
+	protected void doMenuToolExport() {
+		final ExportDialog dlg = new ExportDialog(this, model);
+		dlg.setVisible(true);
 	}
 
 	@Override

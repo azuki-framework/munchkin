@@ -97,7 +97,6 @@ public class DBObjectDetailPanel extends JPanel {
 
 			@Override
 			public void changedUpdate(final DocumentEvent e) {
-				doFiltering(txtFilter.getText());
 			}
 		});
 
