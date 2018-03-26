@@ -144,29 +144,38 @@ public class OracleModel extends TemplateDatabaseModel {
 		} else if (MunchkinUtil.isEquals(object.getType(), "TABLE")) {
 			if (dbaRole) {
 				builder.append("SELECT");
-				builder.append("    COLUMN_NAME AS \"列名\"");
-				builder.append("  , DATA_TYPE   AS \"データ型\"");
-				builder.append("  , DATA_LENGTH AS LENGTH");
-				builder.append("  , DECODE(NULLABLE, 'N', '○', '') as NOTNULL");
+				builder.append("    A.COLUMN_NAME AS \"列名\"");
+				builder.append("  , B.COMMENTS    AS \"ラベル\"");
+				builder.append("  , A.DATA_TYPE   AS \"データ型\"");
+				builder.append("  , A.DATA_LENGTH AS LENGTH");
+				builder.append("  , DECODE(A.NULLABLE, 'N', '○', '') AS NOTNULL");
 				builder.append("FROM");
-				builder.append("    DBA_TAB_COLUMNS");
+				builder.append("    DBA_TAB_COLUMNS  A");
+				builder.append("  , DBA_COL_COMMENTS B");
 				builder.append("WHERE");
-				builder.append("    OWNER      = ?", object.getSchema());
-				builder.append("AND TABLE_NAME = ?", object.getName());
+				builder.append("    A.OWNER       = ?", object.getSchema());
+				builder.append("AND A.TABLE_NAME  = ?", object.getName());
+				builder.append("AND A.OWNER       = B.OWNER");
+				builder.append("AND A.TABLE_NAME  = B.TABLE_NAME");
+				builder.append("AND A.COLUMN_NAME = B.COLUMN_NAME");
 				builder.append("ORDER BY");
-				builder.append("    COLUMN_ID");
+				builder.append("    A.COLUMN_ID");
 			} else {
 				builder.append("SELECT");
-				builder.append("    COLUMN_NAME AS \"列名\"");
-				builder.append("  , DATA_TYPE   AS \"データ型\"");
-				builder.append("  , DATA_LENGTH AS LENGTH");
-				builder.append("  , DECODE(NULLABLE, 'N', '○', '') as NOTNULL");
+				builder.append("    A.COLUMN_NAME AS \"列名\"");
+				builder.append("  , B.COMMENTS    AS \"ラベル\"");
+				builder.append("  , A.DATA_TYPE   AS \"データ型\"");
+				builder.append("  , A.DATA_LENGTH AS LENGTH");
+				builder.append("  , DECODE(A.NULLABLE, 'N', '○', '') AS NOTNULL");
 				builder.append("FROM");
-				builder.append("    USER_TAB_COLUMNS");
+				builder.append("    USER_TAB_COLUMNS  A");
+				builder.append("  , USER_COL_COMMENTS B");
 				builder.append("WHERE");
-				builder.append("    TABLE_NAME = ?", object.getName());
+				builder.append("    A.TABLE_NAME   = ?", object.getName());
+				builder.append(" AND A.TABLE_NAME  = B.TABLE_NAME");
+				builder.append(" AND A.COLUMN_NAME = B.COLUMN_NAME");
 				builder.append("ORDER BY");
-				builder.append("    COLUMN_ID");
+				builder.append("    A.COLUMN_ID");
 			}
 		} else {
 
