@@ -126,16 +126,18 @@ public class OracleModel extends TemplateDatabaseModel {
 				builder.append("    DBA_OBJECTS      A");
 				builder.append("  , DBA_TAB_COMMENTS B");
 				builder.append("WHERE");
-				builder.append("    A.OWNER       = ?", schema.getName());
-				builder.append("AND A.OBJECT_TYPE = ?", type.getName());
-				builder.append("AND A.OWNER       = B.OWNER");
+				builder.append("    A.OWNER       = B.OWNER");
 				builder.append("AND A.OBJECT_NAME = B.TABLE_NAME");
 				builder.append("AND A.OBJECT_TYPE = B.TABLE_TYPE");
+				if (null != schema) {
+					builder.append("AND A.OWNER       = ?", schema.getName());
+				}
+				builder.append("AND A.OBJECT_TYPE = ?", type.getName());
 				builder.append("ORDER BY");
 				builder.append("    A.OBJECT_NAME");
 			} else {
 				builder.append("SELECT");
-				builder.append("    NULL            AS schema");
+				builder.append("    ''              AS schema");
 				builder.append("  , A.OBJECT_NAME   AS name");
 				builder.append("  , B.COMMENTS      AS label");
 				builder.append("  , A.OBJECT_TYPE   AS type");
@@ -146,9 +148,9 @@ public class OracleModel extends TemplateDatabaseModel {
 				builder.append("    USER_OBJECTS      A");
 				builder.append("  , USER_TAB_COMMENTS B");
 				builder.append("WHERE");
-				builder.append("    A.OBJECT_TYPE = ?", type.getName());
-				builder.append("AND A.OBJECT_NAME = B.TABLE_NAME");
+				builder.append("    A.OBJECT_NAME = B.TABLE_NAME");
 				builder.append("AND A.OBJECT_TYPE = B.TABLE_TYPE");
+				builder.append("AND A.OBJECT_TYPE = ?", type.getName());
 				builder.append("ORDER BY");
 				builder.append("    A.OBJECT_NAME");
 			}
@@ -166,8 +168,10 @@ public class OracleModel extends TemplateDatabaseModel {
 				builder.append("FROM");
 				builder.append("    DBA_OBJECTS      A");
 				builder.append("WHERE");
-				builder.append("    A.OWNER       = ?", schema.getName());
-				builder.append("AND A.OBJECT_TYPE = ?", type.getName());
+				builder.append("    A.OBJECT_TYPE = ?", type.getName());
+				if (null != schema) {
+					builder.append("AND A.OWNER       = ?", schema.getName());
+				}
 				builder.append("ORDER BY");
 				builder.append("    A.OBJECT_NAME");
 			} else {
