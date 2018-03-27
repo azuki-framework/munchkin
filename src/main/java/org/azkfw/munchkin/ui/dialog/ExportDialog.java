@@ -35,7 +35,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -182,7 +181,9 @@ public class ExportDialog extends AbstractDialog {
 				busy = Boolean.FALSE;
 			}
 		};
-		SwingUtilities.invokeLater(r);
+
+		final Thread thread = new Thread(r);
+		thread.start();
 	}
 
 	private void doFiltering(final String text) {
