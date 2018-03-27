@@ -78,6 +78,7 @@ public class ExportDialog extends AbstractDialog {
 
 	public ExportDialog(final Frame owner, final DatabaseModel model) {
 		super(owner);
+		setTitle("エクスポート");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLayout(new BorderLayout());
 
@@ -98,6 +99,9 @@ public class ExportDialog extends AbstractDialog {
 
 			@Override
 			public boolean isCellEditable(final int row, final int column) {
+				if (1 == column) {
+					return true;
+				}
 				return false;
 			}
 		};
