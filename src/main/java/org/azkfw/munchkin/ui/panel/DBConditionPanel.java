@@ -60,7 +60,8 @@ public class DBConditionPanel extends JPanel {
 		listeners = new ArrayList<DBConditionPanelListener>();
 
 		//setPreferredSize(new Dimension(0, 60 + 12));
-		setBorder(new EmptyBorder(2, 2, 4, 2));
+
+		setBorder(new EmptyBorder(4, 4, 4, 4));
 
 		lblSchema = new JLabel("Schema :");
 		cmbSchema = new JComboBox<SchemaEntity>();
@@ -165,7 +166,7 @@ public class DBConditionPanel extends JPanel {
 		container.setLayout(layout);
 
 		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
+		//layout.setAutoCreateContainerGaps(true);
 
 		final int ny = compos.length;
 		final int nx = compos[0].length;
