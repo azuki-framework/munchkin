@@ -22,19 +22,31 @@ import java.sql.Connection;
 import org.azkfw.munchkin.database.model.TemplateDatabaseModel;
 import org.azkfw.munchkin.database.model.entity.ObjectEntity;
 import org.azkfw.munchkin.database.model.entity.SchemaEntity;
+import org.azkfw.munchkin.database.model.entity.TableObjectEntity;
 import org.azkfw.munchkin.database.model.entity.TypeEntity;
 import org.azkfw.munchkin.util.MunchkinUtil;
 import org.azkfw.munchkin.util.SQLBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
+ * PostgreSQL データベースモデル
+ * 
  * @author Kawakicchi
  */
 public class PostgreSQLModel extends TemplateDatabaseModel {
 
+	/** logger */
+	@SuppressWarnings("unused")
+	private static final Logger LOGGER = LoggerFactory.getLogger(PostgreSQLModel.class);
+
+	/**
+	 * コンストラクタ
+	 *
+	 * @param connection コネクション情報
+	 */
 	public PostgreSQLModel(final Connection connection) {
 		super(connection);
-
 	}
 
 	@Override
@@ -97,6 +109,11 @@ public class PostgreSQLModel extends TemplateDatabaseModel {
 		} else {
 
 		}
+	}
+
+	@Override
+	protected final void sqlGetPrimaryKey(final SQLBuilder builder, final TableObjectEntity table) {
+		// TODO:
 	}
 
 	@Override

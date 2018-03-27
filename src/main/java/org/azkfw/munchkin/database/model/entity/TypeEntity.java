@@ -17,13 +17,17 @@
  */
 package org.azkfw.munchkin.database.model.entity;
 
+import java.io.Serializable;
 
 /**
- *
+ * タイプ情報を保持するエンティティクラス
+ * 
  * @author Kawakicchi
- *
  */
-public class TypeEntity {
+public class TypeEntity implements Serializable {
+
+	/** serialVersionUID */
+	private static final long serialVersionUID = -5097017395641671202L;
 
 	private final String name;
 	private final String label;

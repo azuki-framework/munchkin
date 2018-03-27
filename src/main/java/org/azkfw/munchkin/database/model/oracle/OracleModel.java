@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import org.azkfw.munchkin.database.model.TemplateDatabaseModel;
 import org.azkfw.munchkin.database.model.entity.ObjectEntity;
 import org.azkfw.munchkin.database.model.entity.SchemaEntity;
+import org.azkfw.munchkin.database.model.entity.TableObjectEntity;
 import org.azkfw.munchkin.database.model.entity.TypeEntity;
 import org.azkfw.munchkin.util.MunchkinUtil;
 import org.azkfw.munchkin.util.SQLBuilder;
@@ -32,17 +33,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Oracle データベースモデル
+ * 
  * @author Kawakicchi
- *
  */
 public class OracleModel extends TemplateDatabaseModel {
 
 	/** logger */
 	private static final Logger LOGGER = LoggerFactory.getLogger(OracleModel.class);
 
+	/** DBAロール */
 	private final boolean dbaRole;
 
+	/**
+	 * コンストラクタ
+	 *
+	 * @param connection コネクション情報
+	 */
 	public OracleModel(final Connection connection) {
 		super(connection);
 
@@ -52,8 +59,8 @@ public class OracleModel extends TemplateDatabaseModel {
 	@Override
 	protected final void sqlGetDefaultSchema(final SQLBuilder builder) {
 		builder.append("SELECT");
-		builder.append("    sys_context('userenv', 'session_user') AS name");
-		builder.append("  , sys_context('userenv', 'session_user') AS label");
+		builder.append("    SYS_CONTEXT('USERENV', 'SESSION_USER') AS name");
+		builder.append("  , SYS_CONTEXT('USERENV', 'SESSION_USER') AS label");
 		builder.append("FROM");
 		builder.append("    DUAL");
 	}
@@ -62,20 +69,20 @@ public class OracleModel extends TemplateDatabaseModel {
 	protected final void sqlGetSchemaList(final SQLBuilder builder) {
 		if (dbaRole) {
 			builder.append("SELECT");
-			builder.append("    username AS name");
-			builder.append("  , username AS label");
+			builder.append("    USERNAME AS name");
+			builder.append("  , USERNAME AS label");
 			builder.append("FROM");
-			builder.append("    dba_users");
+			builder.append("    DBA_USERS");
 			builder.append("ORDER BY");
-			builder.append("    username");
+			builder.append("    USERNAME");
 		} else {
 			builder.append("SELECT");
-			builder.append("    username AS name");
-			builder.append("  , username AS label");
+			builder.append("    USERNAME AS name");
+			builder.append("  , USERNAME AS label");
 			builder.append("FROM");
-			builder.append("    user_users");
+			builder.append("    USER_USERS");
 			builder.append("ORDER BY");
-			builder.append("    username");
+			builder.append("    USERNAME");
 		}
 	}
 
@@ -103,37 +110,123 @@ public class OracleModel extends TemplateDatabaseModel {
 
 	@Override
 	protected final void sqlGetObjectList(final SQLBuilder builder, final SchemaEntity schema, final TypeEntity type) {
+		if (MunchkinUtil.isNull(type)) {
+
+		} else if (MunchkinUtil.isEqualsAny(type.getName(), "TABLE", "VIEW")) {
+			if (dbaRole) {
+				builder.append("SELECT");
+				builder.append("    A.OWNER         AS schema");
+				builder.append("  , A.OBJECT_NAME   AS name");
+				builder.append("  , B.COMMENTS      AS label");
+				builder.append("  , A.OBJECT_TYPE   AS type");
+				builder.append("  , A.OWNER         AS owner");
+				builder.append("  , A.LAST_DDL_TIME AS \"UPDATE\"");
+				builder.append("  , A.STATUS        AS \"STATUS\"");
+				builder.append("FROM");
+				builder.append("    DBA_OBJECTS      A");
+				builder.append("  , DBA_TAB_COMMENTS B");
+				builder.append("WHERE");
+				builder.append("    A.OWNER       = ?", schema.getName());
+				builder.append("AND A.OBJECT_TYPE = ?", type.getName());
+				builder.append("AND A.OWNER       = B.OWNER");
+				builder.append("AND A.OBJECT_NAME = B.TABLE_NAME");
+				builder.append("AND A.OBJECT_TYPE = B.TABLE_TYPE");
+				builder.append("ORDER BY");
+				builder.append("    A.OBJECT_NAME");
+			} else {
+				builder.append("SELECT");
+				builder.append("    NULL            AS schema");
+				builder.append("  , A.OBJECT_NAME   AS name");
+				builder.append("  , B.COMMENTS      AS label");
+				builder.append("  , A.OBJECT_TYPE   AS type");
+				builder.append("  , NULL            AS owner");
+				builder.append("  , A.LAST_DDL_TIME AS \"UPDATE\"");
+				builder.append("  , A.STATUS        AS \"STATUS\"");
+				builder.append("FROM");
+				builder.append("    USER_OBJECTS      A");
+				builder.append("  , USER_TAB_COMMENTS B");
+				builder.append("WHERE");
+				builder.append("    A.OBJECT_TYPE = ?", type.getName());
+				builder.append("AND A.OBJECT_NAME = B.TABLE_NAME");
+				builder.append("AND A.OBJECT_TYPE = B.TABLE_TYPE");
+				builder.append("ORDER BY");
+				builder.append("    A.OBJECT_NAME");
+			}
+		} else if (MunchkinUtil.isEqualsAny(type.getName(), "SYNONYM", "FUNCTION", "PROCEDURE", "PACKAGE",
+				"PACKAGE BODY", "SEQUENCE", "TRIGGER", "INDEX")) {
+			if (dbaRole) {
+				builder.append("SELECT");
+				builder.append("    A.OWNER         AS schema");
+				builder.append("  , A.OBJECT_NAME   AS name");
+				builder.append("  , ''              AS label");
+				builder.append("  , A.OBJECT_TYPE   AS type");
+				builder.append("  , A.OWNER         AS owner");
+				builder.append("  , A.LAST_DDL_TIME AS \"UPDATE\"");
+				builder.append("  , A.STATUS        AS \"STATUS\"");
+				builder.append("FROM");
+				builder.append("    DBA_OBJECTS      A");
+				builder.append("WHERE");
+				builder.append("    A.OWNER       = ?", schema.getName());
+				builder.append("AND A.OBJECT_TYPE = ?", type.getName());
+				builder.append("ORDER BY");
+				builder.append("    A.OBJECT_NAME");
+			} else {
+				builder.append("SELECT");
+				builder.append("    NULL            AS schema");
+				builder.append("  , A.OBJECT_NAME   AS name");
+				builder.append("  , ''              AS label");
+				builder.append("  , A.OBJECT_TYPE   AS type");
+				builder.append("  , NULL            AS owner");
+				builder.append("  , A.LAST_DDL_TIME AS \"UPDATE\"");
+				builder.append("  , A.STATUS        AS \"STATUS\"");
+				builder.append("FROM");
+				builder.append("    USER_OBJECTS      A");
+				builder.append("WHERE");
+				builder.append("    A.OBJECT_TYPE = ?", type.getName());
+				builder.append("ORDER BY");
+				builder.append("    A.OBJECT_NAME");
+			}
+		}
+	}
+
+	@Override
+	protected final void sqlGetPrimaryKey(final SQLBuilder builder, final TableObjectEntity table) {
 		if (dbaRole) {
 			builder.append("SELECT");
-			builder.append("    OWNER         AS schema");
-			builder.append("  , OBJECT_NAME   AS name");
-			builder.append("  , ''            AS label");
-			builder.append("  , OBJECT_TYPE   AS type");
-			builder.append("  , OWNER         AS owner");
-			builder.append("  , LAST_DDL_TIME AS \"UPDATE\"");
-			builder.append("  , STATUS        AS \"STATUS\"");
+			builder.append("    A.COLUMN_NAME AS name");
+			builder.append("  , C.COMMENTS    AS LABEL");
 			builder.append("FROM");
-			builder.append("    DBA_OBJECTS");
+			builder.append("    DBA_CONS_COLUMNS A");
+			builder.append("  , DBA_CONSTRAINTS  B");
+			builder.append("  , DBA_COL_COMMENTS C");
 			builder.append("WHERE");
-			builder.append("    OWNER       = ?", schema.getName());
-			builder.append("AND OBJECT_TYPE = ?", type.getName());
+			builder.append("    B.OWNER           = ?", table.getSchema());
+			builder.append("AND B.TABLE_NAME      = ?", table.getName());
+			builder.append("AND B.CONSTRAINT_TYPE = ?", "P");
+			builder.append("AND A.OWNER           = B.OWNER");
+			builder.append("AND A.CONSTRAINT_NAME = B.CONSTRAINT_NAME");
+			builder.append("AND B.OWNER           = C.OWNER");
+			builder.append("AND B.TABLE_NAME      = C.TABLE_NAME");
+			builder.append("AND A.COLUMN_NAME     = C.COLUMN_NAME");
 			builder.append("ORDER BY");
-			builder.append("    OBJECT_NAME");
+			builder.append("    A.POSITION");
 		} else {
 			builder.append("SELECT");
-			builder.append("    ?             AS schema", schema.getName());
-			builder.append("  , OBJECT_NAME   AS name");
-			builder.append("  , ''            AS label");
-			builder.append("  , OBJECT_TYPE   AS type");
-			builder.append("  , ?             AS owner", schema.getName());
-			builder.append("  , LAST_DDL_TIME AS \"UPDATE\"");
-			builder.append("  , STATUS        AS \"STATUS\"");
+			builder.append("    A.COLUMN_NAME AS name");
+			builder.append("  , C.COMMENTS    AS LABEL");
 			builder.append("FROM");
-			builder.append("    USER_OBJECTS");
+			builder.append("    USER_CONS_COLUMNS A");
+			builder.append("  , USER_CONSTRAINTS  B");
+			builder.append("  , USER_COL_COMMENTS C");
 			builder.append("WHERE");
-			builder.append("    OBJECT_TYPE = ?", type.getName());
+			builder.append("    B.TABLE_NAME      = ?", table.getName());
+			builder.append("AND B.CONSTRAINT_TYPE = ?", "P");
+			builder.append("AND A.OWNER           = B.OWNER");
+			builder.append("AND A.CONSTRAINT_NAME = B.CONSTRAINT_NAME");
+			builder.append("AND B.TABLE_NAME      = C.TABLE_NAME");
+			builder.append("AND A.COLUMN_NAME     = C.COLUMN_NAME");
 			builder.append("ORDER BY");
-			builder.append("    OBJECT_NAME");
+			builder.append("    A.POSITION");
 		}
 	}
 
@@ -146,8 +239,11 @@ public class OracleModel extends TemplateDatabaseModel {
 				builder.append("SELECT");
 				builder.append("    A.COLUMN_NAME AS \"列名\"");
 				builder.append("  , B.COMMENTS    AS \"ラベル\"");
-				builder.append("  , A.DATA_TYPE   AS \"データ型\"");
-				builder.append("  , A.DATA_LENGTH AS LENGTH");
+				builder.append("  , CASE A.CHAR_USED");
+				builder.append("      WHEN 'B' THEN A.DATA_TYPE || '(' || A.DATA_LENGTH || ' BYTE)' ");
+				builder.append("      WHEN 'C' THEN A.DATA_TYPE || '(' || A.CHAR_LENGTH || ' CHAR)' ");
+				builder.append("      ELSE A.DATA_TYPE");
+				builder.append("    END           AS \"データ型\"");
 				builder.append("  , DECODE(A.NULLABLE, 'N', '○', '') AS NOTNULL");
 				builder.append("FROM");
 				builder.append("    DBA_TAB_COLUMNS  A");
@@ -164,8 +260,11 @@ public class OracleModel extends TemplateDatabaseModel {
 				builder.append("SELECT");
 				builder.append("    A.COLUMN_NAME AS \"列名\"");
 				builder.append("  , B.COMMENTS    AS \"ラベル\"");
-				builder.append("  , A.DATA_TYPE   AS \"データ型\"");
-				builder.append("  , A.DATA_LENGTH AS LENGTH");
+				builder.append("  , CASE A.CHAR_USED");
+				builder.append("      WHEN 'B' THEN A.DATA_TYPE || '(' || A.DATA_LENGTH || ' BYTE)' ");
+				builder.append("      WHEN 'C' THEN A.DATA_TYPE || '(' || A.CHAR_LENGTH || ' CHAR)' ");
+				builder.append("      ELSE A.DATA_TYPE");
+				builder.append("    END           AS \"データ型\"");
 				builder.append("  , DECODE(A.NULLABLE, 'N', '○', '') AS NOTNULL");
 				builder.append("FROM");
 				builder.append("    USER_TAB_COLUMNS  A");

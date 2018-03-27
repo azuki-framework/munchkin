@@ -17,14 +17,18 @@
  */
 package org.azkfw.munchkin.database.model.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
- *
+ * オブジェクト詳細情報を保持するエンティティクラス
+ * 
  * @author Kawakicchi
- *
  */
-public class ObjectDetailEntity {
+public class ObjectDetailEntity implements Serializable {
+
+	/** serialVersionUID */
+	private static final long serialVersionUID = 132859745232673206L;
 
 	private final List<String> columnNames;
 	private final List<List<Object>> records;
@@ -41,4 +45,5 @@ public class ObjectDetailEntity {
 	public List<List<Object>> getRecords() {
 		return records;
 	}
+
 }

@@ -25,9 +25,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.azkfw.munchkin.database.model.entity.ColumnEntity;
 import org.azkfw.munchkin.database.model.entity.ObjectDetailEntity;
 import org.azkfw.munchkin.database.model.entity.ObjectEntity;
 import org.azkfw.munchkin.database.model.entity.SchemaEntity;
+import org.azkfw.munchkin.database.model.entity.TableObjectEntity;
 import org.azkfw.munchkin.database.model.entity.TypeEntity;
 import org.azkfw.munchkin.util.MunchkinUtil;
 import org.azkfw.munchkin.util.SQLBuilder;
@@ -35,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 　
+ * 
  * 
  * @author Kawakicchi
  */
@@ -223,7 +225,8 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 	protected abstract void sqlGetObjectList(SQLBuilder builder, SchemaEntity schema, TypeEntity type);
 
 	@Override
-	public final List<ObjectEntity> getObjectList(final SchemaEntity schema, final TypeEntity type) throws SQLException {
+	public final List<ObjectEntity> getObjectList(final SchemaEntity schema, final TypeEntity type)
+			throws SQLException {
 		final List<ObjectEntity> objects = new ArrayList<ObjectEntity>();
 
 		final MySQLBuilder builder = new MySQLBuilder();
@@ -263,6 +266,58 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 	}
 
 	/**
+	 * <p>
+	 * 以下の項目をSELECT句に指定すること。
+	 * <ul>
+	 * <li>name - オブジェクト名(必須)</li>
+	 * <li>label - ラベル</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param builder
+	 * @param table
+	 */
+	protected abstract void sqlGetPrimaryKey(SQLBuilder builder, TableObjectEntity table);
+
+	@Override
+	public final List<ColumnEntity> getPrimaryKey(final TableObjectEntity table) throws SQLException {
+		final List<ColumnEntity> columns = new ArrayList<ColumnEntity>();
+
+		final MySQLBuilder builder = new MySQLBuilder();
+		sqlGetPrimaryKey(builder, table);
+
+		if (MunchkinUtil.isNotEmpty(builder.getSQL())) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = getConnection().prepareStatement(builder.getSQL());
+				for (int i = 0; i < builder.getParams().size(); i++) {
+					ps.setObject(i + 1, builder.getParams().get(i));
+				}
+
+				rs = ps.executeQuery();
+				rs.setFetchSize(100);
+
+				while (rs.next()) {
+					final String name = rs.getString("name");
+					final String label = rs.getString("label");
+
+					final ColumnEntity column = new ColumnEntity(name, label);
+					columns.add(column);
+				}
+
+			} catch (SQLException ex) {
+				LOGGER.error("SQL : {}", builder.getSQL());
+				throw ex;
+			} finally {
+				release(rs);
+				release(ps);
+			}
+		}
+		return columns;
+	}
+
+	/**
 	 * 
 	 * @param builder
 	 * @param object
@@ -270,7 +325,7 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 	protected abstract void sqlGetObjectDetail(SQLBuilder builder, ObjectEntity object);
 
 	@Override
-	public ObjectDetailEntity getObjectDetail(final ObjectEntity object) throws SQLException {
+	public final ObjectDetailEntity getObjectDetail(final ObjectEntity object) throws SQLException {
 		ObjectDetailEntity detail = null;
 
 		final MySQLBuilder builder = new MySQLBuilder();

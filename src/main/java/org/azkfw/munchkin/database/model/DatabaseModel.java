@@ -21,9 +21,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.azkfw.munchkin.database.model.entity.ColumnEntity;
 import org.azkfw.munchkin.database.model.entity.ObjectDetailEntity;
 import org.azkfw.munchkin.database.model.entity.ObjectEntity;
 import org.azkfw.munchkin.database.model.entity.SchemaEntity;
+import org.azkfw.munchkin.database.model.entity.TableObjectEntity;
 import org.azkfw.munchkin.database.model.entity.TypeEntity;
 
 /**
@@ -136,6 +138,15 @@ public interface DatabaseModel {
 	List<ObjectEntity> getObjectList(SchemaEntity schema, TypeEntity type) throws SQLException;
 
 	/**
+	 * テーブルの主キー情報を取得する。
+	 *
+	 * @param table テーブル情報
+	 * @return 主キー情報
+	 * @throws SQLException SQL操作に起因する問題が発生した場合
+	 */
+	List<ColumnEntity> getPrimaryKey(TableObjectEntity table) throws SQLException;
+
+	/**
 	 * オブジェクトの詳細情報を取得する。
 	 *
 	 * @param object オブジェクト情報
@@ -143,4 +154,5 @@ public interface DatabaseModel {
 	 * @throws SQLException SQL操作に起因する問題が発生した場合
 	 */
 	ObjectDetailEntity getObjectDetail(ObjectEntity object) throws SQLException;
+
 }
