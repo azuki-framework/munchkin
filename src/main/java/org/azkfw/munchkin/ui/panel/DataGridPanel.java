@@ -43,6 +43,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledEditorKit;
 
 import org.azkfw.munchkin.ui.ColumnWidths;
 import org.azkfw.munchkin.ui.DataGridSelection;
@@ -161,16 +162,18 @@ public class DataGridPanel extends JPanel {
 
 		final ColumnWidths widths = new ColumnWidths(meta.getColumnCount(), 60);
 
-		final MyStringCellRenderer rendererString = new MyStringCellRenderer(table);
-		final MyDateCellRenderer rendererDate = new MyDateCellRenderer(table);
-
 		final TableColumnModel mdlColumn = table.getColumnModel();
 		for (int i = 0; i < mdlColumn.getColumnCount(); i++) {
-			int type = meta.getColumnType(i + 1);
+			final boolean nullable = (ResultSetMetaData.columnNoNulls != meta.isNullable(i + 1));
+
+			final int type = meta.getColumnType(i + 1);
 			if (MunchkinUtil.isEqualsAny(type, Types.TIMESTAMP, Types.TIMESTAMP_WITH_TIMEZONE)) {
-				mdlColumn.getColumn(i).setCellRenderer(rendererDate);
+				final MyDateCellRenderer renderer = new MyDateCellRenderer(table, nullable);
+				mdlColumn.getColumn(i).setCellRenderer(renderer);
+
 			} else {
-				mdlColumn.getColumn(i).setCellRenderer(rendererString);
+				final MyStringCellRenderer renderer = new MyStringCellRenderer(table, nullable);
+				mdlColumn.getColumn(i).setCellRenderer(renderer);
 			}
 		}
 
@@ -234,7 +237,7 @@ public class DataGridPanel extends JPanel {
 		}
 	}
 
-	private class MyStringCellRenderer extends DataGridStringCell implements TableCellRenderer {
+	private static class MyStringCellRenderer extends AbstractCellRenderer {
 		/** serialVersionUID */
 		private static final long serialVersionUID = 1L;
 
@@ -242,15 +245,8 @@ public class DataGridPanel extends JPanel {
 		private final SimpleAttributeSet asNumber;
 		private final SimpleAttributeSet asNull;
 
-		private final Color color;
-
-		public MyStringCellRenderer(final JTable table) {
-			super(new TableDataCellEditorKit());
-
-			setFont(table.getFont());
-			setOpaque(true);
-
-			color = new Color(255, 239, 224);
+		public MyStringCellRenderer(final JTable table, final boolean nullable) {
+			super(table, nullable, new TableDataCellEditorKit());
 
 			asString = new SimpleAttributeSet();
 			StyleConstants.setForeground(asString, table.getForeground());
@@ -271,17 +267,13 @@ public class DataGridPanel extends JPanel {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(final JTable table, final Object value,
-				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
+				final boolean hasFocus, final int row, final int column) {
 
 			if (isSelected) {
 				setBackground(table.getSelectionBackground());
 			} else {
-				if (0 == row % 2) {
-					setBackground(table.getBackground());
-				} else {
-					setBackground(color);
-				}
+				setBackground(getBackground(row));
 			}
 
 			if (null == value) {
@@ -313,7 +305,7 @@ public class DataGridPanel extends JPanel {
 		}
 	}
 
-	private class MyDateCellRenderer extends DataGridStringCell implements TableCellRenderer {
+	private static class MyDateCellRenderer extends AbstractCellRenderer {
 		/** serialVersionUID */
 		private static final long serialVersionUID = 1L;
 
@@ -321,15 +313,8 @@ public class DataGridPanel extends JPanel {
 		private final SimpleAttributeSet asNumber;
 		private final SimpleAttributeSet asNull;
 
-		private final Color color;
-
-		public MyDateCellRenderer(final JTable table) {
-			super();
-
-			setFont(table.getFont());
-			setOpaque(true);
-
-			color = new Color(255, 239, 224);
+		public MyDateCellRenderer(final JTable table, final boolean nullable) {
+			super(table, nullable, null);
 
 			asString = new SimpleAttributeSet();
 			StyleConstants.setForeground(asString, table.getForeground());
@@ -350,17 +335,13 @@ public class DataGridPanel extends JPanel {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(final JTable table, final Object value,
-				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
+				final boolean hasFocus, final int row, final int column) {
 
 			if (isSelected) {
 				setBackground(table.getSelectionBackground());
 			} else {
-				if (0 == row % 2) {
-					setBackground(table.getBackground());
-				} else {
-					setBackground(color);
-				}
+				setBackground(getBackground(row));
 			}
 
 			if (null == value) {
@@ -389,6 +370,40 @@ public class DataGridPanel extends JPanel {
 
 		private void setAttri(final SimpleAttributeSet as) {
 			getStyledDocument().setParagraphAttributes(0, getDocument().getLength(), as, true);
+		}
+	}
+
+	private static abstract class AbstractCellRenderer extends DataGridStringCell implements TableCellRenderer {
+
+		/** serialVersionUID */
+		private static final long serialVersionUID = 1L;
+
+		private final Color colorLineBackground1;
+		private final Color colorLineBackground2;
+
+		public AbstractCellRenderer(final JTable table, final boolean nullable, final StyledEditorKit kit) {
+			super(kit);
+
+			setFont(table.getFont());
+			setOpaque(true);
+
+			if (nullable) {
+				colorLineBackground1 = new Color(255, 255, 255);
+				colorLineBackground2 = new Color(255, 239, 224);
+			} else {
+				colorLineBackground1 = new Color(255, 255, 183);
+				colorLineBackground2 = new Color(255, 235, 137);
+			}
+		}
+
+		protected final Color getBackground(final int row) {
+			Color color = null;
+			if (0 == row % 2) {
+				color = colorLineBackground1;
+			} else {
+				color = colorLineBackground2;
+			}
+			return color;
 		}
 	}
 }
