@@ -17,7 +17,6 @@
  */
 package org.azkfw.munchkin.exp;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,22 +24,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.azkfw.munchkin.database.model.ColumnModel;
 import org.azkfw.munchkin.database.model.DatabaseModel;
 import org.azkfw.munchkin.database.model.QueryHandler;
 import org.azkfw.munchkin.database.model.RecordModel;
+import org.azkfw.munchkin.excel.style.RichTableExcelStyle;
+import org.azkfw.munchkin.excel.style.TableExcelStyle;
 import org.azkfw.munchkin.util.MunchkinUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +51,12 @@ public class ExportDB {
 	private final DatabaseModel model;
 	private File outputFile;
 
-	private CellStyle styleHead;
-	private CellStyle styleData1;
-	private CellStyle styleData2;
+	private final TableExcelStyle style;
 
 	public ExportDB(final DatabaseModel model) {
 		this.model = model;
+
+		this.style = new RichTableExcelStyle();
 	}
 
 	public void setOutputFile(final File file) {
@@ -72,59 +66,7 @@ public class ExportDB {
 	public void export(final List<String> tableNames) {
 		final Workbook workbook = new SXSSFWorkbook();
 
-		final Font fontDef = workbook.getFontAt((short) 0);
-		fontDef.setFontName("ＭＳ ゴシック");
-		fontDef.setFontHeightInPoints((short) 12);
-
-		final Font fontHead = workbook.createFont();
-		fontHead.setFontName(fontDef.getFontName());
-		fontHead.setFontHeightInPoints(fontDef.getFontHeightInPoints());
-		if (fontHead instanceof XSSFFont) {
-			final XSSFFont font = (XSSFFont) fontHead;
-			font.setColor(new XSSFColor(new Color(255, 255, 255)));
-		}
-		final Font fontData = workbook.createFont();
-		fontData.setFontName(fontDef.getFontName());
-		fontData.setFontHeightInPoints(fontDef.getFontHeightInPoints());
-		if (fontData instanceof XSSFFont) {
-			final XSSFFont font = (XSSFFont) fontData;
-			font.setColor(new XSSFColor(new Color(0, 0, 0)));
-		}
-
-		styleHead = workbook.createCellStyle();
-		styleHead.setFont(fontHead);
-		styleHead.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-		styleHead.setBorderBottom(BorderStyle.MEDIUM);
-		styleHead.setBorderRight(BorderStyle.THIN);
-		if (styleHead instanceof XSSFCellStyle) {
-			final XSSFCellStyle style = (XSSFCellStyle) styleHead;
-			style.setFillForegroundColor(new XSSFColor(new Color(71, 125, 192)));
-			style.setBottomBorderColor(new XSSFColor(new Color(255, 255, 255)));
-			style.setRightBorderColor(new XSSFColor(new Color(255, 255, 255)));
-		}
-
-		styleData1 = workbook.createCellStyle();
-		styleData1.setFont(fontData);
-		styleData1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-		styleData1.setBorderBottom(BorderStyle.THIN);
-		styleData1.setBorderRight(BorderStyle.THIN);
-		if (styleData1 instanceof XSSFCellStyle) {
-			final XSSFCellStyle style = (XSSFCellStyle) styleData1;
-			style.setFillForegroundColor(new XSSFColor(new Color(181, 203, 229)));
-			style.setBottomBorderColor(new XSSFColor(new Color(255, 255, 255)));
-			style.setRightBorderColor(new XSSFColor(new Color(255, 255, 255)));
-		}
-		styleData2 = workbook.createCellStyle();
-		styleData2.setFont(fontData);
-		styleData2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-		styleData2.setBorderBottom(BorderStyle.THIN);
-		styleData2.setBorderRight(BorderStyle.THIN);
-		if (styleData2 instanceof XSSFCellStyle) {
-			final XSSFCellStyle style = (XSSFCellStyle) styleData2;
-			style.setFillForegroundColor(new XSSFColor(new Color(218, 230, 242)));
-			style.setBottomBorderColor(new XSSFColor(new Color(255, 255, 255)));
-			style.setRightBorderColor(new XSSFColor(new Color(255, 255, 255)));
-		}
+		style.install(workbook);
 
 		for (String tableName : tableNames) {
 			exportTable(tableName, workbook);
@@ -179,24 +121,24 @@ public class ExportDB {
 					final Row row = sheet.createRow(0);
 
 					Cell cell = null;
-					for (int i = 0; i < column.count(); i++) {
-						cell = row.createCell(i);
-						cell.setCellStyle(styleHead);
-						cell.setCellValue(column.getName(i));
+					for (int col = 0; col < column.count(); col++) {
+						cell = row.createCell(col);
+						cell.setCellStyle(style.getTableHeaderStyle(col));
+						cell.setCellValue(column.getName(col));
 					}
 				}
 
 				@Override
 				public void record(final long no, final RecordModel record) {
-					final CellStyle style = (0 == (no % 2)) ? styleData1 : styleData2;
-
 					final Row row = sheet.createRow((int) (no)); // TODO: multi page
 
 					Cell cell = null;
-					for (int i = 0; i < column.count(); i++) {
-						cell = row.createCell(i);
-						cell.setCellStyle(style);
-						cell.setCellValue(s(record.getValue(i)));
+					for (int col = 0; col < column.count(); col++) {
+						final Object value = record.getValue(col);
+
+						cell = row.createCell(col);
+						cell.setCellStyle(style.getTableDataStyle(col, (int) no, value));
+						cell.setCellValue(s(value));
 					}
 				}
 			});
