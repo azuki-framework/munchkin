@@ -75,16 +75,23 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 		final MySQLBuilder builder = new MySQLBuilder();
 		sqlGetDefaultSchema(builder);
 
-		if (MunchkinUtil.isNotEmpty(builder.getSQL())) {
+		final String sql = builder.getSQL();
+		final List<Object> params = builder.getParams();
+
+		if (MunchkinUtil.isNotEmpty(sql)) {
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			try {
-				ps = getConnection().prepareStatement(builder.getSQL());
-				for (int i = 0; i < builder.getParams().size(); i++) {
-					ps.setObject(i + 1, builder.getParams().get(i));
+				ps = getConnection().prepareStatement(sql);
+				int i = 1;
+				for (final Object val : params) {
+					ps.setObject(i++, val);
 				}
 
+				LOGGER.trace("SQL : {}", sql);
+				LOGGER.trace("Parameter : {}", params);
 				rs = ps.executeQuery();
+				rs.setFetchSize(100);
 
 				if (rs.next()) {
 					final String name = rs.getString("name");
@@ -94,7 +101,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				}
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}", builder.getSQL());
+				LOGGER.error("Get default schema error.", ex);
+				LOGGER.error("SQL : {}", sql);
+				LOGGER.error("Parameter : {}", params);
 				throw ex;
 			} finally {
 				release(rs);
@@ -124,15 +133,21 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 		final MySQLBuilder builder = new MySQLBuilder();
 		sqlGetSchemaList(builder);
 
-		if (MunchkinUtil.isNotEmpty(builder.getSQL())) {
+		final String sql = builder.getSQL();
+		final List<Object> params = builder.getParams();
+
+		if (MunchkinUtil.isNotEmpty(sql)) {
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			try {
-				ps = getConnection().prepareStatement(builder.getSQL());
-				for (int i = 0; i < builder.getParams().size(); i++) {
-					ps.setObject(i + 1, builder.getParams().get(i));
+				ps = getConnection().prepareStatement(sql);
+				int i = 1;
+				for (final Object val : params) {
+					ps.setObject(i++, val);
 				}
 
+				LOGGER.trace("SQL : {}", sql);
+				LOGGER.trace("Parameter : {}", params);
 				rs = ps.executeQuery();
 				rs.setFetchSize(100);
 
@@ -145,7 +160,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				}
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}", builder.getSQL());
+				LOGGER.error("Get schema list error.", ex);
+				LOGGER.error("SQL : {}", sql);
+				LOGGER.error("Parameter : {}", params);
 				throw ex;
 			} finally {
 				release(rs);
@@ -175,15 +192,21 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 		final MySQLBuilder builder = new MySQLBuilder();
 		sqlGetTypeList(builder);
 
-		if (MunchkinUtil.isNotEmpty(builder.getSQL())) {
+		final String sql = builder.getSQL();
+		final List<Object> params = builder.getParams();
+
+		if (MunchkinUtil.isNotEmpty(sql)) {
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			try {
-				ps = getConnection().prepareStatement(builder.getSQL());
-				for (int i = 0; i < builder.getParams().size(); i++) {
-					ps.setObject(i + 1, builder.getParams().get(i));
+				ps = getConnection().prepareStatement(sql);
+				int i = 1;
+				for (final Object val : params) {
+					ps.setObject(i++, val);
 				}
 
+				LOGGER.trace("SQL : {}", sql);
+				LOGGER.trace("Parameter : {}", params);
 				rs = ps.executeQuery();
 				rs.setFetchSize(100);
 
@@ -196,7 +219,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				}
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}", builder.getSQL());
+				LOGGER.error("Get type list error.", ex);
+				LOGGER.error("SQL : {}", sql);
+				LOGGER.error("Parameter : {}", params);
 				throw ex;
 			} finally {
 				release(rs);
@@ -225,22 +250,27 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 	protected abstract void sqlGetObjectList(SQLBuilder builder, SchemaEntity schema, TypeEntity type);
 
 	@Override
-	public final List<ObjectEntity> getObjectList(final SchemaEntity schema, final TypeEntity type)
-			throws SQLException {
+	public final List<ObjectEntity> getObjectList(final SchemaEntity schema, final TypeEntity type) throws SQLException {
 		final List<ObjectEntity> objects = new ArrayList<ObjectEntity>();
 
 		final MySQLBuilder builder = new MySQLBuilder();
 		sqlGetObjectList(builder, schema, type);
 
-		if (MunchkinUtil.isNotEmpty(builder.getSQL())) {
+		final String sql = builder.getSQL();
+		final List<Object> params = builder.getParams();
+
+		if (MunchkinUtil.isNotEmpty(sql)) {
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			try {
-				ps = getConnection().prepareStatement(builder.getSQL());
-				for (int i = 0; i < builder.getParams().size(); i++) {
-					ps.setObject(i + 1, builder.getParams().get(i));
+				ps = getConnection().prepareStatement(sql);
+				int i = 1;
+				for (final Object val : params) {
+					ps.setObject(i++, val);
 				}
 
+				LOGGER.trace("SQL : {}", sql);
+				LOGGER.trace("Parameter : {}", params);
 				rs = ps.executeQuery();
 				rs.setFetchSize(100);
 
@@ -255,7 +285,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				}
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}", builder.getSQL());
+				LOGGER.error("Get object list error.", ex);
+				LOGGER.error("SQL : {}", sql);
+				LOGGER.error("Parameter : {}", params);
 				throw ex;
 			} finally {
 				release(rs);
@@ -286,15 +318,21 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 		final MySQLBuilder builder = new MySQLBuilder();
 		sqlGetPrimaryKey(builder, table);
 
-		if (MunchkinUtil.isNotEmpty(builder.getSQL())) {
+		final String sql = builder.getSQL();
+		final List<Object> params = builder.getParams();
+
+		if (MunchkinUtil.isNotEmpty(sql)) {
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			try {
-				ps = getConnection().prepareStatement(builder.getSQL());
-				for (int i = 0; i < builder.getParams().size(); i++) {
-					ps.setObject(i + 1, builder.getParams().get(i));
+				ps = getConnection().prepareStatement(sql);
+				int i = 1;
+				for (final Object val : params) {
+					ps.setObject(i++, val);
 				}
 
+				LOGGER.trace("SQL : {}", sql);
+				LOGGER.trace("Parameter : {}", params);
 				rs = ps.executeQuery();
 				rs.setFetchSize(100);
 
@@ -307,7 +345,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				}
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}", builder.getSQL());
+				LOGGER.error("Get primary key error.", ex);
+				LOGGER.error("SQL : {}", sql);
+				LOGGER.error("Parameter : {}", params);
 				throw ex;
 			} finally {
 				release(rs);
@@ -331,21 +371,27 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 		final MySQLBuilder builder = new MySQLBuilder();
 		sqlGetObjectDetail(builder, object);
 
-		if (MunchkinUtil.isNotEmpty(builder.getSQL())) {
+		final String sql = builder.getSQL();
+		final List<Object> params = builder.getParams();
+
+		if (MunchkinUtil.isNotEmpty(sql)) {
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			try {
-				ps = getConnection().prepareStatement(builder.getSQL());
-				for (int i = 0; i < builder.getParams().size(); i++) {
-					ps.setObject(i + 1, builder.getParams().get(i));
+				ps = getConnection().prepareStatement(sql);
+				int i = 1;
+				for (final Object val : params) {
+					ps.setObject(i++, val);
 				}
 
+				LOGGER.trace("SQL : {}", sql);
+				LOGGER.trace("Parameter : {}", params);
 				rs = ps.executeQuery();
 				rs.setFetchSize(100);
 
 				final List<String> columnNames = new ArrayList<String>();
 				final ResultSetMetaData meta = rs.getMetaData();
-				for (int i = 0; i < meta.getColumnCount(); i++) {
+				for (i = 0; i < meta.getColumnCount(); i++) {
 					columnNames.add(meta.getColumnName(i + 1));
 				}
 
@@ -353,7 +399,7 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				while (rs.next()) {
 					final List<Object> record = new ArrayList<Object>();
 
-					for (int i = 0; i < meta.getColumnCount(); i++) {
+					for (i = 0; i < meta.getColumnCount(); i++) {
 						record.add(rs.getObject(i + 1));
 					}
 
@@ -363,7 +409,9 @@ public abstract class TemplateDatabaseModel extends AbstractDatabaseModel {
 				detail = new ObjectDetailEntity(columnNames, records);
 
 			} catch (SQLException ex) {
-				LOGGER.error("SQL : {}", builder.getSQL());
+				LOGGER.error("Get primary key error.", ex);
+				LOGGER.error("SQL : {}", sql);
+				LOGGER.error("Parameter : {}", params);
 				throw ex;
 			} finally {
 				release(rs);

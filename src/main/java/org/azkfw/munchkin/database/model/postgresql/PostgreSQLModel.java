@@ -90,7 +90,7 @@ public class PostgreSQLModel extends TemplateDatabaseModel {
 			builder.append("    A.schemaname  AS schema");
 			builder.append("  , A.relname     AS name");
 			builder.append("  , B.description AS label");
-			builder.append("  , 'table'       AS type");
+			builder.append("  , 'TABLE'       AS type");
 			builder.append("  , ''            AS owner");
 			builder.append("FROM");
 			builder.append("    pg_stat_all_tables A");
