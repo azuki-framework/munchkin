@@ -40,30 +40,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * このクラスは、データベースからデータをエクスポートするクラスです。
+ * 
  * @author Kawakicchi
  */
-public class ExportDB {
+public class ExpDB {
 
 	/** Logger */
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExportDB.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExpDB.class);
 
+	/** モデル */
 	private final DatabaseModel model;
-	private File outputFile;
+	/** リスナー */
+	private final List<ExpDBListeneer> listeners;
 
 	private final TableExcelStyle style;
 
-	public ExportDB(final DatabaseModel model) {
+	/**
+	 * コンストラクタ
+	 *
+	 * @param model データベースモデル
+	 */
+	public ExpDB(final DatabaseModel model) {
 		this.model = model;
+		this.listeners = new ArrayList<ExpDBListeneer>();
 
 		this.style = new RichTableExcelStyle();
 	}
 
-	public void setOutputFile(final File file) {
-		this.outputFile = file;
+	public synchronized void addExpDBListener(final ExpDBListeneer listener) {
+		listeners.add(listener);
 	}
 
-	public void export(final List<String> tableNames) {
+	public void exp(final List<String> tableNames, final File outputFile) {
 		final Workbook workbook = new SXSSFWorkbook();
 
 		style.install(workbook);
@@ -149,5 +158,4 @@ public class ExportDB {
 			LOGGER.error("Table data export error.", ex);
 		}
 	}
-
 }
