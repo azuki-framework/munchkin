@@ -19,6 +19,7 @@ package org.azkfw.munchkin.ui.component;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,7 +69,10 @@ public class DatasourcePanel extends GridLayoutPanel {
 
 	private final DefaultComboBoxModel<DatabaseDriver> mdlDriver;
 
-	public DatasourcePanel() {
+	private final Dialog owner;
+
+	public DatasourcePanel(final Dialog owner) {
+		this.owner = owner;
 
 		mdlDriver = new DefaultComboBoxModel<DatabaseDriver>();
 
@@ -148,7 +152,7 @@ public class DatasourcePanel extends GridLayoutPanel {
 
 	private void doSelectColor() {
 		final Color color = MunchkinUtil.getColorFormHexadecimal(txtColor.getText());
-		final Color selectColor = JColorChooser.showDialog(this, "カラー選択", color);
+		final Color selectColor = JColorChooser.showDialog(owner, "カラー選択", color);
 		if (MunchkinUtil.isNotNull(selectColor)) {
 			txtColor.setText(MunchkinUtil.getHexadecimalFromColor(selectColor));
 		}

@@ -22,8 +22,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -32,7 +35,7 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -54,7 +57,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Kawakicchi
  */
-public class DatasourcesDialog extends JFrame {
+public class DatasourcesDialog extends JDialog {
 
 	/** serialVersionUID */
 	private static final long serialVersionUID = -3202118104324325403L;
@@ -62,23 +65,13 @@ public class DatasourcesDialog extends JFrame {
 	/** Logger */
 	private static final Logger LOGGER = LoggerFactory.getLogger(DatasourcesDialog.class);
 
-	public static void main(final String[] args) {
-		List<DatasourceEntity> datasources = new ArrayList<DatasourceEntity>();
-		for (int i = 0; i < 5; i++) {
-			final DatasourceEntity datasource = new DatasourceEntity();
-			datasource.setName(String.format("データソース-%02d", (i + 1)));
-			datasource.setUser(String.format("ユーザ-%02d", (i + 1)));
-			datasources.add(datasource);
-		}
-
-		DatasourcesDialog dlg = new DatasourcesDialog(datasources);
-		dlg.setVisible(true);
-	}
-
 	private final DefaultListModel<DatasourceEntity> model;
 
 	private final JList<DatasourceEntity> lstDatasource;
 	private final DatasourcePanel pnlDatasource;
+
+	/** イベントリスナー */
+	private final List<DatasourcesDialogListener> listeners;
 
 	private final JButton btnCreate;
 	private final JButton btnDelete;
@@ -86,16 +79,19 @@ public class DatasourcesDialog extends JFrame {
 	private final JButton btnOK;
 	private final JButton btnCancel;
 
-	public DatasourcesDialog(final List<DatasourceEntity> datasources) {
+	public DatasourcesDialog(final Frame owner, final List<DatasourceEntity> datasources) {
+		super(owner, true);
 		setTitle("データソース一覧");
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE); // XXX
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
 		model = new DefaultListModel<DatasourceEntity>();
 
 		lstDatasource = new JList<DatasourceEntity>(model);
 		lstDatasource.setCellRenderer(new DatasourceCellRenderer());
 
-		pnlDatasource = new DatasourcePanel();
+		pnlDatasource = new DatasourcePanel(this);
+
+		listeners = new ArrayList<DatasourcesDialogListener>();
 
 		btnCreate = new JButton("+");
 		btnDelete = new JButton("-");
@@ -110,11 +106,21 @@ public class DatasourcesDialog extends JFrame {
 		settingEvent();
 
 		for (DatasourceEntity datasource : datasources) {
-			model.addElement(datasource);
+			model.addElement(new DatasourceEntity(datasource));
 		}
-		lstDatasource.setSelectedIndex(0);
+		if (MunchkinUtil.isNotEmpty(datasources)) {
+			lstDatasource.setSelectedIndex(0);
+		}
 
 		setSize(800, 600);
+
+		final int offsetX = owner.getX() + (owner.getWidth() - getWidth()) / 2;
+		final int offsetY = owner.getY() + (owner.getHeight() - getHeight()) / 2;
+		setLocation(offsetX, offsetY);
+	}
+
+	public synchronized void addDatasourcesDialogListener(final DatasourcesDialogListener listener) {
+		listeners.add(listener);
 	}
 
 	private void doCreateDatasource() {
@@ -163,6 +169,24 @@ public class DatasourcesDialog extends JFrame {
 		}
 	}
 
+	private void doClosedOk() {
+		final List<DatasourceEntity> datasources = new ArrayList<DatasourceEntity>();
+		for (int i = 0; i < model.getSize(); i++) {
+			datasources.add(model.get(i));
+		}
+
+		listeners.forEach(l -> l.datasourcesDialogClosedOk(this, datasources));
+
+		dispose();
+	}
+
+	private void doClosedCancel() {
+
+		listeners.forEach(l -> l.datasourcesDialogClosedCancel(this));
+
+		dispose();
+	}
+
 	private void settingLayout() {
 		setLayout(new BorderLayout());
 
@@ -204,6 +228,21 @@ public class DatasourcesDialog extends JFrame {
 	}
 
 	private void settingEvent() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(final WindowEvent e) {
+			}
+
+			@Override
+			public void windowClosing(final WindowEvent e) {
+				doClosedCancel();
+			}
+
+			@Override
+			public void windowClosed(final WindowEvent e) {
+			}
+		});
+
 		lstDatasource.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(final ListSelectionEvent e) {
@@ -211,6 +250,19 @@ public class DatasourcesDialog extends JFrame {
 					return;
 				}
 				doChangeDatasource();
+			}
+		});
+
+		btnOK.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				doClosedOk();
+			}
+		});
+		btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				doClosedCancel();
 			}
 		});
 

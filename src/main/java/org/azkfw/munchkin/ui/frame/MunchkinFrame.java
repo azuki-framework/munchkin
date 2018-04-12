@@ -47,6 +47,7 @@ import org.azkfw.munchkin.ui.dialog.DatasourceDialog;
 import org.azkfw.munchkin.ui.dialog.DatasourceDialogListener;
 import org.azkfw.munchkin.ui.dialog.DatasourceListDialog;
 import org.azkfw.munchkin.ui.dialog.DatasourcesDialog;
+import org.azkfw.munchkin.ui.dialog.DatasourcesDialogListener;
 import org.azkfw.munchkin.ui.dialog.ExportDialog;
 import org.azkfw.munchkin.ui.dialog.VersionDialog;
 import org.azkfw.munchkin.ui.panel.DBConditionPanelListener;
@@ -397,10 +398,20 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 
 	@Override
 	protected void doMenuFileDatasource() {
-		final List<DatasourceEntity> datasources = new ArrayList<DatasourceEntity>();
-		datasource.getDatasources().forEach(d -> datasources.add(new DatasourceEntity(d)));
+		final List<DatasourceEntity> bufDatasources = new ArrayList<DatasourceEntity>();
+		datasource.getDatasources().forEach(ds -> bufDatasources.add(new DatasourceEntity(ds)));
 
-		final DatasourcesDialog dlg = new DatasourcesDialog(datasources);
+		final DatasourcesDialog dlg = new DatasourcesDialog(this, bufDatasources);
+		dlg.addDatasourcesDialogListener(new DatasourcesDialogListener() {
+			@Override
+			public void datasourcesDialogClosedOk(final DatasourcesDialog dialog, final List<DatasourceEntity> dss) {
+				datasource.setDatasources(dss);
+			}
+
+			@Override
+			public void datasourcesDialogClosedCancel(final DatasourcesDialog dialog) {
+			}
+		});
 		dlg.setVisible(true);
 	}
 
