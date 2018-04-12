@@ -68,10 +68,21 @@ public class ExpDB {
 		this.style = new RichTableExcelStyle();
 	}
 
+	/**
+	 * リスナーを追加する。
+	 *
+	 * @param listener リスナー
+	 */
 	public synchronized void addExpDBListener(final ExpDBListeneer listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * エクスポートを行う。
+	 *
+	 * @param tableNames
+	 * @param outputFile
+	 */
 	public void exp(final List<String> tableNames, final File outputFile) {
 		final Workbook workbook = new SXSSFWorkbook();
 

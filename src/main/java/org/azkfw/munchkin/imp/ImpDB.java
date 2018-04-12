@@ -59,10 +59,20 @@ public class ImpDB {
 		this.listeners = new ArrayList<ImpDBListener>();
 	}
 
+	/**
+	 * リスナーを追加する。
+	 *
+	 * @param listener リスナー
+	 */
 	public synchronized void addImpDBListener(final ImpDBListener listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * インポートを行う。
+	 *
+	 * @param inputFile
+	 */
 	public void imp(final File inputFile) {
 		InputStream is = null;
 		Workbook workbook = null;
