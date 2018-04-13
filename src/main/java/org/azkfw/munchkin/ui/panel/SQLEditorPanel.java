@@ -39,7 +39,9 @@ import javax.swing.InputMap;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
 
 import org.azkfw.munchkin.ui.SQLTextEditor;
 import org.azkfw.munchkin.ui.component.ImageButton;
@@ -161,6 +163,21 @@ public class SQLEditorPanel extends JPanel {
 		txtEditor.setText(text);
 		txtEditor.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 		txtEditor.setCaretPosition(0);
+	}
+
+	public void insert(final String text) {
+		final int end = txtEditor.getSelectionEnd();
+
+		try {
+			final Document doc = txtEditor.getDocument();
+			doc.insertString(end, text, null);
+
+			txtEditor.setCaretPosition(end + text.length());
+
+			txtEditor.requestFocus();
+		} catch (BadLocationException ex) {
+
+		}
 	}
 
 	public void setExecuteButtonEnabled(final boolean enabled) {

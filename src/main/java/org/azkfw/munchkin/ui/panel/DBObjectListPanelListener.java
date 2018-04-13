@@ -27,4 +27,6 @@ import org.azkfw.munchkin.database.model.entity.ObjectEntity;
 public interface DBObjectListPanelListener {
 
 	void dbObjectListPanelChengedObject(ObjectEntity object);
+
+	void dbObjectListPanelDoubleClick(String value);
 }

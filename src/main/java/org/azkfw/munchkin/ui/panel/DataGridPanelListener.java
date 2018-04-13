@@ -24,4 +24,5 @@ package org.azkfw.munchkin.ui.panel;
  */
 public interface DataGridPanelListener {
 
+	void dataGridPanelDoubleClick(Object value);
 }

@@ -102,13 +102,15 @@ public class DBObjectListPanel extends JPanel {
 		table = new JTable(model);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setRowSorter(sorter);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		table.setCellSelectionEnabled(true);
+		table.setRowSelectionAllowed(true);
 		table.setSelectionBackground(new Color(255, 204, 153));
 		table.setSelectionForeground(table.getForeground());
+
 		table.getColumnModel().getColumn(1).setCellRenderer(renderer);
 		table.getColumnModel().getColumn(2).setCellRenderer(renderer);
 		table.getColumnModel().getColumn(3).setCellRenderer(renderer);
-
 		table.removeColumn(table.getColumn("ID"));
 
 		initLayout();
@@ -213,22 +215,28 @@ public class DBObjectListPanel extends JPanel {
 				if (MouseEvent.BUTTON1 == e.getButton() && 2 == e.getClickCount()) {
 					final Point pt = e.getPoint();
 					final int row = table.rowAtPoint(pt);
+					final int col = table.columnAtPoint(pt);
 					if (0 <= row) {
 						final int rowReal = table.convertRowIndexToModel(row);
-						final ObjectEntity object = (ObjectEntity) model.getValueAt(rowReal, 0);
+						final int colReal = table.convertColumnIndexToModel(col);
+						final Object object = model.getValueAt(rowReal, colReal);
 
-						// TODO:
+						final String value = object.toString();
+						listeners.forEach(l -> l.dbObjectListPanelDoubleClick(value));
 					}
+
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					final Point pt = e.getPoint();
 					final int row = table.rowAtPoint(pt);
+					final int col = table.columnAtPoint(pt);
 					if (0 <= row) {
-						table.changeSelection(row, 0, false, false);
+						table.changeSelection(row, col, false, false);
 
 						final int rowReal = table.convertRowIndexToModel(row);
 						final ObjectEntity object = (ObjectEntity) model.getValueAt(rowReal, 0);
 
 						// TODO:
+
 					}
 				}
 			}
@@ -244,8 +252,8 @@ public class DBObjectListPanel extends JPanel {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
-				final boolean hasFocus, final int row, final int column) {
+		public Component getTableCellRendererComponent(final JTable table, final Object value,
+				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 			if (isSelected) {

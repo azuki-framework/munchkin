@@ -23,10 +23,13 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -105,7 +108,6 @@ public class DataGridPanel extends JPanel {
 		table.setSelectionBackground(new Color(255, 204, 153));
 
 		table.addKeyListener(new KeyAdapter() {
-
 			@Override
 			public void keyTyped(final KeyEvent e) {
 				if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_C) {
@@ -125,6 +127,23 @@ public class DataGridPanel extends JPanel {
 				if ((e.getKeyCode() == KeyEvent.VK_C) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
 					doCopy();
 					e.consume();
+				}
+			}
+		});
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				if (MouseEvent.BUTTON1 == e.getButton() && 2 == e.getClickCount()) {
+					final Point pt = e.getPoint();
+					final int row = table.rowAtPoint(pt);
+					final int col = table.columnAtPoint(pt);
+					if (0 <= row) {
+						final int rowReal = table.convertRowIndexToModel(row);
+						final int colReal = table.convertColumnIndexToModel(col);
+						final Object object = model.getValueAt(rowReal, colReal);
+
+						listeners.forEach(l -> l.dataGridPanelDoubleClick(object));
+					}
 				}
 			}
 		});
@@ -267,8 +286,8 @@ public class DataGridPanel extends JPanel {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
-				final boolean hasFocus, final int row, final int column) {
+		public Component getTableCellRendererComponent(final JTable table, final Object value,
+				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 
 			if (isSelected) {
 				setBackground(table.getSelectionBackground());
@@ -335,8 +354,8 @@ public class DataGridPanel extends JPanel {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
-				final boolean hasFocus, final int row, final int column) {
+		public Component getTableCellRendererComponent(final JTable table, final Object value,
+				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 
 			if (isSelected) {
 				setBackground(table.getSelectionBackground());

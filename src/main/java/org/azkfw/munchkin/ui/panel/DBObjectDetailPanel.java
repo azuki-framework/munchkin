@@ -181,10 +181,14 @@ public class DBObjectDetailPanel extends JPanel {
 				if (MouseEvent.BUTTON1 == e.getButton() && 2 == e.getClickCount()) {
 					final Point pt = e.getPoint();
 					final int row = table.rowAtPoint(pt);
+					final int col = table.columnAtPoint(pt);
 					if (0 <= row) {
 						final int rowReal = table.convertRowIndexToModel(row);
+						final int colReal = table.convertColumnIndexToModel(col);
+						final Object object = model.getValueAt(rowReal, colReal);
 
-						// TODO:
+						final String value = object.toString();
+						listeners.forEach(l -> l.dbObjectDetailPanelDoubleClick(value));
 					}
 				}
 			}
@@ -200,8 +204,8 @@ public class DBObjectDetailPanel extends JPanel {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
-				final boolean hasFocus, final int row, final int column) {
+		public Component getTableCellRendererComponent(final JTable table, final Object value,
+				final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 			if (isSelected) {

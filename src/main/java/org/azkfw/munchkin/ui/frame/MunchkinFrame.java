@@ -51,7 +51,9 @@ import org.azkfw.munchkin.ui.dialog.DatasourcesDialogListener;
 import org.azkfw.munchkin.ui.dialog.ExportDialog;
 import org.azkfw.munchkin.ui.dialog.VersionDialog;
 import org.azkfw.munchkin.ui.panel.DBConditionPanelListener;
+import org.azkfw.munchkin.ui.panel.DBObjectDetailPanelListener;
 import org.azkfw.munchkin.ui.panel.DBObjectListPanelListener;
+import org.azkfw.munchkin.ui.panel.DataGridPanelListener;
 import org.azkfw.munchkin.ui.panel.SQLEditorPanelListener;
 import org.azkfw.munchkin.util.MunchkinUtil;
 import org.slf4j.Logger;
@@ -108,11 +110,28 @@ public class MunchkinFrame extends AbstractMunchkinFrame {
 			public void dbObjectListPanelChengedObject(final ObjectEntity object) {
 				getDetail(object);
 			}
+
+			@Override
+			public void dbObjectListPanelDoubleClick(final String value) {
+				pnlSqlEditor.insert(value);
+			}
+		});
+		pnlObjectDetail.addDBObjectDetailListener(new DBObjectDetailPanelListener() {
+			@Override
+			public void dbObjectDetailPanelDoubleClick(final String value) {
+				pnlSqlEditor.insert(value);
+			}
 		});
 		pnlSqlEditor.addSQLEditorPanelListener(new SQLEditorPanelListener() {
 			@Override
 			public void sqlEditorPanelExecSQL(final String sql) {
 				execute(sql);
+			}
+		});
+		pnlDataGrid.addDataGridPanelListener(new DataGridPanelListener() {
+			@Override
+			public void dataGridPanelDoubleClick(final Object value) {
+				pnlSqlEditor.insert(value.toString());
 			}
 		});
 
