@@ -17,29 +17,53 @@
  */
 package org.azkfw.munchkin.sql.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.azkfw.munchkin.sql.parser.token.Token;
 
 /**
- * このインターフェースは、SQL解析機能を定義したインターフェースです。
+ * このクラスは、SQL解析機能を実装するための基底クラスです。
  * 
  * @author Kawakicchi
  */
-public interface SQLParser {
+public abstract class AbstractSQLParser implements SQLParser {
+
+	/** トークン一覧 */
+	private final List<Token> tokens;
 
 	/**
-	 * トークン一覧を取得する。
-	 *
-	 * @return トークン一覧
+	 * コンストラクタ
 	 */
-	List<Token> getPlainTokens();
+	public AbstractSQLParser() {
+		tokens = new ArrayList<Token>();
+	}
+
+	@Override
+	public final List<Token> getPlainTokens() {
+		return new ArrayList<Token>(tokens);
+	}
+
+	@Override
+	public final void parse(final String sql) {
+		tokens.clear();
+
+		doParse(sql);
+	}
 
 	/**
-	 * SQLを解析する。
+	 * パース処理を行う。
 	 *
-	 * @param sql SQL文
+	 * @param sql SQL
 	 */
-	void parse(String sql);
+	protected abstract void doParse(final String sql);
 
+	/**
+	 * トークンを追加する。
+	 *
+	 * @param token トークン
+	 */
+	protected final void addToken(final Token token) {
+		tokens.add(token);
+	}
 }

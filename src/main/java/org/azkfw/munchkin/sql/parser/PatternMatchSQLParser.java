@@ -17,29 +17,42 @@
  */
 package org.azkfw.munchkin.sql.parser;
 
-import java.util.List;
-
-import org.azkfw.munchkin.sql.parser.token.Token;
+import java.util.regex.Pattern;
 
 /**
- * このインターフェースは、SQL解析機能を定義したインターフェースです。
- * 
+ *
  * @author Kawakicchi
  */
-public interface SQLParser {
+public class PatternMatchSQLParser extends BasicSQLParser {
 
-	/**
-	 * トークン一覧を取得する。
-	 *
-	 * @return トークン一覧
-	 */
-	List<Token> getPlainTokens();
+	private Pattern ptnKeyword;
+	private Pattern ptnParameter;
 
-	/**
-	 * SQLを解析する。
-	 *
-	 * @param sql SQL文
-	 */
-	void parse(String sql);
+	public void setKeywordPattern(final Pattern pattern) {
+		ptnKeyword = pattern;
+	}
 
+	public void setParameterPattern(final Pattern pattern) {
+		ptnParameter = pattern;
+	}
+
+	@Override
+	protected boolean isKeyword(final String word) {
+		if (null != ptnKeyword) {
+			if (ptnKeyword.matcher(word).matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	protected boolean isParameter(final String word) {
+		if (null != ptnParameter) {
+			if (ptnParameter.matcher(word).matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

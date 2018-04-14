@@ -17,11 +17,43 @@
  */
 package org.azkfw.munchkin.sql.parser;
 
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.azkfw.munchkin.util.MunchkinUtil;
+
 /**
  *
  * @author Kawakicchi
- *
  */
-public class ANSISQLParser {
+public class ANSISQLParser extends BasicSQLParser {
+
+	private static final Set<String> keywords;
+	static {
+		final InputStream stream = ANSISQLParser.class.getResourceAsStream("sql99.txt");
+		final List<String> lines = MunchkinUtil.readLines(stream, Charset.forName("UTF-8"));
+
+		keywords = new HashSet<String>();
+
+		lines.forEach(line -> {
+			final String s = line.trim().toUpperCase();
+			if (0 < s.length()) {
+				keywords.add(s);
+			}
+		});
+	}
+
+	@Override
+	protected final boolean isKeyword(final String word) {
+		return keywords.contains(word.toUpperCase());
+	}
+
+	@Override
+	protected boolean isParameter(final String word) {
+		return false;
+	}
 
 }

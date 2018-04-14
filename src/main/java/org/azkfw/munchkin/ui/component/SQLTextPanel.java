@@ -19,7 +19,6 @@ package org.azkfw.munchkin.ui.component;
 
 import java.awt.Color;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -34,7 +33,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoManager;
 
-import org.azkfw.munchkin.sql.parser.BasicSQLParser;
+import org.azkfw.munchkin.sql.parser.ANSISQLParser;
+import org.azkfw.munchkin.sql.parser.SQLParser;
 import org.azkfw.munchkin.sql.parser.token.Token;
 import org.azkfw.munchkin.sql.parser.token.TokenType;
 
@@ -50,7 +50,7 @@ public class SQLTextPanel extends JTextPane {
 	private final UndoManager undoManager;
 
 	private boolean parsing;
-	private BasicSQLParser parser;
+	private final SQLParser parser;
 
 	private final SimpleAttributeSet asDefault;
 	private final SimpleAttributeSet asComment;
@@ -64,7 +64,7 @@ public class SQLTextPanel extends JTextPane {
 		undoManager = new UndoManager();
 
 		parsing = false;
-		parser = new BasicSQLParser();
+		parser = new ANSISQLParser();
 
 		asDefault = new SimpleAttributeSet();
 		StyleConstants.setForeground(asDefault, Color.black);
@@ -115,14 +115,6 @@ public class SQLTextPanel extends JTextPane {
 	@Override
 	public void setText(final String text) {
 		super.setText(text);
-	}
-
-	public void setKeywordPattern(final Pattern pattern) {
-		parser.setKeywordPattern(pattern);
-	}
-
-	public void setParameterPattern(final Pattern pattern) {
-		parser.setParameterPattern(pattern);
 	}
 
 	public boolean undo() {

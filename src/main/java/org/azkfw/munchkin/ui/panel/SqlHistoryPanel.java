@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -107,8 +106,8 @@ public class SqlHistoryPanel extends JPanel {
 
 		text = new SQLTextPanel();
 		text.setEditable(false);
-		text.setKeywordPattern(Pattern.compile("^(select|as)$", Pattern.CASE_INSENSITIVE));
-		text.setParameterPattern(Pattern.compile("^:(.+)$", Pattern.CASE_INSENSITIVE));
+		//text.setKeywordPattern(Pattern.compile("^(select|as)$", Pattern.CASE_INSENSITIVE));
+		//text.setParameterPattern(Pattern.compile("^:(.+)$", Pattern.CASE_INSENSITIVE));
 
 		final Caret orgCaret = text.getCaret();
 		final Caret newCaret = new VisibleCaret(orgCaret.getBlinkRate());

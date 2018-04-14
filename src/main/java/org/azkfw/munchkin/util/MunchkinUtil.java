@@ -18,10 +18,16 @@
 package org.azkfw.munchkin.util;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -162,6 +168,28 @@ public class MunchkinUtil {
 			str = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
 		}
 		return str;
+	}
+
+	public static List<String> readLines(final InputStream stream, final Charset charset) {
+		final List<String> lines = new ArrayList<String>();
+		if (null != stream) {
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(stream, charset));
+				String line;
+				while (null != (line = reader.readLine())) {
+					lines.add(line);
+				}
+			} catch (IOException ex) {
+				// 
+			} finally {
+				try {
+					stream.close();
+				} catch (IOException ex) {
+
+				}
+			}
+		}
+		return lines;
 	}
 
 	public static void release(final Connection connection) {

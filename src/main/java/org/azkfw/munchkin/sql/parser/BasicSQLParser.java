@@ -17,47 +17,26 @@
  */
 package org.azkfw.munchkin.sql.parser;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.azkfw.munchkin.sql.parser.token.SimpleToken;
 import org.azkfw.munchkin.sql.parser.token.Token;
 import org.azkfw.munchkin.sql.parser.token.TokenType;
 import org.azkfw.munchkin.util.MunchkinUtil;
 
 /**
- *
+ * 
  * @author Kawakicchi
  */
-public class BasicSQLParser implements SQLParser {
-
-	private final List<Token> tokens;
-
-	private Pattern ptnKeyword;
-	private Pattern ptnParameter;
+public abstract class BasicSQLParser extends AbstractSQLParser {
 
 	public BasicSQLParser() {
-		tokens = new ArrayList<Token>();
 	}
 
-	public void setKeywordPattern(final Pattern pattern) {
-		ptnKeyword = pattern;
-	}
+	protected abstract boolean isKeyword(String word);
 
-	public void setParameterPattern(final Pattern pattern) {
-		ptnParameter = pattern;
-	}
+	protected abstract boolean isParameter(String word);
 
 	@Override
-	public List<Token> getPlainTokens() {
-		return new ArrayList<Token>(tokens);
-	}
-
-	@Override
-	public void parse(final String sql) {
-		tokens.clear();
-
+	protected final void doParse(final String sql) {
 		final char[] chars = sql.toCharArray();
 		final int length = chars.length;
 
@@ -235,13 +214,6 @@ public class BasicSQLParser implements SQLParser {
 		addToken(mode, s.toString(), start);
 	}
 
-	private void addToken(final int mode, final String word, final int position) {
-		if (0 < word.length()) {
-			final Token token = createToken(mode, word, position);
-			tokens.add(token);
-		}
-	}
-
 	protected Token createToken(final int mode, final String word, final int position) {
 		TokenType type = TokenType.Unknown;
 		if (MunchkinUtil.isEqualsAny(mode, 1, 2)) {
@@ -255,21 +227,24 @@ public class BasicSQLParser implements SQLParser {
 		}
 
 		if (TokenType.Unknown == type) {
-			if (null != ptnKeyword) {
-				if (ptnKeyword.matcher(word).matches()) {
-					type = TokenType.Keyword;
-				}
+			if (isKeyword(word)) {
+				type = TokenType.Keyword;
 			}
 		}
 		if (TokenType.Unknown == type) {
-			if (null != ptnParameter) {
-				if (ptnParameter.matcher(word).matches()) {
-					type = TokenType.Parameter;
-				}
+			if (isParameter(word)) {
+				type = TokenType.Parameter;
 			}
 		}
 
 		final Token token = new SimpleToken(type, word, position);
 		return token;
+	}
+
+	private void addToken(final int mode, final String word, final int position) {
+		if (MunchkinUtil.isNotEmpty(word)) {
+			final Token token = createToken(mode, word, position);
+			addToken(token);
+		}
 	}
 }
